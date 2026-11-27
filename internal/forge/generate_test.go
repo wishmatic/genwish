@@ -11,7 +11,6 @@ import (
 	"testing"
 
 	"github.com/wishmatic/genwish/internal/format"
-	"go.uber.org/zap"
 )
 
 type recordedRequest struct {
@@ -34,7 +33,7 @@ func newRecordingForge(t *testing.T) (*Client, *recordedRequest) {
 
 	t.Cleanup(server.Close)
 
-	return New(server.URL, zap.NewNop()), recorded
+	return New(server.URL, io.Discard), recorded
 }
 
 func initImagePNG(t *testing.T, width, height int) []byte {

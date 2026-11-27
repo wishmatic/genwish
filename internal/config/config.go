@@ -8,8 +8,6 @@ import (
 	"strings"
 
 	"github.com/BurntSushi/toml"
-	"github.com/caarlos0/env/v11"
-	"github.com/joho/godotenv"
 )
 
 const (
@@ -19,9 +17,6 @@ const (
 )
 
 type Config struct {
-	LogLevel    string `toml:"-"`
-	ErrorDetail string `toml:"-"`
-
 	Output OutputConfig
 	Neo    NeoConfig
 	Booru  BooruConfig
@@ -47,15 +42,8 @@ type RateLimitConfig struct {
 	Timeout int     `toml:"timeout"`
 }
 
-type envConfig struct {
-	LogLevel    string `env:"LOG_LEVEL" envDefault:"info"`
-	ErrorDetail string `env:"ERROR_DETAIL" envDefault:"useful"`
-}
-
 func Defaults() Config {
 	return Config{
-		LogLevel:    "info",
-		ErrorDetail: "useful",
 		Output: OutputConfig{
 			Format: "webp",
 			Path:   defaultOutputPath,
@@ -68,16 +56,7 @@ func Defaults() Config {
 }
 
 func Load(path string) (Config, error) {
-	_ = godotenv.Load()
-
-	var fromEnv envConfig
-	if err := env.Parse(&fromEnv); err != nil {
-		return Config{}, fmt.Errorf("parse environment: %w", err)
-	}
-
 	cfg := Defaults()
-	cfg.LogLevel = fromEnv.LogLevel
-	cfg.ErrorDetail = fromEnv.ErrorDetail
 
 	file := strings.TrimSpace(path)
 	explicit := file != ""
@@ -152,10 +131,6 @@ func (c *Config) normalize() error {
 	}
 
 	return nil
-}
-
-func (c Config) VerboseErrors() bool {
-	return c.ErrorDetail == "verbose"
 }
 
 func (c Config) Validate() error {

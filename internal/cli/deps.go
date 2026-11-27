@@ -17,7 +17,6 @@ import (
 	"github.com/wishmatic/genwish/internal/novelai"
 	"github.com/wishmatic/genwish/internal/provider"
 	"github.com/wishmatic/genwish/internal/resolve"
-	"go.uber.org/zap"
 )
 
 const userAgent = "genwish/0.1.0"
@@ -138,7 +137,7 @@ func ForgeClient(deps Deps, cfg config.Config) *forge.Client {
 		return deps.Forge
 	}
 
-	return forge.New(cfg.Neo.URL, zap.NewNop())
+	return forge.New(cfg.Neo.URL, deps.Err)
 }
 
 func CatalogService(deps Deps) (*catalog.Service, error) {
@@ -183,11 +182,10 @@ func danbooruCredentials(deps Deps) (credential.DanbooruCredentials, error) {
 
 func booruProvider(cfg config.Config, creds credential.DanbooruCredentials) (*booru.Client, error) {
 	transport, err := fetch.New(fetch.Config{
-		BaseURL:       booru.DefaultBaseURL,
-		UserAgent:     userAgent,
-		Timeout:       time.Duration(cfg.Booru.RateLimit.Timeout) * time.Second,
-		Limiter:       fetch.NewLimiter(cfg.Booru.RateLimit.RPS, cfg.Booru.RateLimit.Burst),
-		VerboseErrors: cfg.VerboseErrors(),
+		BaseURL:   booru.DefaultBaseURL,
+		UserAgent: userAgent,
+		Timeout:   time.Duration(cfg.Booru.RateLimit.Timeout) * time.Second,
+		Limiter:   fetch.NewLimiter(cfg.Booru.RateLimit.RPS, cfg.Booru.RateLimit.Burst),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("danbooru transport: %w", err)

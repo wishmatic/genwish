@@ -31,16 +31,10 @@ func setHome(t *testing.T) string {
 func TestLoad(t *testing.T) {
 	t.Run("applies the built-in defaults", func(t *testing.T) {
 		home := setHome(t)
-		t.Setenv("LOG_LEVEL", "")
-		t.Setenv("ERROR_DETAIL", "")
 
 		cfg, err := Load("")
 		if err != nil {
 			t.Fatalf("Load() error: %v", err)
-		}
-
-		if cfg.LogLevel != "info" || cfg.ErrorDetail != "useful" {
-			t.Errorf("Load() = %+v, want the environment defaults", cfg)
 		}
 
 		if cfg.Output.Format != "webp" || cfg.Output.Path != filepath.Join(home, ".genwish", "out") {
@@ -59,8 +53,6 @@ func TestLoad(t *testing.T) {
 
 	t.Run("reads a config file", func(t *testing.T) {
 		home := setHome(t)
-		t.Setenv("LOG_LEVEL", "debug")
-		t.Setenv("ERROR_DETAIL", "verbose")
 
 		path := writeConfig(t, `
 [output]
@@ -80,10 +72,6 @@ timeout = 30
 		cfg, err := Load(path)
 		if err != nil {
 			t.Fatalf("Load() error: %v", err)
-		}
-
-		if cfg.LogLevel != "debug" || cfg.ErrorDetail != "verbose" {
-			t.Errorf("Load() = %+v, want the environment values", cfg)
 		}
 
 		if cfg.Output.Format != "png" || cfg.Output.Path != filepath.Join(home, "art") {
@@ -149,13 +137,13 @@ formatt = "png"
 		}
 	})
 
-	t.Run("rejects an environment setting in the file", func(t *testing.T) {
+	t.Run("rejects a top-level key", func(t *testing.T) {
 		setHome(t)
 		path := writeConfig(t, "LogLevel = \"debug\"\n")
 
 		_, err := Load(path)
 		if err == nil || !strings.Contains(err.Error(), "unknown key") {
-			t.Errorf("Load() error = %v, want environment settings rejected from the file", err)
+			t.Errorf("Load() error = %v, want unknown top-level keys rejected", err)
 		}
 	})
 
@@ -173,6 +161,7 @@ formatt = "png"
 		home := setHome(t)
 
 		for _, key := range []string{
+			"LOG_LEVEL", "ERROR_DETAIL", "CREDENTIAL_BACKEND", "GENWISH_CREDENTIAL_BACKEND",
 			"OUTPUT_FORMAT", "SD_URL", "NEO_MODELS_FILE", "RATE_LIMIT_RPS",
 			"RATE_LIMIT_BURST", "REQUEST_TIMEOUT_SECONDS", "MAX_LIMIT", "MAX_OFFSET", "BLOCKED_TAGS",
 		} {
@@ -201,10 +190,6 @@ formatt = "png"
 func TestDefaults(t *testing.T) {
 	t.Run("matches the documented values", func(t *testing.T) {
 		cfg := Defaults()
-
-		if cfg.LogLevel != "info" || cfg.ErrorDetail != "useful" {
-			t.Errorf("Defaults() = %+v, want the environment defaults", cfg)
-		}
 
 		if cfg.Output != (OutputConfig{Format: "webp", Path: "~/.genwish/out"}) {
 			t.Errorf("Output = %+v, want webp under ~/.genwish/out", cfg.Output)
@@ -258,26 +243,6 @@ func TestValidate(t *testing.T) {
 
 			if err == nil || !strings.Contains(err.Error(), tt.wantErr) {
 				t.Errorf("Validate() error = %v, want it to name %s", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func TestVerboseErrors(t *testing.T) {
-	tests := []struct {
-		name   string
-		detail string
-		want   bool
-	}{
-		{name: "verbose", detail: "verbose", want: true},
-		{name: "useful", detail: "useful", want: false},
-		{name: "empty", detail: "", want: false},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := (Config{ErrorDetail: tt.detail}).VerboseErrors(); got != tt.want {
-				t.Errorf("VerboseErrors() = %v, want %v", got, tt.want)
 			}
 		})
 	}

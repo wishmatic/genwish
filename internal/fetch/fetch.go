@@ -27,11 +27,10 @@ type Limiter interface {
 }
 
 type Config struct {
-	BaseURL       string
-	UserAgent     string
-	Timeout       time.Duration
-	Limiter       Limiter
-	VerboseErrors bool
+	BaseURL   string
+	UserAgent string
+	Timeout   time.Duration
+	Limiter   Limiter
 }
 
 type Client struct {
@@ -39,7 +38,6 @@ type Client struct {
 	userAgent string
 	http      *http.Client
 	limiter   Limiter
-	verbose   bool
 }
 
 type HTTPError struct {
@@ -47,7 +45,6 @@ type HTTPError struct {
 	Method     string
 	Path       string
 	StatusCode int
-	Status     string
 	Body       string
 }
 
@@ -81,10 +78,6 @@ func (e *BodyError) Error() string {
 func (e *HTTPError) Error() string {
 	message := fmt.Sprintf("%s %s %s returned HTTP %d", e.Label, e.Method, e.Path, e.StatusCode)
 
-	if e.Status != "" {
-		message += fmt.Sprintf(" (%s)", e.Status)
-	}
-
 	if e.Body != "" {
 		message += ": " + e.Body
 	}
@@ -116,7 +109,6 @@ func New(cfg Config) (*Client, error) {
 		userAgent: cfg.UserAgent,
 		http:      &http.Client{Timeout: timeout},
 		limiter:   cfg.Limiter,
-		verbose:   cfg.VerboseErrors,
 	}, nil
 }
 
@@ -272,19 +264,13 @@ func (c *Client) do(ctx context.Context, path string, query url.Values, headers 
 }
 
 func (c *Client) httpError(label, path string, resp *http.Response, body string) *HTTPError {
-	e := &HTTPError{
+	return &HTTPError{
 		Label:      label,
 		Method:     http.MethodGet,
 		Path:       path,
 		StatusCode: resp.StatusCode,
 		Body:       body,
 	}
-
-	if c.verbose {
-		e.Status = resp.Status
-	}
-
-	return e
 }
 
 func retryable(status int) bool {

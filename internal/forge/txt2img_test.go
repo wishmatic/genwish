@@ -1,6 +1,7 @@
 package forge
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"io"
@@ -8,10 +9,6 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
-
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
-	"go.uber.org/zap/zaptest/observer"
 )
 
 func TestTxt2ImgOverrideSettings(t *testing.T) {
@@ -24,7 +21,7 @@ func TestTxt2ImgOverrideSettings(t *testing.T) {
 	}))
 	defer server.Close()
 
-	c := New(server.URL, zap.NewNop())
+	c := New(server.URL, io.Discard)
 
 	_, err := c.txt2img(context.Background(), txt2imgRequest{
 		Checkpoint:             "model",
@@ -74,7 +71,7 @@ func TestTxt2ImgNoOverrideSettings(t *testing.T) {
 	}))
 	defer server.Close()
 
-	c := New(server.URL, zap.NewNop())
+	c := New(server.URL, io.Discard)
 
 	_, err := c.txt2img(context.Background(), txt2imgRequest{Prompt: "test"})
 	if err != nil {
@@ -93,7 +90,7 @@ func TestTxt2ImgRejectsEmptyResponse(t *testing.T) {
 	}))
 	defer server.Close()
 
-	c := New(server.URL, zap.NewNop())
+	c := New(server.URL, io.Discard)
 
 	_, err := c.txt2img(context.Background(), txt2imgRequest{Prompt: "test"})
 	if err == nil || !strings.Contains(err.Error(), "no images") {
@@ -108,11 +105,9 @@ func TestTxt2ImgWarnsAboutExtraImages(t *testing.T) {
 	}))
 	defer server.Close()
 
-	core, logs := observer.New(zapcore.DebugLevel)
+	var warnings bytes.Buffer
 
-	images, err := New(
-		server.URL, zap.New(core),
-	).txt2img(context.Background(), txt2imgRequest{Prompt: "test"})
+	images, err := New(server.URL, &warnings).txt2img(context.Background(), txt2imgRequest{Prompt: "test"})
 	if err != nil {
 		t.Fatalf("txt2img() error: %v", err)
 	}
@@ -121,12 +116,7 @@ func TestTxt2ImgWarnsAboutExtraImages(t *testing.T) {
 		t.Errorf("images = %q, want only the first image", images)
 	}
 
-	entries := logs.FilterLevelExact(zapcore.WarnLevel).All()
-	if len(entries) != 1 {
-		t.Fatalf("warnings = %d, want one warning about the extra image", len(entries))
-	}
-
-	if fields := entries[0].ContextMap(); fields["images"] != int64(2) || fields["endpoint"] != "txt2img" {
-		t.Errorf("warning fields = %v, want two images at the txt2img endpoint", fields)
+	if want := "warning: txt2img returned 2 images"; !strings.Contains(warnings.String(), want) {
+		t.Errorf("warnings = %q, want %q", warnings.String(), want)
 	}
 }

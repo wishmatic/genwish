@@ -8,24 +8,28 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 
 	"github.com/wishmatic/genwish/internal/utils"
-	"go.uber.org/zap"
 )
 
 type Client struct {
 	baseURL string
 	http    *http.Client
-	log     *zap.Logger
+	warn    io.Writer
 }
 
-func New(baseURL string, log *zap.Logger) *Client {
+func New(baseURL string, warn io.Writer) *Client {
+	if warn == nil {
+		warn = io.Discard
+	}
+
 	return &Client{
 		baseURL: strings.TrimRight(baseURL, "/"),
 		http:    &http.Client{},
-		log:     log,
+		warn:    warn,
 	}
 }
 

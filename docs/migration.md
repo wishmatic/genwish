@@ -25,12 +25,6 @@ Removed commands and flags:
 
 ## Configuration mapping
 
-Environment variables that remain:
-
-- `LOG_LEVEL`
-- `ERROR_DETAIL`
-- `CREDENTIAL_BACKEND` (renamed from `GENWISH_CREDENTIAL_BACKEND`)
-
 Moved to `~/.genwish/config.toml`, or the file named by `--config-file`:
 
 | Old environment variable  | Config key                 |
@@ -44,6 +38,9 @@ Moved to `~/.genwish/config.toml`, or the file named by `--config-file`:
 
 Removed:
 
+- `LOG_LEVEL`: there is no logging; results go to stdout and warnings to stderr.
+- `ERROR_DETAIL`: errors always include the useful upstream detail.
+- `CREDENTIAL_BACKEND` (and `GENWISH_CREDENTIAL_BACKEND`): credentials always try the OS keyring first.
 - `MAX_LIMIT`: the tag page limit is fixed at 100.
 - `MAX_OFFSET`: the largest offset is fixed at 1000.
 - `BLOCKED_TAGS`: there is no tag denylist.
@@ -78,7 +75,7 @@ New locations:
 | novel    | `genwish`       | `novelai-api-key` | `os.UserConfigDir()/genwish/novelai_api_key` |
 | danbooru | `genwish`       | `danbooru`        | `os.UserConfigDir()/genwish/danbooru`        |
 
-Backend variable: `CREDENTIAL_BACKEND`.
+Backend: always auto. The OS keyring is tried first, then a user-only file. `genwish login` warns before prompting when the keyring is unavailable.
 
 The Danbooru entry stores the login and API key together. `genwish login danbooru` prompts for the login first, then the API key. Danbooru still works anonymously without a stored credential.
 

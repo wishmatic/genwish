@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/wishmatic/genwish/internal/format"
-	"go.uber.org/zap"
 )
 
 type img2imgRequest struct {
@@ -71,10 +70,7 @@ func (c *Client) img2img(ctx context.Context, req img2imgRequest) ([][]byte, err
 	if len(out.Images) == 0 {
 		return nil, fmt.Errorf("img2img: response contained no images")
 	} else if len(out.Images) > 1 {
-		c.log.Warn("img2img call returned more than one image, using the first",
-			zap.String("endpoint", "img2img"),
-			zap.Int("images", len(out.Images)),
-		)
+		fmt.Fprintf(c.warn, "warning: img2img returned %d images, using the first\n", len(out.Images))
 	}
 
 	image, err := format.DecodeRawBase64(out.Images[0])

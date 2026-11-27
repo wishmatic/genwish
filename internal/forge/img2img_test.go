@@ -7,8 +7,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"go.uber.org/zap"
 )
 
 func TestImg2ImgPayload(t *testing.T) {
@@ -25,7 +23,7 @@ func TestImg2ImgPayload(t *testing.T) {
 	}))
 	defer server.Close()
 
-	c := New(server.URL, zap.NewNop())
+	c := New(server.URL, io.Discard)
 
 	_, err := c.img2img(context.Background(), img2imgRequest{
 		Checkpoint:        "model",

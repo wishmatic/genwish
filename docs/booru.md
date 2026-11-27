@@ -53,4 +53,4 @@ The command prompts for the Danbooru login first, then the API key. `genwish log
 
 ## Configuration
 
-See [configuration.md](configuration.md). The relevant settings are `ERROR_DETAIL` and the `booru.rate_limit` table (`rps`, `burst`, `timeout`). The tag page size is fixed at 100 and the largest offset at 1000. The user agent is hardcoded.
+See [configuration.md](configuration.md). The rate limit is configured with the `booru.rate_limit` table (`rps`, `burst`, `timeout`). Errors always include a short upstream body excerpt. The tag page size is fixed at 100 and the largest offset at 1000. The user agent is hardcoded.

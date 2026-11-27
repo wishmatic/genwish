@@ -159,7 +159,7 @@ func TestRetriesExhausted(t *testing.T) {
 	}
 }
 
-func TestVerboseErrorIncludesStatusAndBody(t *testing.T) {
+func TestErrorIncludesBody(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnprocessableEntity)
 		_, _ = w.Write([]byte(`{"message":"You cannot search for more than 2 tags at a time."}`))
@@ -167,11 +167,10 @@ func TestVerboseErrorIncludesStatusAndBody(t *testing.T) {
 	t.Cleanup(server.Close)
 
 	client, err := New(Config{
-		BaseURL:       server.URL,
-		UserAgent:     "genwish-test",
-		Timeout:       5 * time.Second,
-		Limiter:       &countingLimiter{},
-		VerboseErrors: true,
+		BaseURL:   server.URL,
+		UserAgent: "genwish-test",
+		Timeout:   5 * time.Second,
+		Limiter:   &countingLimiter{},
 	})
 	if err != nil {
 		t.Fatalf("New() error: %v", err)
@@ -182,7 +181,7 @@ func TestVerboseErrorIncludesStatusAndBody(t *testing.T) {
 		t.Fatal("GetJSON() error = nil, want an error")
 	}
 
-	for _, want := range []string{"422", "422 Unprocessable Entity", "more than 2 tags"} {
+	for _, want := range []string{"422", "more than 2 tags"} {
 		if !strings.Contains(err.Error(), want) {
 			t.Errorf("error %q does not contain %q", err.Error(), want)
 		}

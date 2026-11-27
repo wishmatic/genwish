@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/zalando/go-keyring"
+
 	"github.com/wishmatic/genwish/internal/provider"
 )
 
@@ -21,37 +23,45 @@ type Store interface {
 	Delete() error
 }
 
-const envBackend = "CREDENTIAL_BACKEND"
-
-const (
-	BackendAuto    = "auto"
-	BackendKeyring = "keyring"
-	BackendFile    = "file"
-)
-
 func Open(p provider.Name) (Store, error) {
 	if _, err := keyringUser(p); err != nil {
 		return nil, err
 	}
 
-	backend := strings.ToLower(strings.TrimSpace(os.Getenv(envBackend)))
-
-	switch backend {
-	case "", BackendAuto:
-		file, err := NewFileStore(p)
-		if err != nil {
-			return nil, err
-		}
-
-		return newAutoStore(KeyringStore{provider: p}, file), nil
-	case BackendKeyring:
-		return KeyringStore{provider: p}, nil
-	case BackendFile:
-		return NewFileStore(p)
-	default:
-		return nil, fmt.Errorf("%s must be %s, %s, or %s, got %q",
-			envBackend, BackendAuto, BackendKeyring, BackendFile, backend)
+	file, err := NewFileStore(p)
+	if err != nil {
+		return nil, err
 	}
+
+	return newAutoStore(KeyringStore{provider: p}, file), nil
+}
+
+func StorageWarning(p provider.Name) string {
+	user, err := keyringUser(p)
+	if err != nil {
+		return ""
+	}
+
+	_, keyringErr := keyring.Get(keyringService, user)
+
+	path, err := configFilePath(p)
+	if err != nil {
+		path = ""
+	}
+
+	return storageWarning(keyringErr, path)
+}
+
+func storageWarning(keyringErr error, path string) string {
+	if keyringErr == nil || errors.Is(keyringErr, keyring.ErrNotFound) {
+		return ""
+	}
+
+	if path == "" {
+		return "warning: the OS keyring is unavailable; the credential will be stored in a user-only file"
+	}
+
+	return fmt.Sprintf("warning: the OS keyring is unavailable; the credential will be stored in %s", path)
 }
 
 type FileStore struct {
@@ -59,17 +69,12 @@ type FileStore struct {
 }
 
 func NewFileStore(p provider.Name) (*FileStore, error) {
-	file, err := credentialFile(p)
+	path, err := configFilePath(p)
 	if err != nil {
 		return nil, err
 	}
 
-	dir, err := os.UserConfigDir()
-	if err != nil {
-		return nil, fmt.Errorf("find config directory: %w", err)
-	}
-
-	return NewFileStoreAt(filepath.Join(dir, "genwish", file)), nil
+	return NewFileStoreAt(path), nil
 }
 
 func NewFileStoreAt(path string) *FileStore {
@@ -149,6 +154,20 @@ func (s *FileStore) Delete() error {
 	}
 
 	return nil
+}
+
+func configFilePath(p provider.Name) (string, error) {
+	file, err := credentialFile(p)
+	if err != nil {
+		return "", err
+	}
+
+	dir, err := os.UserConfigDir()
+	if err != nil {
+		return "", fmt.Errorf("find config directory: %w", err)
+	}
+
+	return filepath.Join(dir, "genwish", file), nil
 }
 
 func credentialFile(p provider.Name) (string, error) {

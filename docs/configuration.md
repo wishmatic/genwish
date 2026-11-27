@@ -1,6 +1,6 @@
 # Configuration
 
-`genwish` reads a TOML config file and three environment variables. Credentials are not configuration; use `genwish login`.
+`genwish` reads a TOML config file. Credentials are not configuration; use `genwish login`.
 
 ## Config file
 
@@ -54,13 +54,7 @@ Every image and video is written under the configured base directory:
 
 ## Environment
 
-| Variable             | Default  | Purpose                                                         |
-| -------------------- | -------- | --------------------------------------------------------------- |
-| `LOG_LEVEL`          | `info`   | Reserved for internal logging.                                  |
-| `ERROR_DETAIL`       | `useful` | Set to `verbose` to include upstream response bodies in errors. |
-| `CREDENTIAL_BACKEND` | `auto`   | `auto`, `keyring`, or `file`.                                   |
-
-No other environment variable is read. A `.env` file in the working directory is loaded when present.
+`genwish` reads no environment variables and does not load a `.env` file.
 
 ## Credentials
 
@@ -75,7 +69,7 @@ genwish login danbooru
 - `genwish logout <provider>` deletes the stored credential.
 - Danbooru also works anonymously when no credential is stored.
 
-`auto` prefers the OS keyring and falls back to a user-only file.
+Credentials use the OS keyring, falling back to a user-only file when the keyring is unavailable. `genwish login` warns before prompting when that fallback will be used.
 
 - Keyring service: `genwish`.
 - Keyring users: `nanogpt-api-key`, `novelai-api-key`, `danbooru`.

@@ -41,6 +41,8 @@ func newLoginCommand(deps cli.Deps) *cobra.Command {
 }
 
 func login(deps cli.Deps, name provider.Name) error {
+	warnAboutStorage(deps, name)
+
 	key, err := readAPIKey(deps, name)
 	if err != nil {
 		return err
@@ -61,6 +63,8 @@ func login(deps cli.Deps, name provider.Name) error {
 }
 
 func loginDanbooru(deps cli.Deps) error {
+	warnAboutStorage(deps, provider.Danbooru)
+
 	creds, err := readDanbooruCredentials(deps)
 	if err != nil {
 		return err
@@ -78,6 +82,16 @@ func loginDanbooru(deps cli.Deps) error {
 	fmt.Fprintln(deps.Out, "logged in")
 
 	return nil
+}
+
+func warnAboutStorage(deps cli.Deps, name provider.Name) {
+	if deps.Credentials != nil {
+		return
+	}
+
+	if warning := credential.StorageWarning(name); warning != "" {
+		fmt.Fprintln(deps.Err, warning)
+	}
 }
 
 func readAPIKey(deps cli.Deps, name provider.Name) (string, error) {

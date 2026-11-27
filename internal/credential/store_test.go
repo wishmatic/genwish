@@ -6,6 +6,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/zalando/go-keyring"
+
 	"github.com/wishmatic/genwish/internal/provider"
 )
 
@@ -16,27 +18,57 @@ func TestOpen(t *testing.T) {
 		}
 	})
 
-	t.Run("rejects an unknown backend", func(t *testing.T) {
-		t.Setenv(envBackend, "bogus")
-
-		_, err := Open(provider.Nano)
-		if err == nil || !strings.Contains(err.Error(), envBackend) {
-			t.Errorf("Open(nano) error = %v, want it to name %s", err, envBackend)
-		}
-	})
-
-	t.Run("selects the file backend", func(t *testing.T) {
-		t.Setenv(envBackend, BackendFile)
-
+	t.Run("returns the auto store", func(t *testing.T) {
 		store, err := Open(provider.Nano)
 		if err != nil {
 			t.Fatalf("Open(nano) error: %v", err)
 		}
 
-		if _, ok := store.(*FileStore); !ok {
-			t.Errorf("Open(nano) = %T, want *FileStore", store)
+		if _, ok := store.(*autoStore); !ok {
+			t.Errorf("Open(nano) = %T, want *autoStore", store)
 		}
 	})
+}
+
+func TestStorageWarning(t *testing.T) {
+	tests := []struct {
+		name       string
+		keyringErr error
+		path       string
+		want       string
+	}{
+		{name: "silent on a healthy keyring", keyringErr: nil, path: "/tmp/key", want: ""},
+		{name: "silent when no key is stored", keyringErr: keyring.ErrNotFound, path: "/tmp/key", want: ""},
+		{
+			name:       "names the fallback path",
+			keyringErr: errors.New("dbus unavailable"),
+			path:       "/tmp/key",
+			want:       "/tmp/key",
+		},
+		{
+			name:       "falls back to a generic message",
+			keyringErr: errors.New("dbus unavailable"),
+			want:       "user-only file",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := storageWarning(tt.keyringErr, tt.path)
+
+			if tt.want == "" {
+				if got != "" {
+					t.Errorf("storageWarning() = %q, want silence", got)
+				}
+
+				return
+			}
+
+			if !strings.Contains(got, tt.want) {
+				t.Errorf("storageWarning() = %q, want it to contain %q", got, tt.want)
+			}
+		})
+	}
 }
 
 func TestFileStore(t *testing.T) {
