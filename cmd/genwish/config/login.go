@@ -24,8 +24,12 @@ func NewLoginCommand(deps cli.Deps) *cobra.Command {
 		Long: "Reads credentials from STDIN and stores them in the OS keyring, with a " +
 			"user-only file fallback when no keyring is available. Danbooru reads a login " +
 			"line followed by an API key line.",
-		Args: cobra.ExactArgs(1),
-		RunE: func(_ *cobra.Command, args []string) error {
+		Args: cobra.MaximumNArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 0 {
+				return cmd.Help()
+			}
+
 			name, err := provider.ParseCredential(args[0])
 			if err != nil {
 				return err
