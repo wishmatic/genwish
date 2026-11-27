@@ -55,10 +55,7 @@ func editCropRun(
 		return fmt.Errorf("edit: %w", err)
 	}
 
-	resolver, err := cli.ImageResolver(deps)
-	if err != nil {
-		return err
-	}
+	resolver := cli.ImageResolver(deps)
 
 	source, err := cli.ReadImage(cmd.Context(), resolver, image)
 	if err != nil {

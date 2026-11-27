@@ -14,6 +14,8 @@
 
 Implemented natively. Automated verification passes: `go build ./...`, `go vet ./...`, `go test ./... -race -count=1`, and `gofmt -l .` is clean. The human smoke tests in Unit 10 remain outstanding. The plan stays in `docs/plans` until they pass.
 
+The image URL map was removed after implementation: `internal/sourcemap` and `IMAGE_URL_MAP` no longer exist, and `internal/resolve` fetches URLs unchanged. References to it below record the original build.
+
 ## Requirements
 
 - Deprecate `booru-mcp`, `nano-mcp`, `neo-mcp`, and `novel-mcp` in favor of two projects: `genwish` (generation) and `lukwish` (the rest of NanoGPT). This plan covers only `genwish`.

@@ -3,21 +3,9 @@ package cli
 import (
 	"context"
 	"encoding/base64"
-	"fmt"
-	"os"
 
 	"github.com/wishmatic/genwish/internal/resolve"
-	"github.com/wishmatic/genwish/internal/sourcemap"
 )
-
-func ResolverFromEnv() (*resolve.Client, error) {
-	sources, err := sourcemap.Parse(os.Getenv("IMAGE_URL_MAP"))
-	if err != nil {
-		return nil, fmt.Errorf("IMAGE_URL_MAP: %w", err)
-	}
-
-	return resolve.New(sources), nil
-}
 
 func DataURL(image resolve.Image) string {
 	return "data:" + image.MediaType + ";base64," + base64.StdEncoding.EncodeToString(image.Data)

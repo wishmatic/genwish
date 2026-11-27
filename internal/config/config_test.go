@@ -8,7 +8,6 @@ import (
 func TestLoad(t *testing.T) {
 	t.Run("applies the defaults", func(t *testing.T) {
 		t.Setenv("LOG_LEVEL", "")
-		t.Setenv("IMAGE_URL_MAP", "")
 		t.Setenv("OUTPUT_FORMAT", "")
 		t.Setenv("SD_URL", "")
 		t.Setenv("ERROR_DETAIL", "")
@@ -43,7 +42,6 @@ func TestLoad(t *testing.T) {
 	})
 
 	t.Run("reads the environment", func(t *testing.T) {
-		t.Setenv("IMAGE_URL_MAP", "https://a=https://b")
 		t.Setenv("OUTPUT_FORMAT", "png")
 		t.Setenv("SD_URL", "http://forge:7860")
 		t.Setenv("ERROR_DETAIL", "verbose")

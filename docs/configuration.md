@@ -31,7 +31,6 @@ The Danbooru entry stores the login and API key together.
 
 | Variable          | Default                 | Purpose                                                                                                                                   |
 | ----------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `IMAGE_URL_MAP`   | empty                   | Comma-separated `public=private` address rewrites for input images. A mapped directory is readable by anyone who can call the tool.       |
 | `OUTPUT_FORMAT`   | `webp`                  | Default image format for Forge Neo and NovelAI: `png`, `jpeg`, `jxl`, or `webp`.                                                          |
 | `SD_URL`          | `http://127.0.0.1:7860` | Forge Neo API base URL.                                                                                                                   |
 | `NEO_MODELS_FILE` | empty                   | Newline-delimited checkpoint names for `models list neo`. Unset means an empty list. Blank lines and lines starting with `#` are ignored. |

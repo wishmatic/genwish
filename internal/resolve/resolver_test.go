@@ -12,11 +12,11 @@ import (
 func newResolver(t *testing.T) *Client {
 	t.Helper()
 
-	return New(nil)
+	return New()
 }
 
 func TestFetchFollowsRedirectToPlainURL(t *testing.T) {
-	r := New(nil)
+	r := New()
 
 	origin := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		_, _ = w.Write([]byte("from-http"))
@@ -63,7 +63,7 @@ func TestFetchSetsUserAgent(t *testing.T) {
 	}))
 	defer redirector.Close()
 
-	if _, err := New(nil).Fetch(context.Background(), redirector.URL+"/start"); err != nil {
+	if _, err := New().Fetch(context.Background(), redirector.URL+"/start"); err != nil {
 		t.Fatalf("Fetch() error: %v", err)
 	}
 
@@ -87,7 +87,7 @@ func TestFetchRejectsARedirectWithoutALocation(t *testing.T) {
 	}))
 	defer server.Close()
 
-	_, err := New(nil).Fetch(context.Background(), server.URL+"/nowhere.png")
+	_, err := New().Fetch(context.Background(), server.URL+"/nowhere.png")
 	if err == nil || !strings.Contains(err.Error(), "Location") {
 		t.Errorf("Fetch() error = %v, want it to name the missing Location", err)
 	}
@@ -101,7 +101,7 @@ func TestFetchGivesUpOnARedirectLoop(t *testing.T) {
 	}))
 	defer server.Close()
 
-	_, err := New(nil).Fetch(context.Background(), server.URL+"/loop.png")
+	_, err := New().Fetch(context.Background(), server.URL+"/loop.png")
 	if err == nil || !strings.Contains(err.Error(), "too many redirects") {
 		t.Errorf("Fetch() error = %v, want the hop limit named", err)
 	}
@@ -113,13 +113,13 @@ func TestFetchNonOK(t *testing.T) {
 	}))
 	defer server.Close()
 
-	if _, err := New(nil).Fetch(context.Background(), server.URL+"/missing.png"); err == nil {
+	if _, err := New().Fetch(context.Background(), server.URL+"/missing.png"); err == nil {
 		t.Fatal("Fetch() expected error, got nil")
 	}
 }
 
 func TestFetchRejectsAMalformedURL(t *testing.T) {
-	if _, err := New(nil).Fetch(context.Background(), "://nope"); err == nil {
+	if _, err := New().Fetch(context.Background(), "://nope"); err == nil {
 		t.Fatal("Fetch() expected error, got nil")
 	}
 }

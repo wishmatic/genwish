@@ -109,10 +109,7 @@ func forgeRun(ctx context.Context, deps cli.Deps, flags forgeFlags, args []strin
 		return fmt.Errorf("forge: %w", err)
 	}
 
-	resolver, err := cli.ImageResolver(deps)
-	if err != nil {
-		return err
-	}
+	resolver := cli.ImageResolver(deps)
 
 	initImage, err := readInitImage(ctx, resolver, flags.initImage, flags.initImageURL)
 	if err != nil {

@@ -15,7 +15,6 @@ const maxTagLimit = 100
 type Config struct {
 	LogLevel string `env:"LOG_LEVEL" envDefault:"info"`
 
-	ImageURLMap   string `env:"IMAGE_URL_MAP"`
 	DefaultOutput string `env:"OUTPUT_FORMAT" envDefault:"webp"`
 	SDURL         string `env:"SD_URL" envDefault:"http://127.0.0.1:7860"`
 

@@ -34,7 +34,7 @@ Flags:
 | `--guidance-scale`      | unset            | How closely the model follows the prompt.         |
 | `--num-inference-steps` | unset            | Denoising steps.                                  |
 
-Input images accept an http(s) URL, a data URI, or raw base64, with `IMAGE_URL_MAP` applied first.
+Input images accept an http(s) URL, a data URI, or raw base64.
 
 Generated images are written locally with the media type NanoGPT returned, using the `nano-image-` prefix. The command prints each path and `Cost: $...`.
 

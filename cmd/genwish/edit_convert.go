@@ -38,10 +38,7 @@ func convertRun(cmd *cobra.Command, deps cli.Deps, flags convertFlags, image str
 		return fmt.Errorf("convert: %w", err)
 	}
 
-	resolver, err := cli.ImageResolver(deps)
-	if err != nil {
-		return err
-	}
+	resolver := cli.ImageResolver(deps)
 
 	source, err := cli.ReadImage(cmd.Context(), resolver, image)
 	if err != nil {

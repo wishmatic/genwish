@@ -27,7 +27,6 @@ Removed commands and flags:
 
 Unchanged:
 
-- `IMAGE_URL_MAP`
 - `OUTPUT_FORMAT`
 - `SD_URL`
 - `ERROR_DETAIL`
@@ -50,6 +49,10 @@ Removed, because credentials are login-only:
 - `NOVELAI_API_KEY`
 - `DANBOORU_LOGIN`
 - `DANBOORU_API_KEY`
+
+Removed, because input addresses are no longer rewritten:
+
+- `IMAGE_URL_MAP`
 
 Removed, because the user agent is hardcoded:
 

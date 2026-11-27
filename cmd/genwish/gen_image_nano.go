@@ -29,10 +29,7 @@ func newGenImageNanoCommand(deps cli.Deps) *cobra.Command {
 				return err
 			}
 
-			resolver, err := cli.ImageResolver(deps)
-			if err != nil {
-				return err
-			}
+			resolver := cli.ImageResolver(deps)
 
 			imageDataURL, err := cli.ResolveDataURL(cmd.Context(), resolver, image)
 			if err != nil {

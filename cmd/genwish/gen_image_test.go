@@ -14,8 +14,6 @@ import (
 )
 
 func TestGenerateImageWritesInlineImages(t *testing.T) {
-	t.Setenv("IMAGE_URL_MAP", "")
-
 	encoded := base64.StdEncoding.EncodeToString(testPNG)
 	body := fmt.Sprintf(`{"data":[{"b64_json":%q},{"b64_json":%q}],"cost":0.02}`, encoded, encoded)
 
@@ -87,8 +85,6 @@ func TestGenerateImageWritesInlineImages(t *testing.T) {
 }
 
 func TestGenerateImageResolvesInputAddresses(t *testing.T) {
-	t.Setenv("IMAGE_URL_MAP", "")
-
 	input := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		_, _ = w.Write(testPNG)
 	}))
@@ -127,8 +123,6 @@ func TestGenerateImageResolvesInputAddresses(t *testing.T) {
 }
 
 func TestGenerateImageDownloadsAURLResult(t *testing.T) {
-	t.Setenv("IMAGE_URL_MAP", "")
-
 	var serverURL string
 	server, requests := captureServerFunc(t, func(r *http.Request) (int, string) {
 		switch r.URL.Path {
@@ -170,8 +164,6 @@ func TestGenerateImageDownloadsAURLResult(t *testing.T) {
 }
 
 func TestGenerateImageLeavesNoFileWhenADownloadFails(t *testing.T) {
-	t.Setenv("IMAGE_URL_MAP", "")
-
 	var serverURL string
 	server, _ := captureServerFunc(t, func(r *http.Request) (int, string) {
 		switch r.URL.Path {

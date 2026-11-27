@@ -12,8 +12,6 @@ import (
 )
 
 func TestGenerateVideoWritesTheDownloadedFile(t *testing.T) {
-	t.Setenv("IMAGE_URL_MAP", "")
-
 	var serverURL string
 	server, requests := captureServerFunc(t, func(r *http.Request) (int, string) {
 		switch r.URL.Path {
@@ -107,8 +105,6 @@ func TestGenerateVideoWritesTheDownloadedFile(t *testing.T) {
 }
 
 func TestGenerateVideoLeavesNoFileWhenTheDownloadFails(t *testing.T) {
-	t.Setenv("IMAGE_URL_MAP", "")
-
 	var serverURL string
 	server, _ := captureServerFunc(t, func(r *http.Request) (int, string) {
 		switch r.URL.Path {

@@ -1,6 +1,6 @@
-// Package resolve turns an address an agent names into the bytes of an image. A provider that
-// takes an image cannot read a file this deployment holds, or a host only this deployment can
-// reach, so the bytes travel with the request instead of an address.
+// Package resolve turns an address into the bytes of an image. A provider that takes an image
+// cannot read a file this deployment holds, so the bytes travel with the request instead of an
+// address.
 package resolve
 
 import (
@@ -11,7 +11,6 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/wishmatic/genwish/internal/sourcemap"
 	"github.com/wishmatic/genwish/internal/utils"
 )
 
@@ -25,18 +24,15 @@ const (
 )
 
 type Client struct {
-	sources *sourcemap.Map
-	http    *http.Client
+	http *http.Client
 
 	// maxBytes is MaxImageBytes, and is a field so a test can drive the limit without
 	// building a sixteen megabyte image.
 	maxBytes int64
 }
 
-// New takes the address map, which may be nil when nothing needs translating.
-func New(sources *sourcemap.Map) *Client {
+func New() *Client {
 	return &Client{
-		sources:  sources,
 		maxBytes: MaxImageBytes,
 		http: &http.Client{
 			Timeout: fetchTimeout,
@@ -47,8 +43,8 @@ func New(sources *sourcemap.Map) *Client {
 	}
 }
 
-// Fetch returns the bytes for rawURL, following redirects itself rather than through the HTTP
-// client, so a mapped host is rewritten on every hop instead of only the first.
+// Fetch returns the bytes for rawURL. Redirects are followed here rather than by the HTTP client
+// so every hop is bounded and sends the same user agent.
 func (c *Client) Fetch(ctx context.Context, rawURL string) ([]byte, error) {
 	u, err := url.Parse(rawURL)
 	if err != nil {
@@ -56,20 +52,6 @@ func (c *Client) Fetch(ctx context.Context, rawURL string) ([]byte, error) {
 	}
 
 	for hop := 0; ; hop++ {
-		if source, rest, ok := c.sources.Lookup(u); ok {
-			switch source.Kind() {
-			case sourcemap.Directory:
-				return source.Read(rest)
-			case sourcemap.BaseURL:
-				rewritten, err := source.Target(u, rest)
-				if err != nil {
-					return nil, err
-				}
-
-				u = rewritten
-			}
-		}
-
 		resp, err := c.get(ctx, u)
 		if err != nil {
 			return nil, err

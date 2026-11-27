@@ -17,7 +17,6 @@ import (
 	"github.com/wishmatic/genwish/internal/novelai"
 	"github.com/wishmatic/genwish/internal/provider"
 	"github.com/wishmatic/genwish/internal/resolve"
-	"github.com/wishmatic/genwish/internal/sourcemap"
 	"go.uber.org/zap"
 )
 
@@ -192,20 +191,10 @@ func booruProvider(cfg config.Config, creds credential.DanbooruCredentials) (*bo
 	}), nil
 }
 
-func ImageResolver(deps Deps) (*resolve.Client, error) {
+func ImageResolver(deps Deps) *resolve.Client {
 	if deps.Resolver != nil {
-		return deps.Resolver, nil
+		return deps.Resolver
 	}
 
-	cfg, err := ResolveConfig(deps)
-	if err != nil {
-		return nil, err
-	}
-
-	sources, err := sourcemap.Parse(cfg.ImageURLMap)
-	if err != nil {
-		return nil, fmt.Errorf("IMAGE_URL_MAP: %w", err)
-	}
-
-	return resolve.New(sources), nil
+	return resolve.New()
 }

@@ -141,10 +141,7 @@ func readNovelInitImage(cmd *cobra.Command, deps cli.Deps, path, address string)
 
 		return data, nil
 	case address != "":
-		resolver, err := cli.ImageResolver(deps)
-		if err != nil {
-			return nil, err
-		}
+		resolver := cli.ImageResolver(deps)
 
 		image, err := resolver.Resolve(cmd.Context(), address)
 		if err != nil {

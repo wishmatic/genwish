@@ -46,10 +46,7 @@ func newGenVideoNanoCommand(deps cli.Deps) *cobra.Command {
 			}
 
 			if image != "" {
-				resolver, err := cli.ImageResolver(deps)
-				if err != nil {
-					return err
-				}
+				resolver := cli.ImageResolver(deps)
 
 				imageDataURL, err := cli.ResolveDataURL(cmd.Context(), resolver, image)
 				if err != nil {
