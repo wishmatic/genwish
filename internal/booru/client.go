@@ -14,8 +14,9 @@ import (
 const (
 	DefaultBaseURL = "https://danbooru.donmai.us"
 
-	// tagPageCeiling is the largest page requested from the tag listing. Keeping it modest bounds how many pages one
-	// window spans and keeps the page index small, which matters because Danbooru caps how deep page may go.
+	// tagPageCeiling is the largest page requested from the tag listing. Keeping it modest bounds how
+	// many pages one window spans and keeps the page index small, which matters because Danbooru caps
+	// how deep page may go.
 	tagPageCeiling = 100
 
 	tagFields = "name,category,post_count"
@@ -66,21 +67,26 @@ func (c *Client) Name() string {
 	return c.name
 }
 
-// SearchTags returns exactly the window [query.Offset, query.Offset+query.Limit) of the count-ordered tag matches, or
-// a shorter final window, plus whether at least one match exists past it. The listing is page-based, so the window is
-// read from the one or two pages that contain it.
+// SearchTags returns exactly the window [query.Offset, query.Offset+query.Limit) of the
+// count-ordered tag matches, or a shorter final window, plus whether at least one match exists past
+// it. The listing is page-based, so the window is read from the one or two pages that contain it.
 //
-// Matches below query.MinCount are withheld rather than returned. Danbooru's tag table is user-editable and carries
-// concatenated and punctuation-mangled zero-post rows that no caller wants, but those rows are real canonical tags, so
-// the page reports how many were withheld instead of pretending they do not exist. Because the listing is
-// count-ordered they are always the tail, so paging stops as soon as one is seen.
+// Matches below query.MinCount are withheld rather than returned. Danbooru's tag table is
+// user-editable and carries concatenated and punctuation-mangled zero-post rows that no caller
+// wants, but those rows are real canonical tags, so the page reports how many were withheld instead
+// of pretending they do not exist. Because the listing is count-ordered they are always the tail,
+// so paging stops as soon as one is seen.
 func (c *Client) SearchTags(ctx context.Context, query TagQuery) (TagPage, error) {
 	if strings.TrimSpace(query.Search) == "" {
 		return TagPage{}, fmt.Errorf("%s: tag search needs a search term", c.name)
 	}
 
 	if query.Limit < 1 {
-		return TagPage{}, fmt.Errorf("%s: tag search needs a positive limit, got %d", c.name, query.Limit)
+		return TagPage{}, fmt.Errorf(
+			"%s: tag search needs a positive limit, got %d",
+			c.name,
+			query.Limit,
+		)
 	}
 
 	floor := query.MinCount
@@ -91,7 +97,8 @@ func (c *Client) SearchTags(ctx context.Context, query TagQuery) (TagPage, error
 	pageSize := c.pageSize()
 	skip := query.Offset % pageSize
 
-	// One item past the window decides whether more matches exist, so the window is read wider than it is returned.
+	// One item past the window decides whether more matches exist, so the window is read wider than it
+	// is returned.
 	wanted := skip + query.Limit + 1
 	collected := make([]Tag, 0, wanted)
 
@@ -130,9 +137,9 @@ func (c *Client) SearchTags(ctx context.Context, query TagQuery) (TagPage, error
 		}
 	}
 
-	// An empty page at a non-zero offset cannot say on its own whether the search matches nothing or the offset simply
-	// overtook a short list, so it asks once. This only happens when the offset page is empty, so the common search
-	// stays one request.
+	// An empty page at a non-zero offset cannot say on its own whether the search matches nothing or
+	// the offset simply overtook a short list, so it asks once. This only happens when the offset page
+	// is empty, so the common search stays one request.
 	if !sawRows && query.Offset > 0 {
 		probe, err := c.searchPage(ctx, query, 1, 1)
 		if err != nil {

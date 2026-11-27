@@ -27,7 +27,8 @@ func TestModelsListNovel(t *testing.T) {
 			t.Fatalf("Execute() error: %v", err)
 		}
 
-		if !strings.Contains(out, "nai-diffusion-4-5-full") || !strings.Contains(out, "2 of 17 models shown (4 matched)") {
+		if !strings.Contains(out, "nai-diffusion-4-5-full") ||
+			!strings.Contains(out, "2 of 17 models shown (4 matched)") {
 			t.Errorf("stdout = %q, want the filtered window", out)
 		}
 	})

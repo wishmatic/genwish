@@ -1,6 +1,5 @@
 // Package resolve turns an address into the bytes of an image. A provider that takes an image
-// cannot read a file this deployment holds, so the bytes travel with the request instead of an
-// address.
+// cannot read a file this host holds, so the bytes travel with the request, not an address.
 package resolve
 
 import (
@@ -26,8 +25,8 @@ const (
 type Client struct {
 	http *http.Client
 
-	// maxBytes is MaxImageBytes, and is a field so a test can drive the limit without
-	// building a sixteen megabyte image.
+	// maxBytes is MaxImageBytes, and is a field so a test can drive the limit without building a
+	// sixteen megabyte image.
 	maxBytes int64
 }
 
@@ -43,8 +42,8 @@ func New() *Client {
 	}
 }
 
-// Fetch returns the bytes for rawURL. Redirects are followed here rather than by the HTTP client
-// so every hop is bounded and sends the same user agent.
+// Fetch returns the bytes for rawURL. Redirects are followed here rather than by the HTTP client so
+// every hop is bounded and sends the same user agent.
 func (c *Client) Fetch(ctx context.Context, rawURL string) ([]byte, error) {
 	u, err := url.Parse(rawURL)
 	if err != nil {
@@ -65,7 +64,11 @@ func (c *Client) Fetch(ctx context.Context, rawURL string) ([]byte, error) {
 		resp.Body.Close()
 
 		if location == "" {
-			return nil, fmt.Errorf("resolve: %s returned HTTP %d without a Location header", u, resp.StatusCode)
+			return nil, fmt.Errorf(
+				"resolve: %s returned HTTP %d without a Location header",
+				u,
+				resp.StatusCode,
+			)
 		}
 
 		if hop >= maxRedirects {
@@ -105,7 +108,12 @@ func readResponse(u *url.URL, resp *http.Response) ([]byte, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("resolve: %s returned HTTP %d: %s", u, resp.StatusCode, utils.ReadLimited(resp.Body))
+		return nil, fmt.Errorf(
+			"resolve: %s returned HTTP %d: %s",
+			u,
+			resp.StatusCode,
+			utils.ReadLimited(resp.Body),
+		)
 	}
 
 	data, err := io.ReadAll(resp.Body)

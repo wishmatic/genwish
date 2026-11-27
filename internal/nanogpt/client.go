@@ -17,8 +17,8 @@ var ErrNoAPIKey = errors.New("NanoGPT API key is required")
 const (
 	DefaultBaseURL = "https://nano-gpt.com"
 
-	// FastTimeout bounds the endpoints that answer in one round trip. A call that asks
-	// NanoGPT to wait for a crawl passes its own budget instead.
+	// FastTimeout bounds the endpoints that answer in one round trip. A call that asks NanoGPT to wait
+	// for a crawl passes its own budget instead.
 	FastTimeout = 90 * time.Second
 
 	errorBodyLimit = 512
@@ -34,8 +34,8 @@ type Client struct {
 	baseURL string
 	http    *http.Client
 
-	// The poll loop's cadence and ceiling are fields so tests can drive them without waiting
-	// out a real generation.
+	// The poll loop's cadence and ceiling are fields so tests can drive them without waiting out a
+	// real generation.
 	videoPollInterval time.Duration
 	videoWaitBudget   time.Duration
 }
@@ -59,23 +59,39 @@ func New(cfg Config) (*Client, error) {
 	}, nil
 }
 
-// credential is the header an endpoint reads the key from; the data endpoints disagree on
-// which header that is, so each caller names its own.
+// credential is the header an endpoint reads the key from; the data endpoints disagree on which
+// header that is, so each caller names its own.
 type credential struct {
 	header string
 	value  string
 }
 
-func (c *Client) post(ctx context.Context, path string, budget time.Duration, cred credential, payload, out any) error {
+func (c *Client) post(
+	ctx context.Context,
+	path string,
+	budget time.Duration,
+	cred credential,
+	payload, out any,
+) error {
 	return c.do(ctx, http.MethodPost, path, budget, cred, payload, out)
 }
 
-func (c *Client) get(ctx context.Context, path string, budget time.Duration, cred credential, out any) error {
+func (c *Client) get(
+	ctx context.Context,
+	path string,
+	budget time.Duration,
+	cred credential,
+	out any,
+) error {
 	return c.do(ctx, http.MethodGet, path, budget, cred, nil, out)
 }
 
 func (c *Client) do(
-	ctx context.Context, method, path string, budget time.Duration, cred credential, payload, out any,
+	ctx context.Context,
+	method, path string,
+	budget time.Duration,
+	cred credential,
+	payload, out any,
 ) error {
 	ctx, cancel := context.WithTimeout(ctx, budget)
 	defer cancel()

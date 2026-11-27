@@ -26,9 +26,10 @@ func newRoot(deps cli.Deps) *cobra.Command {
 	deps = cli.WithDefaults(deps)
 
 	root := &cobra.Command{
-		Use:           "genwish",
-		Short:         "Generate images and video from the command line",
-		Long:          "Generate images and video through NanoGPT, Forge Neo, and NovelAI, and look up booru tags.",
+		Use:   "genwish",
+		Short: "Generate images and video from the command line",
+		Long: "Generate images and video through NanoGPT, Forge Neo, and NovelAI, " +
+			"and look up booru tags.",
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}

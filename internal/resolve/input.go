@@ -15,8 +15,8 @@ const (
 	MediaJPEG = "image/jpeg"
 	MediaWebP = "image/webp"
 
-	// MaxImageBytes caps what travels to NanoGPT, where the image is base64-encoded into the
-	// request body and so costs a third more on the wire than it does on disk.
+	// MaxImageBytes caps what travels to NanoGPT, where the image is base64-encoded into the request
+	// body and so costs a third more on the wire than it does on disk.
 	MaxImageBytes = 16 << 20
 )
 
@@ -25,8 +25,9 @@ type Image struct {
 	MediaType string
 }
 
-// Resolve normalises an image reference into raw bytes and a media type. The reference may be an http(s) URL, a
-// base64 data URI, or raw base64 data; URLs go through Fetch, so redirect handling is shared.
+// Resolve normalises an image reference into raw bytes and a media type. The reference may be an
+// http(s) URL, a base64 data URI, or raw base64 data; URLs go through Fetch, so redirect handling
+// is shared.
 func (c *Client) Resolve(ctx context.Context, input string) (Image, error) {
 	trimmed := strings.TrimSpace(input)
 	if trimmed == "" {
@@ -52,7 +53,11 @@ func (c *Client) Resolve(ctx context.Context, input string) (Image, error) {
 	}
 
 	if int64(len(data)) > c.maxBytes {
-		return Image{}, fmt.Errorf("resolve: the image is %d bytes, over the %d byte limit", len(data), c.maxBytes)
+		return Image{}, fmt.Errorf(
+			"resolve: the image is %d bytes, over the %d byte limit",
+			len(data),
+			c.maxBytes,
+		)
 	}
 
 	mediaType, err := supportedMediaType(data, declaredType)
@@ -70,7 +75,9 @@ func decodeDataURI(uri string) ([]byte, string, error) {
 	}
 
 	if !strings.HasSuffix(strings.ToLower(meta), ";base64") {
-		return nil, "", fmt.Errorf("resolve: unsupported data URI: only base64-encoded data is supported")
+		return nil, "", fmt.Errorf(
+			"resolve: unsupported data URI: only base64-encoded data is supported",
+		)
 	}
 
 	declared := meta[:len(meta)-len(";base64")]

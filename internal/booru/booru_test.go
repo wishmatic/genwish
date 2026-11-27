@@ -19,7 +19,9 @@ func TestNormalizeTag(t *testing.T) {
 }
 
 func TestTagCategoryString(t *testing.T) {
-	for _, category := range []TagCategory{CategoryGeneral, CategoryArtist, CategoryCopyright, CategoryCharacter, CategoryMeta} {
+	for _, category := range []TagCategory{
+		CategoryGeneral, CategoryArtist, CategoryCopyright, CategoryCharacter, CategoryMeta,
+	} {
 		if category.String() == "" {
 			t.Errorf("TagCategory(%q).String() is empty", string(category))
 		}

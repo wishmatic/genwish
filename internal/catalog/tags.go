@@ -9,8 +9,9 @@ import (
 	"github.com/wishmatic/genwish/internal/booru"
 )
 
-// wildcardMetacharacters are the pattern characters the Danbooru tag API understands. They are replaced with a space
-// rather than deleted, so a search like `blue*hair` reads as `blue_hair` instead of `bluehair`.
+// wildcardMetacharacters are the pattern characters the Danbooru tag API understands. They are
+// replaced with a space rather than deleted, so a search like `blue*hair` reads as `blue_hair`
+// instead of `bluehair`.
 var wildcardMetacharacters = strings.NewReplacer("*", " ", "?", " ", "%", " ", `\`, " ")
 
 type Status string
@@ -102,7 +103,13 @@ func (s *Service) Tags(ctx context.Context, input TagsInput) (TagsResult, error)
 	return result, nil
 }
 
-func (s *Service) result(search string, tags []booru.Tag, more bool, status Status, aliasOf string) TagsResult {
+func (s *Service) result(
+	search string,
+	tags []booru.Tag,
+	more bool,
+	status Status,
+	aliasOf string,
+) TagsResult {
 	return TagsResult{
 		Search:       search,
 		Tags:         tags,
@@ -137,8 +144,9 @@ func knownImplications(index RelationIndex, name string) []string {
 	return known
 }
 
-// synonyms surfaces the canonical names the search is also known by, which substring matching alone can never find. It
-// is index-only: recall must not add an upstream request to every search, so an unbuilt index simply reports nothing.
+// synonyms surfaces the canonical names the search is also known by, which substring matching alone
+// can never find. It is index-only: recall must not add an upstream request to every search, so an
+// unbuilt index simply reports nothing.
 func (s *Service) synonyms(search string, tags []booru.Tag) []string {
 	if s.opts.Relations == nil || !s.opts.Relations.Ready() {
 		return []string{}
@@ -173,9 +181,9 @@ func validateCategories(categories []booru.TagCategory) error {
 	return nil
 }
 
-// normalizeSearch renders a caller's search as a literal substring of a canonical tag name. The metacharacters both tag
-// APIs understand are replaced, so a search can never become an expression, and a search with no letter or digit left
-// is rejected rather than sent as a match-everything pattern.
+// normalizeSearch renders a search as a literal substring of a canonical tag name. The
+// metacharacters both tag APIs understand are replaced, so a search can never become an expression;
+// a search with no letter or digit left is rejected rather than sent as a match-everything pattern.
 func normalizeSearch(value string) (string, error) {
 	search := strings.Trim(booru.NormalizeTag(wildcardMetacharacters.Replace(value)), "_")
 

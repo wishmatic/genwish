@@ -33,8 +33,8 @@ an image could look like, and use the tool's own description for how each field 
 ## Prompting
 
 - {{PROMPT_STYLE_NOTES}}, for example {{PROMPT_STYLE_EXAMPLE}}.
-- Quality tags are added automatically and an empty negative prompt gets a default one, so do not add
-  either yourself.
+- Quality tags are added automatically and an empty negative prompt gets a default one, so do not
+  add either yourself.
 
 ## Chaining calls
 
@@ -47,10 +47,10 @@ an image could look like, and use the tool's own description for how each field 
 ## Credits
 
 - `novelai` calls can spend Anlas on the account the server is configured with.
-- With an Opus subscription, one image at a time with no base image, at most 1,048,576 pixels, and 28
-  steps or fewer does not spend Anlas.
-- Anything beyond that spends Anlas, for example roughly 45 for a single 1024x1536 image. Subscription
-  Anlas resets when the subscription period ends; purchased Anlas does not expire.
+- With an Opus subscription, one image at a time with no base image, at most 1,048,576 pixels, and
+  28 steps or fewer does not spend Anlas.
+- Anything beyond that spends Anlas, for example roughly 45 for a single 1024x1536 image.
+  Subscription Anlas resets when the subscription period ends; purchased Anlas does not expire.
 
 ## Worth knowing
 

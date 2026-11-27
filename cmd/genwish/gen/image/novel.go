@@ -109,10 +109,12 @@ func NewNovelCommand(deps cli.Deps) *cobra.Command {
 		"things to avoid in the generated image")
 	cmd.Flags().StringVar(&samplerName, "sampler-name", novelai.DefaultSampler, "NovelAI sampler")
 	cmd.Flags().IntVar(&steps, "steps", defaultSteps, "number of sampling steps")
-	cmd.Flags().IntVar(&width, "width", 0, "output width; defaults to 512 or the init image's width")
+	cmd.Flags().
+		IntVar(&width, "width", 0, "output width; defaults to 512 or the init image's width")
 	cmd.Flags().IntVar(&height, "height", 0,
 		"output height; defaults to 512 or the init image's height")
-	cmd.Flags().Float64Var(&cfgScale, "cfg-scale", defaultCFGScale, "classifier-free guidance scale")
+	cmd.Flags().
+		Float64Var(&cfgScale, "cfg-scale", defaultCFGScale, "classifier-free guidance scale")
 	cmd.Flags().IntVar(&seed, "seed", defaultSeed, "random seed; -1 uses a random seed")
 	cmd.Flags().StringVar(&initImage, "init-image", "",
 		"path to a local image to transform instead of generating from scratch")
@@ -123,7 +125,8 @@ func NewNovelCommand(deps cli.Deps) *cobra.Command {
 	cmd.Flags().Float64Var(&noise, "noise", 0, "extra image noise; only used with an init image")
 	cmd.Flags().StringVar(&outputFormat, "format", "",
 		"output format: png, jpeg, jxl, or webp (default: output.format)")
-	cmd.Flags().StringVar(&out, "out", "", "base directory for generated images (default: output.path)")
+	cmd.Flags().
+		StringVar(&out, "out", "", "base directory for generated images (default: output.path)")
 
 	return cmd
 }

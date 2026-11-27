@@ -92,13 +92,16 @@ func TestUtilBooru(t *testing.T) {
 			t.Fatalf("Execute() error: %v", err)
 		}
 
-		for _, want := range []string{"blue_hair (general): 482913 works", "More matches exist; continue with offset 1"} {
+		for _, want := range []string{
+			"blue_hair (general): 482913 works", "More matches exist; continue with offset 1",
+		} {
 			if !strings.Contains(out, want) {
 				t.Errorf("stdout does not contain %q:\n%s", want, out)
 			}
 		}
 
-		if source.query.Search != "blue_hair" || source.query.Offset != 0 || source.query.Limit != 5 {
+		if source.query.Search != "blue_hair" || source.query.Offset != 0 ||
+			source.query.Limit != 5 {
 			t.Errorf("query = %+v, want the joined search and the requested window", source.query)
 		}
 
@@ -169,11 +172,13 @@ func TestUtilBooru(t *testing.T) {
 			t.Fatalf("decode stdout: %v\n%s", err, out)
 		}
 
-		if decoded.Search != "blue_hair" || decoded.Offset != 0 || decoded.Limit != catalog.DefaultTagLimit {
+		if decoded.Search != "blue_hair" || decoded.Offset != 0 ||
+			decoded.Limit != catalog.DefaultTagLimit {
 			t.Errorf("output = %+v, want the echoed request", decoded)
 		}
 
-		if len(decoded.Tags) != 1 || decoded.Tags[0].Name != "blue_hair" || decoded.Tags[0].Count != 482913 {
+		if len(decoded.Tags) != 1 || decoded.Tags[0].Name != "blue_hair" ||
+			decoded.Tags[0].Count != 482913 {
 			t.Errorf("tags = %+v, want the matching tag", decoded.Tags)
 		}
 
@@ -186,11 +191,14 @@ func TestUtilBooru(t *testing.T) {
 		args      []string
 		wantNamed string
 	}{
-		"unknown category": {args: []string{"blue", "--category", "nonsense"}, wantNamed: "general"},
-		"negative offset":  {args: []string{"blue", "--offset=-1"}, wantNamed: "offset"},
-		"huge limit":       {args: []string{"blue", "--limit=101"}, wantNamed: "limit"},
-		"negative floor":   {args: []string{"blue", "--min-count=-1"}, wantNamed: "min_count"},
-		"empty search":     {args: []string{"   "}, wantNamed: "search"},
+		"unknown category": {
+			args:      []string{"blue", "--category", "nonsense"},
+			wantNamed: "general",
+		},
+		"negative offset": {args: []string{"blue", "--offset=-1"}, wantNamed: "offset"},
+		"huge limit":      {args: []string{"blue", "--limit=101"}, wantNamed: "limit"},
+		"negative floor":  {args: []string{"blue", "--min-count=-1"}, wantNamed: "min_count"},
+		"empty search":    {args: []string{"   "}, wantNamed: "search"},
 	}
 
 	for name, tt := range badInputs {
@@ -216,7 +224,8 @@ func TestUtilBooru(t *testing.T) {
 		source := &stubSource{err: errors.New("danbooru: upstream is down")}
 
 		out, err := runBooru(t, source, "blue")
-		if err == nil || !strings.Contains(err.Error(), "tags:") || !strings.Contains(err.Error(), "upstream is down") {
+		if err == nil || !strings.Contains(err.Error(), "tags:") ||
+			!strings.Contains(err.Error(), "upstream is down") {
 			t.Errorf("Execute() error = %v, want the upstream failure", err)
 		}
 

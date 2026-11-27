@@ -23,7 +23,11 @@ func decodeMsgpackStream(r io.Reader) ([]byte, error) {
 
 		size := int(binary.BigEndian.Uint32(header[:]))
 		if size > maxFrameBytes {
-			return nil, fmt.Errorf("novelai: frame length %d exceeds the %d byte cap", size, maxFrameBytes)
+			return nil, fmt.Errorf(
+				"novelai: frame length %d exceeds the %d byte cap",
+				size,
+				maxFrameBytes,
+			)
 		}
 
 		frame := make([]byte, size)

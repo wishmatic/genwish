@@ -1,6 +1,7 @@
 # Migration
 
-`genwish` replaces the CLI parts of `nano-mcp`, `neo-mcp`, `novel-mcp`, and `booru-mcp`. The MCP servers, Docker images, and HTTP file hosting are not part of genwish.
+`genwish` replaces the CLI parts of `nano-mcp`, `neo-mcp`, `novel-mcp`, and `booru-mcp`. The MCP
+servers, Docker images, and HTTP file hosting are not part of genwish.
 
 ## Command mapping
 
@@ -40,12 +41,14 @@ Removed:
 
 - `LOG_LEVEL`: there is no logging; results go to stdout and warnings to stderr.
 - `ERROR_DETAIL`: errors always include the useful upstream detail.
-- `CREDENTIAL_BACKEND` (and `GENWISH_CREDENTIAL_BACKEND`): credentials always try the OS keyring first.
+- `CREDENTIAL_BACKEND` (and `GENWISH_CREDENTIAL_BACKEND`): credentials always try the OS
+  keyring first.
 - `MAX_LIMIT`: the tag page limit is fixed at 100.
 - `MAX_OFFSET`: the largest offset is fixed at 1000.
 - `BLOCKED_TAGS`: there is no tag denylist.
 - `IMAGE_URL_MAP`: input addresses are no longer rewritten.
-- `NANOGPT_API_KEY`, `NOVELAI_API_KEY`, `DANBOORU_LOGIN`, `DANBOORU_API_KEY`: credentials are login-only.
+- `NANOGPT_API_KEY`, `NOVELAI_API_KEY`, `DANBOORU_LOGIN`, `DANBOORU_API_KEY`: credentials are
+  login-only.
 - `USER_AGENT`: the user agent is hardcoded.
 - `HOST`, `PORT`, `API_KEY`, `PUBLIC_HOST`, `FILES_DIR`: server-only.
 
@@ -61,11 +64,11 @@ genwish login danbooru
 
 Old locations, for reference:
 
-| Tool      | Keyring service | Keyring user      | File fallback                     | Backend variable                                       |
-| --------- | --------------- | ----------------- | --------------------------------- | ------------------------------------------------------ |
-| nano-cli  | `nano-mcp`      | `nanogpt-api-key` | `~/.config/nano/api_key`          | `NANO_CREDENTIAL_BACKEND`                              |
-| novel-cli | `novel-cli`     | `novelai-api-key` | `~/.config/novel/novelai_api_key` | `NOVEL_CREDENTIAL_BACKEND`                             |
-| booru-cli | none            | none              | none                              | environment only: `DANBOORU_LOGIN`, `DANBOORU_API_KEY` |
+- nano-cli: keyring `nano-mcp` / `nanogpt-api-key`, file `~/.config/nano/api_key`,
+  backend `NANO_CREDENTIAL_BACKEND`.
+- novel-cli: keyring `novel-cli` / `novelai-api-key`, file `~/.config/novel/novelai_api_key`,
+  backend `NOVEL_CREDENTIAL_BACKEND`.
+- booru-cli: no keyring or file; environment only: `DANBOORU_LOGIN`, `DANBOORU_API_KEY`.
 
 New locations:
 
@@ -75,9 +78,11 @@ New locations:
 | novel    | `genwish`       | `novelai-api-key` | `os.UserConfigDir()/genwish/novelai_api_key` |
 | danbooru | `genwish`       | `danbooru`        | `os.UserConfigDir()/genwish/danbooru`        |
 
-Backend: always auto. The OS keyring is tried first, then a user-only file. `genwish login` warns before prompting when the keyring is unavailable.
+Backend: always auto. The OS keyring is tried first, then a user-only file. `genwish login` warns
+before prompting when the keyring is unavailable.
 
-The Danbooru entry stores the login and API key together. `genwish login danbooru` prompts for the login first, then the API key. Danbooru still works anonymously without a stored credential.
+The Danbooru entry stores the login and API key together. `genwish login danbooru` prompts for the
+login first, then the API key. Danbooru still works anonymously without a stored credential.
 
 ## Behavior changes
 
@@ -86,7 +91,8 @@ The Danbooru entry stores the login and API key together. `genwish login danboor
 - `login` and `logout` take the provider.
 - API keys are login-only; no key environment variable is read.
 - The Danbooru user agent is hardcoded at `genwish/0.1.0`.
-- Generated and edited media is written under `<output.path>/<images|videos>/<date>/<uuid>.<ext>`; `--out` replaces the base directory.
+- Generated and edited media is written under
+  `<output.path>/<images|videos>/<date>/<uuid>.<ext>`; `--out` replaces the base directory.
 - `gen image` and `gen video` take the provider as a subcommand.
 - `gen video neo` and `gen video novel` fail with an unsupported-provider error.
 - `models list neo` reads `neo.models_file` instead of querying Forge.

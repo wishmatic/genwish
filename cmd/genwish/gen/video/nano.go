@@ -104,7 +104,8 @@ func NewNanoCommand(deps cli.Deps) *cobra.Command {
 	cmd.Flags().Int("seed", 0, "seed for the providers that honour one")
 	cmd.Flags().Bool("generate-audio", false, "add AI audio on the models that support it")
 	cmd.Flags().StringVar(&videoURL, "video-url", "", "source video to extend, edit, or upscale")
-	cmd.Flags().StringVar(&out, "out", "", "base directory for the generated video (default: output.path)")
+	cmd.Flags().
+		StringVar(&out, "out", "", "base directory for the generated video (default: output.path)")
 
 	_ = cmd.MarkFlagRequired("model")
 

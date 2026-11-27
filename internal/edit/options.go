@@ -10,8 +10,8 @@ type Request struct {
 	Padding  *int
 }
 
-// OptionsFor reports ok false when no crop was requested. A circle implies a square canvas but, unlike a plain
-// square, gets no padding by default: the circle is cut to the canvas edges.
+// OptionsFor reports ok false when no crop was requested. A circle implies a square canvas but,
+// unlike a plain square, gets no padding by default: the circle is cut to the canvas edges.
 func OptionsFor(req Request) (Options, bool) {
 	isSquare := req.IsSquare || req.IsCircle
 	if !req.IsCrop && !isSquare {

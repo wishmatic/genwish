@@ -61,7 +61,10 @@ func storageWarning(keyringErr error, path string) string {
 		return "warning: the OS keyring is unavailable; the credential will be stored in a user-only file"
 	}
 
-	return fmt.Sprintf("warning: the OS keyring is unavailable; the credential will be stored in %s", path)
+	return fmt.Sprintf(
+		"warning: the OS keyring is unavailable; the credential will be stored in %s",
+		path,
+	)
 }
 
 type FileStore struct {

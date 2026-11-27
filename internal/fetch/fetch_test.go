@@ -60,7 +60,10 @@ func TestRequestHeaders(t *testing.T) {
 	}))
 	t.Cleanup(server.Close)
 
-	if _, err := GetJSON[map[string]bool](context.Background(), newTestClient(t, server.URL, &countingLimiter{}), "danbooru", "/posts.json", nil); err != nil {
+	if _, err := GetJSON[map[string]bool](
+		context.Background(), newTestClient(t, server.URL, &countingLimiter{}),
+		"danbooru", "/posts.json", nil,
+	); err != nil {
 		t.Fatalf("GetJSON() error: %v", err)
 	}
 
@@ -83,7 +86,10 @@ func TestQueryIsEncoded(t *testing.T) {
 	t.Cleanup(server.Close)
 
 	query := url.Values{"tags": {"blue_eyes"}, "limit": {"3"}}
-	if _, err := GetJSON[map[string]any](context.Background(), newTestClient(t, server.URL, &countingLimiter{}), "danbooru", "/posts.json", query); err != nil {
+	if _, err := GetJSON[map[string]any](
+		context.Background(), newTestClient(t, server.URL, &countingLimiter{}),
+		"danbooru", "/posts.json", query,
+	); err != nil {
 		t.Fatalf("GetJSON() error: %v", err)
 	}
 
@@ -115,7 +121,10 @@ func TestRetryThenSucceed(t *testing.T) {
 
 	limiter := &countingLimiter{}
 
-	if _, err := GetJSON[map[string]bool](context.Background(), newTestClient(t, server.URL, limiter), "danbooru", "/posts.json", nil); err != nil {
+	if _, err := GetJSON[map[string]bool](
+		context.Background(), newTestClient(t, server.URL, limiter),
+		"danbooru", "/posts.json", nil,
+	); err != nil {
 		t.Fatalf("GetJSON() error: %v", err)
 	}
 
@@ -134,7 +143,13 @@ func TestRetriesExhausted(t *testing.T) {
 
 	limiter := &countingLimiter{}
 
-	_, err := GetJSON[map[string]any](context.Background(), newTestClient(t, server.URL, limiter), "danbooru", "/posts.json", nil)
+	_, err := GetJSON[map[string]any](
+		context.Background(),
+		newTestClient(t, server.URL, limiter),
+		"danbooru",
+		"/posts.json",
+		nil,
+	)
 	if err == nil {
 		t.Fatal("GetJSON() error = nil, want an error")
 	}
@@ -195,7 +210,13 @@ func TestErrorBodyIsBounded(t *testing.T) {
 	}))
 	t.Cleanup(server.Close)
 
-	_, err := GetJSON[map[string]any](context.Background(), newTestClient(t, server.URL, &countingLimiter{}), "danbooru", "/x", nil)
+	_, err := GetJSON[map[string]any](
+		context.Background(),
+		newTestClient(t, server.URL, &countingLimiter{}),
+		"danbooru",
+		"/x",
+		nil,
+	)
 	if err == nil {
 		t.Fatal("GetJSON() error = nil, want an error")
 	}
@@ -218,7 +239,13 @@ func TestNonRetryableStatus(t *testing.T) {
 
 	limiter := &countingLimiter{}
 
-	_, err := GetJSON[map[string]any](context.Background(), newTestClient(t, server.URL, limiter), "danbooru", "/posts.json", nil)
+	_, err := GetJSON[map[string]any](
+		context.Background(),
+		newTestClient(t, server.URL, limiter),
+		"danbooru",
+		"/posts.json",
+		nil,
+	)
 	if err == nil {
 		t.Fatal("GetJSON() error = nil, want an error")
 	}
@@ -238,7 +265,13 @@ func TestContextDeadline(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Millisecond)
 	defer cancel()
 
-	_, err := GetJSON[map[string]any](ctx, newTestClient(t, server.URL, &countingLimiter{}), "danbooru", "/posts.json", nil)
+	_, err := GetJSON[map[string]any](
+		ctx,
+		newTestClient(t, server.URL, &countingLimiter{}),
+		"danbooru",
+		"/posts.json",
+		nil,
+	)
 	if err == nil {
 		t.Fatal("GetJSON() error = nil, want an error")
 	}
@@ -255,21 +288,49 @@ func TestNonJSONBodyIsATypedBodyError(t *testing.T) {
 		wantReason  string
 		wantBody    string
 	}{
-		"html":        {contentType: "text/html", body: "<html>Access Restricted</html>", wantReason: "HTML", wantBody: "Access Restricted"},
-		"xml":         {contentType: "text/xml", body: "<tags type=\"array\"></tags>", wantReason: "HTML or XML", wantBody: "<tags"},
-		"json string": {contentType: "application/json", body: `"Missing authentication. Go to the API host for more information"`, wantReason: "upstream message", wantBody: "Missing authentication"},
-		"plain text":  {contentType: "text/plain", body: "404 page not found", wantReason: "non-JSON", wantBody: "404 page not found"},
+		"html": {
+			contentType: "text/html",
+			body:        "<html>Access Restricted</html>",
+			wantReason:  "HTML",
+			wantBody:    "Access Restricted",
+		},
+		"xml": {
+			contentType: "text/xml",
+			body:        "<tags type=\"array\"></tags>",
+			wantReason:  "HTML or XML",
+			wantBody:    "<tags",
+		},
+		"json string": {
+			contentType: "application/json",
+			body:        `"Missing authentication. Go to the API host for more information"`,
+			wantReason:  "upstream message",
+			wantBody:    "Missing authentication",
+		},
+		"plain text": {
+			contentType: "text/plain",
+			body:        "404 page not found",
+			wantReason:  "non-JSON",
+			wantBody:    "404 page not found",
+		},
 	}
 
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.Header().Set("Content-Type", tt.contentType)
-				_, _ = w.Write([]byte(tt.body))
-			}))
+			server := httptest.NewServer(
+				http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.Header().Set("Content-Type", tt.contentType)
+					_, _ = w.Write([]byte(tt.body))
+				}),
+			)
 			t.Cleanup(server.Close)
 
-			_, err := GetJSON[map[string]any](context.Background(), newTestClient(t, server.URL, &countingLimiter{}), "upstream", "/index.php", nil)
+			_, err := GetJSON[map[string]any](
+				context.Background(),
+				newTestClient(t, server.URL, &countingLimiter{}),
+				"upstream",
+				"/index.php",
+				nil,
+			)
 			if err == nil {
 				t.Fatal("GetJSON() error = nil, want a body error")
 			}
@@ -296,12 +357,19 @@ func TestLargeJSONBodyDecodesInFull(t *testing.T) {
 	items := make([]string, 0, 200)
 
 	for i := 0; i < 200; i++ {
-		items = append(items, fmt.Sprintf(`{"id":%d,"tags":"alpha beta gamma delta epsilon zeta eta theta"}`, i))
+		items = append(
+			items,
+			fmt.Sprintf(`{"id":%d,"tags":"alpha beta gamma delta epsilon zeta eta theta"}`, i),
+		)
 	}
 
 	body := "[" + strings.Join(items, ",") + "]"
 	if len(body) <= maxBodyExcerpt {
-		t.Fatalf("fixture is %d bytes, want it above the %d-byte excerpt bound", len(body), maxBodyExcerpt)
+		t.Fatalf(
+			"fixture is %d bytes, want it above the %d-byte excerpt bound",
+			len(body),
+			maxBodyExcerpt,
+		)
 	}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -310,7 +378,13 @@ func TestLargeJSONBodyDecodesInFull(t *testing.T) {
 	}))
 	t.Cleanup(server.Close)
 
-	posts, err := GetJSON[[]map[string]any](context.Background(), newTestClient(t, server.URL, &countingLimiter{}), "danbooru", "/posts.json", nil)
+	posts, err := GetJSON[[]map[string]any](
+		context.Background(),
+		newTestClient(t, server.URL, &countingLimiter{}),
+		"danbooru",
+		"/posts.json",
+		nil,
+	)
 	if err != nil {
 		t.Fatalf("GetJSON() error: %v, want a large body to decode in full", err)
 	}
@@ -327,7 +401,13 @@ func TestWrongShapeDecodesAsBodyError(t *testing.T) {
 	}))
 	t.Cleanup(server.Close)
 
-	_, err := GetJSON[map[string]any](context.Background(), newTestClient(t, server.URL, &countingLimiter{}), "upstream", "/index.php", nil)
+	_, err := GetJSON[map[string]any](
+		context.Background(),
+		newTestClient(t, server.URL, &countingLimiter{}),
+		"upstream",
+		"/index.php",
+		nil,
+	)
 	if err == nil {
 		t.Fatal("GetJSON() error = nil, want a body error")
 	}

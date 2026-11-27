@@ -54,7 +54,9 @@ func newTestClient(t *testing.T, maxLimit int, handler http.HandlerFunc) *Client
 	server := httptest.NewServer(handler)
 	t.Cleanup(server.Close)
 
-	httpClient, err := fetch.New(fetch.Config{BaseURL: server.URL, UserAgent: "test", Limiter: noopLimiter{}})
+	httpClient, err := fetch.New(
+		fetch.Config{BaseURL: server.URL, UserAgent: "test", Limiter: noopLimiter{}},
+	)
 	if err != nil {
 		t.Fatalf("fetch.New() error: %v", err)
 	}
@@ -72,8 +74,8 @@ func tagNames(count int) []string {
 	return names
 }
 
-// serveTagPage answers a tag listing request the way Danbooru does: the requested page of the requested size, with
-// counts falling as the index rises and an empty page once the names run out.
+// serveTagPage answers a tag listing request the way Danbooru does: the requested page of the
+// requested size, with counts falling as the index rises and an empty page once the names run out.
 func serveTagPage(w http.ResponseWriter, r *http.Request, names []string) {
 	page := intParam(r, "page", 1)
 	limit := intParam(r, "limit", 20)
@@ -84,7 +86,10 @@ func serveTagPage(w http.ResponseWriter, r *http.Request, names []string) {
 	items := make([]string, 0, end-start)
 
 	for i := start; i < end; i++ {
-		items = append(items, fmt.Sprintf(`{"name":%q,"category":0,"post_count":%d}`, names[i], 100000-i))
+		items = append(
+			items,
+			fmt.Sprintf(`{"name":%q,"category":0,"post_count":%d}`, names[i], 100000-i),
+		)
 	}
 
 	_, _ = w.Write([]byte("[" + strings.Join(items, ",") + "]"))
@@ -148,7 +153,10 @@ func TestSearchTagsWindowSpansPages(t *testing.T) {
 		serveTagPage(w, r, names)
 	})
 
-	page, err := client.SearchTags(context.Background(), TagQuery{Search: "blue", Offset: 30, Limit: 25})
+	page, err := client.SearchTags(
+		context.Background(),
+		TagQuery{Search: "blue", Offset: 30, Limit: 25},
+	)
 	if err != nil {
 		t.Fatalf("SearchTags() error: %v", err)
 	}
@@ -192,7 +200,10 @@ func TestSearchTagsMoreAtTheBoundary(t *testing.T) {
 				serveTagPage(w, r, tagNames(tt.total))
 			})
 
-			page, err := client.SearchTags(context.Background(), TagQuery{Search: "blue", Limit: 25})
+			page, err := client.SearchTags(
+				context.Background(),
+				TagQuery{Search: "blue", Limit: 25},
+			)
 			if err != nil {
 				t.Fatalf("SearchTags() error: %v", err)
 			}
@@ -213,7 +224,10 @@ func TestSearchTagsPastTheEnd(t *testing.T) {
 		serveTagPage(w, r, tagNames(5))
 	})
 
-	page, err := client.SearchTags(context.Background(), TagQuery{Search: "blue", Offset: 25, Limit: 25})
+	page, err := client.SearchTags(
+		context.Background(),
+		TagQuery{Search: "blue", Offset: 25, Limit: 25},
+	)
 	if err != nil {
 		t.Fatalf("SearchTags() error: %v", err)
 	}
@@ -228,7 +242,9 @@ func TestSearchTagsRejectsEmptySearch(t *testing.T) {
 		t.Error("the client made a request for an empty search")
 	})
 
-	if _, err := client.SearchTags(context.Background(), TagQuery{Search: "  ", Limit: 25}); err == nil {
+	if _, err := client.SearchTags(
+		context.Background(), TagQuery{Search: "  ", Limit: 25},
+	); err == nil {
 		t.Fatal("SearchTags() error = nil, want an error")
 	}
 }

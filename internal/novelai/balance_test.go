@@ -19,7 +19,8 @@ func TestCheckBalance(t *testing.T) {
 			}
 
 			_, _ = w.Write([]byte(
-				`{"subscription":{"tier":"opus","trainingStepsLeft":{"fixedTrainingStepsLeft":9898,"purchasedTrainingSteps":32}}}`,
+				`{"subscription":{"tier":"opus","trainingStepsLeft":` +
+					`{"fixedTrainingStepsLeft":9898,"purchasedTrainingSteps":32}}}`,
 			))
 		}))
 		t.Cleanup(server.Close)

@@ -82,7 +82,16 @@ func noisePNG(t *testing.T, width, height int) []byte {
 	for y := 0; y < height; y++ {
 		for x := 0; x < width; x++ {
 			state = state*1664525 + 1013904223
-			img.SetNRGBA(x, y, color.NRGBA{R: uint8(state >> 24), G: uint8(state >> 16), B: uint8(state >> 8), A: 255})
+			img.SetNRGBA(
+				x,
+				y,
+				color.NRGBA{
+					R: uint8(state >> 24),
+					G: uint8(state >> 16),
+					B: uint8(state >> 8),
+					A: 255,
+				},
+			)
 		}
 	}
 

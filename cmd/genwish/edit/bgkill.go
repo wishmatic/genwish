@@ -29,7 +29,8 @@ func NewBgkillCommand(deps cli.Deps) *cobra.Command {
 	}
 
 	cmd.Flags().StringVar(&flags.model, "model", "General", "BiRefNet model to load")
-	cmd.Flags().BoolVar(&flags.fullMode, "full-mode", false, "run the model in fp32 instead of fp16")
+	cmd.Flags().
+		BoolVar(&flags.fullMode, "full-mode", false, "run the model in fp32 instead of fp16")
 	cmd.Flags().StringVar(&flags.outputFormat, "format", "",
 		"output image format: png, jpeg, jxl, or webp")
 	cmd.Flags().StringVar(&flags.out, "out", "",

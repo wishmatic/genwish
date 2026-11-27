@@ -55,7 +55,13 @@ func runNovel(deps cli.Deps, args []string, query string, limit int) error {
 		return err
 	}
 
-	fmt.Fprintf(deps.Out, "%d of %d models shown (%d matched)\n", len(shown), len(all), len(matched))
+	fmt.Fprintf(
+		deps.Out,
+		"%d of %d models shown (%d matched)\n",
+		len(shown),
+		len(all),
+		len(matched),
+	)
 
 	return nil
 }

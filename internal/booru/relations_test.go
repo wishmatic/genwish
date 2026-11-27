@@ -13,7 +13,10 @@ type stubRelationSource struct {
 	errPage      int
 }
 
-func (s *stubRelationSource) ImplicationPage(_ context.Context, page, _ int) ([]Implication, error) {
+func (s *stubRelationSource) ImplicationPage(
+	_ context.Context,
+	page, _ int,
+) ([]Implication, error) {
 	if s.err != nil && page == s.errPage {
 		return nil, s.err
 	}
@@ -44,8 +47,14 @@ func orEmptyImplications(relations []Implication) []Implication {
 func TestRelationIndexRefreshMergesPages(t *testing.T) {
 	source := &stubRelationSource{
 		implications: map[int][]Implication{
-			1: {{Antecedent: "futanari_pov", Consequent: "pov"}, {Antecedent: "futanari_pov", Consequent: "futanari"}},
-			2: {{Antecedent: "futanari_pov", Consequent: "futanari"}, {Antecedent: "solo_focus", Consequent: "solo"}},
+			1: {
+				{Antecedent: "futanari_pov", Consequent: "pov"},
+				{Antecedent: "futanari_pov", Consequent: "futanari"},
+			},
+			2: {
+				{Antecedent: "futanari_pov", Consequent: "futanari"},
+				{Antecedent: "solo_focus", Consequent: "solo"},
+			},
 		},
 		aliases: map[int][]Alias{
 			1: {{Antecedent: "piss", Consequent: "pee"}, {Antecedent: "urine", Consequent: "pee"}},
@@ -60,7 +69,8 @@ func TestRelationIndexRefreshMergesPages(t *testing.T) {
 		t.Fatalf("Refresh() error: %v", err)
 	}
 
-	if got := index.Implications("futanari_pov"); len(got) != 2 || got[0] != "futanari" || got[1] != "pov" {
+	if got := index.Implications("futanari_pov"); len(got) != 2 || got[0] != "futanari" ||
+		got[1] != "pov" {
 		t.Errorf("implications = %v, want deduplicated and sorted", got)
 	}
 
@@ -138,7 +148,11 @@ func TestRelationIndexKeepsPreviousGraphsOnFailure(t *testing.T) {
 	}
 
 	if target, aliased := index.Canonical("piss"); !aliased || target != "pee" {
-		t.Fatalf("Canonical(piss) = %q aliased %v, want pee after a successful crawl", target, aliased)
+		t.Fatalf(
+			"Canonical(piss) = %q aliased %v, want pee after a successful crawl",
+			target,
+			aliased,
+		)
 	}
 
 	source.err = errors.New("upstream down")
@@ -153,25 +167,39 @@ func TestRelationIndexKeepsPreviousGraphsOnFailure(t *testing.T) {
 	}
 
 	if target, aliased := index.Canonical("piss"); !aliased || target != "pee" {
-		t.Errorf("Canonical(piss) = %q aliased %v, want the previous alias graph kept", target, aliased)
+		t.Errorf(
+			"Canonical(piss) = %q aliased %v, want the previous alias graph kept",
+			target,
+			aliased,
+		)
 	}
 }
 
 func TestRelationIndexDisabledStartDoesNotCrawl(t *testing.T) {
-	source := &stubRelationSource{implications: map[int][]Implication{1: {{Antecedent: "a", Consequent: "b"}}}}
+	source := &stubRelationSource{
+		implications: map[int][]Implication{1: {{Antecedent: "a", Consequent: "b"}}},
+	}
 
 	index := NewRelationIndex(source, 0)
-	index.Start(context.Background(), func(error) { t.Error("the index reported an error while disabled") })
+	index.Start(
+		context.Background(),
+		func(error) { t.Error("the index reported an error while disabled") },
+	)
 
 	if index.Size() != 0 || index.Ready() {
-		t.Errorf("size = %d ready = %v, want an empty index while disabled", index.Size(), index.Ready())
+		t.Errorf(
+			"size = %d ready = %v, want an empty index while disabled",
+			index.Size(),
+			index.Ready(),
+		)
 	}
 }
 
 func TestNilRelationIndexIsSafe(t *testing.T) {
 	var index *RelationIndex
 
-	if index.Implications("a") != nil || index.Synonyms("a") != nil || index.Size() != 0 || index.Ready() {
+	if index.Implications("a") != nil || index.Synonyms("a") != nil || index.Size() != 0 ||
+		index.Ready() {
 		t.Error("a nil index should answer safely")
 	}
 

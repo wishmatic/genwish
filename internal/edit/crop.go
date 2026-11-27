@@ -9,7 +9,8 @@ import (
 )
 
 type Options struct {
-	// Threshold is the minimum alpha (0-255) for a pixel to count as content. Zero counts any visible pixel.
+	// Threshold is the minimum alpha (0-255) for a pixel to count as content. Zero counts any
+	// visible pixel.
 	Threshold uint8
 
 	IsSquare bool
@@ -21,7 +22,8 @@ type Options struct {
 	Padding int
 }
 
-// Apply trims src to the bounding box of its visible content and renders the requested padding, square, and circle.
+// Apply trims src to the bounding box of its visible content and renders the requested padding,
+// square, and circle.
 func Apply(src image.Image, opts Options) (*image.RGBA, error) {
 	if opts.Padding < 0 {
 		return nil, fmt.Errorf("edit: padding must not be negative, got %d", opts.Padding)

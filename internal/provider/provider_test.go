@@ -44,7 +44,10 @@ func TestParse(t *testing.T) {
 }
 
 func TestParseBalance(t *testing.T) {
-	for _, value := range []string{"nano", "nano-gpt", "nanogpt", "novel", "novel-ai", "novel ai", "novelai"} {
+	for _, value := range []string{
+		"nano", "nano-gpt", "nanogpt",
+		"novel", "novel-ai", "novel ai", "novelai",
+	} {
 		t.Run("accepts "+value, func(t *testing.T) {
 			if _, err := ParseBalance(value); err != nil {
 				t.Errorf("ParseBalance(%q) error: %v", value, err)

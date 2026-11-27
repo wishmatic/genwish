@@ -16,8 +16,11 @@ import (
 
 func TestRunNovel(t *testing.T) {
 	t.Run("prints the Anlas balance", func(t *testing.T) {
-		server, _ := testutil.CaptureServer(t, http.StatusOK,
-			`{"subscription":{"tier":"opus","trainingStepsLeft":{"fixedTrainingStepsLeft":9898,"purchasedTrainingSteps":32}}}`,
+		server, _ := testutil.CaptureServer(
+			t,
+			http.StatusOK,
+			`{"subscription":{"tier":"opus","trainingStepsLeft":`+
+				`{"fixedTrainingStepsLeft":9898,"purchasedTrainingSteps":32}}}`,
 		)
 
 		out := &bytes.Buffer{}

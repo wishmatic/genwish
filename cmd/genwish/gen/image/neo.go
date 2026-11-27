@@ -161,7 +161,11 @@ func (f forgeFlags) request(prompt string, initImage []byte) forge.GenerateReque
 	}
 }
 
-func readInitImage(ctx context.Context, resolver *resolve.Client, path, address string) ([]byte, error) {
+func readInitImage(
+	ctx context.Context,
+	resolver *resolve.Client,
+	path, address string,
+) ([]byte, error) {
 	switch {
 	case path != "" && address != "":
 		return nil, errors.New("pass only one of --init-image or --init-image-url")

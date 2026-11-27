@@ -2,7 +2,8 @@
 
 Bespoke personal CLI for image and video generation, plus Danbooru tag lookup.
 
-It folds the generation parts of `nano-cli`, `neo-cli`, `novel-cli`, and `booru-cli` into one binary. There is no MCP server.
+It folds the generation parts of `nano-cli`, `neo-cli`, `novel-cli`, and `booru-cli` into one
+binary. There is no MCP server.
 
 ## Install
 
@@ -49,4 +50,5 @@ genwish util booru blue_hair --limit 5
 
 Apache-2.0. See [LICENSE](LICENSE).
 
-This project is not affiliated with or endorsed by NanoGPT, NovelAI, Danbooru, AUTOMATIC1111, Illyasviel, Haoming02, or any other third party.
+This project is not affiliated with or endorsed by NanoGPT, NovelAI, Danbooru, AUTOMATIC1111,
+Illyasviel, Haoming02, or any other third party.

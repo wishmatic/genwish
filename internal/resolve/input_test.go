@@ -92,7 +92,11 @@ func TestResolveErrors(t *testing.T) {
 		{"invalid base64", "%%%not-base64%%%", "invalid base64"},
 		{"a gif is not a video model's input", encodeDataURI("image/gif", gifBytes), "image/gif"},
 		{"unsupported gif raw", base64.StdEncoding.EncodeToString(gifBytes), "image/gif"},
-		{"plain text", base64.StdEncoding.EncodeToString([]byte("just some words, here")), "text/plain"},
+		{
+			"plain text",
+			base64.StdEncoding.EncodeToString([]byte("just some words, here")),
+			"text/plain",
+		},
 	}
 
 	r := newResolver(t)

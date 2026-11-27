@@ -136,7 +136,10 @@ func readDanbooruCredentials(deps cli.Deps) (credential.DanbooruCredentials, err
 	return readDanbooruFromReader(deps.In)
 }
 
-func readDanbooruFromTerminal(deps cli.Deps, file *os.File) (credential.DanbooruCredentials, error) {
+func readDanbooruFromTerminal(
+	deps cli.Deps,
+	file *os.File,
+) (credential.DanbooruCredentials, error) {
 	fmt.Fprint(deps.Err, "Danbooru login: ")
 
 	login, err := readTerminalLine(deps.In)

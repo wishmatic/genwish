@@ -1,5 +1,6 @@
-// Package novelai is NovelAI's image generation API in two layers: Generate is the domain operation, and the
-// unexported requests, parameters, and streaming under it are the client that speaks NovelAI's own API.
+// Package novelai is NovelAI's image generation API in two layers: Generate is the domain
+// operation, and the unexported requests, parameters, and streaming under it are the client that
+// speaks NovelAI's own API.
 package novelai
 
 import (
@@ -35,13 +36,22 @@ func New(baseURL, apiKey string) *Client {
 	}
 }
 
-func (c *Client) generate(ctx context.Context, label string, payload map[string]any) ([][]byte, error) {
+func (c *Client) generate(
+	ctx context.Context,
+	label string,
+	payload map[string]any,
+) ([][]byte, error) {
 	body, err := json.Marshal(payload)
 	if err != nil {
 		return nil, fmt.Errorf("marshal %s payload: %w", label, err)
 	}
 
-	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, c.baseURL+generatePath, bytes.NewReader(body))
+	httpReq, err := http.NewRequestWithContext(
+		ctx,
+		http.MethodPost,
+		c.baseURL+generatePath,
+		bytes.NewReader(body),
+	)
 	if err != nil {
 		return nil, fmt.Errorf("build %s request: %w", label, err)
 	}

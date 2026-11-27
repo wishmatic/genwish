@@ -57,6 +57,9 @@ func TestImg2ImgPayload(t *testing.T) {
 		t.Errorf("denoising_strength = %v, want 0.6", payload.DenoisingStrength)
 	}
 	if payload.OverrideSettings.Checkpoint != "model.safetensors" {
-		t.Errorf("sd_model_checkpoint = %q, want model.safetensors", payload.OverrideSettings.Checkpoint)
+		t.Errorf(
+			"sd_model_checkpoint = %q, want model.safetensors",
+			payload.OverrideSettings.Checkpoint,
+		)
 	}
 }

@@ -14,9 +14,9 @@ const (
 	gridStep                 = 8
 )
 
-// GenerateRequest is one generation to run. An unset InitImage generates from the prompt alone; a set one transforms
-// that image instead. Width and Height left at 0 are filled in from the init image, or with 512 pixels each without
-// one.
+// GenerateRequest is one generation to run. An unset InitImage generates from the prompt alone; a
+// set one transforms that image instead. Width and Height left at 0 are filled in from the init
+// image, or with 512 pixels each without one.
 type GenerateRequest struct {
 	InitImage []byte
 
@@ -35,9 +35,9 @@ type GenerateRequest struct {
 	Height   int
 	CFGScale float64
 
-	// DenoisingStrength is how much of the init image to change, so it is only read with an InitImage; 0 there means
-	// the caller left it out. Without an init image it is the hi-res second pass' own denoising strength, where 0
-	// leaves Forge's own setting in place.
+	// DenoisingStrength is how much of the init image to change, so it is only read with an InitImage;
+	// 0 there means the caller left it out. Without an init image it is the hi-res second pass' own
+	// denoising strength, where 0 leaves Forge's own setting in place.
 	DenoisingStrength float64
 
 	Seed int
@@ -120,10 +120,11 @@ func img2imgRequestFor(req GenerateRequest, width, height int) img2imgRequest {
 	}
 }
 
-// outputSize fills in whichever of width and height the caller left out: 512 each without an init image, and
-// otherwise the init image's size, both of them when neither is set and the missing one from the init image's aspect
-// ratio when only one is set. Derived sizes land on the grid Forge encodes and decodes on, so the image that comes
-// back is the size the caller was told rather than Forge's silently floored version of it.
+// outputSize fills in whichever of width and height the caller left out: 512 each without an init
+// image, and otherwise the init image's size, both of them when neither is set and the missing one
+// from the init image's aspect ratio when only one is set. Derived sizes land on the grid Forge
+// encodes and decodes on, so the image that comes back is the size the caller was told rather than
+// Forge's silently floored version of it.
 func outputSize(req GenerateRequest) (int, int, error) {
 	if len(req.InitImage) == 0 {
 		return dimensionOrDefault(req.Width), dimensionOrDefault(req.Height), nil
@@ -160,9 +161,9 @@ func aspectDimension(known, otherSource, knownSource int) int {
 	return int(math.Round(float64(known) * float64(otherSource) / float64(knownSource)))
 }
 
-// gridSize rounds down to the eight pixel grid the diffusion backends encode and decode on, so a size taken from an
-// image is one Forge can reproduce exactly. A grid step at the low end keeps a tiny image from rounding away to
-// nothing.
+// gridSize rounds down to the eight pixel grid the diffusion backends encode and decode on, so a
+// size taken from an image is one Forge can reproduce exactly. A grid step at the low end keeps a
+// tiny image from rounding away to nothing.
 func gridSize(value int) int {
 	return max(gridStep, value/gridStep*gridStep)
 }

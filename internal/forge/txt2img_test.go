@@ -45,19 +45,31 @@ func TestTxt2ImgOverrideSettings(t *testing.T) {
 	}
 
 	if payload.OverrideSettings.Checkpoint != "model.safetensors" {
-		t.Errorf("sd_model_checkpoint = %q, want model.safetensors", payload.OverrideSettings.Checkpoint)
+		t.Errorf(
+			"sd_model_checkpoint = %q, want model.safetensors",
+			payload.OverrideSettings.Checkpoint,
+		)
 	}
 	if payload.OverrideSettings.ForgePreset != "flux" {
 		t.Errorf("forge_preset = %q, want flux", payload.OverrideSettings.ForgePreset)
 	}
 	if len(payload.OverrideSettings.ForgeAdditionalModules) != 2 {
-		t.Fatalf("forge_additional_modules = %v, want 2 entries", payload.OverrideSettings.ForgeAdditionalModules)
+		t.Fatalf(
+			"forge_additional_modules = %v, want 2 entries",
+			payload.OverrideSettings.ForgeAdditionalModules,
+		)
 	}
 	if payload.OverrideSettings.ForgeAdditionalModules[0] != "vae.safetensors" {
-		t.Errorf("forge_additional_modules[0] = %q, want vae.safetensors", payload.OverrideSettings.ForgeAdditionalModules[0])
+		t.Errorf(
+			"forge_additional_modules[0] = %q, want vae.safetensors",
+			payload.OverrideSettings.ForgeAdditionalModules[0],
+		)
 	}
 	if payload.OverrideSettings.ForgeAdditionalModules[1] != "t5xxl.ckpt" {
-		t.Errorf("forge_additional_modules[1] = %q, want t5xxl.ckpt (already has extension)", payload.OverrideSettings.ForgeAdditionalModules[1])
+		t.Errorf(
+			"forge_additional_modules[1] = %q, want t5xxl.ckpt (already has extension)",
+			payload.OverrideSettings.ForgeAdditionalModules[1],
+		)
 	}
 }
 
@@ -107,7 +119,10 @@ func TestTxt2ImgWarnsAboutExtraImages(t *testing.T) {
 
 	var warnings bytes.Buffer
 
-	images, err := New(server.URL, &warnings).txt2img(context.Background(), txt2imgRequest{Prompt: "test"})
+	images, err := New(
+		server.URL,
+		&warnings,
+	).txt2img(context.Background(), txt2imgRequest{Prompt: "test"})
 	if err != nil {
 		t.Fatalf("txt2img() error: %v", err)
 	}

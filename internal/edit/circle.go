@@ -4,8 +4,9 @@ import "image"
 
 const circleSamples = 4
 
-// applyCircle makes every pixel outside the circle inscribed in dst transparent, the way a CSS 50% border radius
-// would. Pixels the circle edge passes through keep a share of their alpha, so the outline stays smooth.
+// applyCircle makes every pixel outside the circle inscribed in dst transparent, the way a CSS 50%
+// border radius would. Pixels the circle edge passes through keep a share of their alpha, so the
+// outline stays smooth.
 func applyCircle(dst *image.RGBA) {
 	bounds := dst.Bounds()
 	centerX := float64(bounds.Min.X) + float64(bounds.Dx())/2
@@ -19,8 +20,8 @@ func applyCircle(dst *image.RGBA) {
 	}
 }
 
-// circleCoverage reports the fraction of the pixel whose corner sits at (dx, dy) relative to the circle's centre
-// that falls inside the circle, by supersampling.
+// circleCoverage reports the fraction of the pixel whose corner sits at (dx, dy) relative to the
+// circle's centre that falls inside the circle, by supersampling.
 func circleCoverage(dx, dy, radius float64) float64 {
 	const (
 		step   = 1.0 / circleSamples

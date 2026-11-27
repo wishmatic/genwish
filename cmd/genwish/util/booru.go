@@ -40,8 +40,18 @@ func NewBooruCommand(deps cli.Deps) *cobra.Command {
 	flags := cmd.Flags()
 	flags.IntVar(&opts.offset, "offset", 0, "how many matching tags to skip")
 	flags.IntVar(&opts.limit, "limit", catalog.DefaultTagLimit, "how many matching tags to return")
-	flags.IntVar(&opts.minCount, "min-count", defaultMinCount, "lowest work count a substring match may have")
-	flags.BoolVar(&opts.exact, "exact", false, "search is the whole tag name and aliases resolve to their target")
+	flags.IntVar(
+		&opts.minCount,
+		"min-count",
+		defaultMinCount,
+		"lowest work count a substring match may have",
+	)
+	flags.BoolVar(
+		&opts.exact,
+		"exact",
+		false,
+		"search is the whole tag name and aliases resolve to their target",
+	)
 	flags.StringArrayVar(&opts.category, "category", nil,
 		"keep only this category; repeatable ("+booru.CategoryList()+")")
 	flags.BoolVar(&opts.json, "json", false, "print the tool's JSON instead of text")

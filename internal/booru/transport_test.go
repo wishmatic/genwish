@@ -26,10 +26,12 @@ func TestSearchTagsOnlyAuthenticatesWhenBothAreSet(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			log := &requestLog{}
 
-			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				log.record(r.URL.Query())
-				_, _ = w.Write([]byte(`[]`))
-			}))
+			server := httptest.NewServer(
+				http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					log.record(r.URL.Query())
+					_, _ = w.Write([]byte(`[]`))
+				}),
+			)
 			t.Cleanup(server.Close)
 
 			httpClient, err := fetch.New(fetch.Config{BaseURL: server.URL, Limiter: noopLimiter{}})
@@ -37,15 +39,26 @@ func TestSearchTagsOnlyAuthenticatesWhenBothAreSet(t *testing.T) {
 				t.Fatalf("fetch.New() error: %v", err)
 			}
 
-			client := New(Config{BaseURL: server.URL, Login: tt.login, APIKey: tt.key, MaxLimit: 10, HTTP: httpClient})
+			client := New(
+				Config{
+					BaseURL:  server.URL,
+					Login:    tt.login,
+					APIKey:   tt.key,
+					MaxLimit: 10,
+					HTTP:     httpClient,
+				},
+			)
 
-			if _, err := client.SearchTags(context.Background(), TagQuery{Search: "x", Limit: 1}); err != nil {
+			if _, err := client.SearchTags(
+				context.Background(), TagQuery{Search: "x", Limit: 1},
+			); err != nil {
 				t.Fatalf("SearchTags() error: %v", err)
 			}
 
 			query := log.at(0)
 
-			if (query.Get("login") != "") != tt.wantLogin || (query.Get("api_key") != "") != tt.wantKey {
+			if (query.Get("login") != "") != tt.wantLogin ||
+				(query.Get("api_key") != "") != tt.wantKey {
 				t.Errorf("login=%q api_key=%q, want login=%v key=%v",
 					query.Get("login"), query.Get("api_key"), tt.wantLogin, tt.wantKey)
 			}

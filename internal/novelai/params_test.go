@@ -21,7 +21,10 @@ func TestBaseParamsDefaults(t *testing.T) {
 	}
 
 	if params["negative_prompt"] != defaultNegativePrompt {
-		t.Errorf("negative_prompt = %v, want the default negative prompt", params["negative_prompt"])
+		t.Errorf(
+			"negative_prompt = %v, want the default negative prompt",
+			params["negative_prompt"],
+		)
 	}
 
 	caption := nestedMap(t, nestedMap(t, params, "v4_prompt"), "caption")
@@ -31,7 +34,10 @@ func TestBaseParamsDefaults(t *testing.T) {
 
 	negativeCaption := nestedMap(t, nestedMap(t, params, "v4_negative_prompt"), "caption")
 	if negativeCaption["base_caption"] != defaultNegativePrompt {
-		t.Errorf("v4_negative_prompt caption = %v, want the default negative prompt", negativeCaption["base_caption"])
+		t.Errorf(
+			"v4_negative_prompt caption = %v, want the default negative prompt",
+			negativeCaption["base_caption"],
+		)
 	}
 
 	if got := asFloat(t, params, "width"); got != 832 {

@@ -14,9 +14,9 @@ const (
 	defaultMaxOffset = 1000
 )
 
-// TagSource is the capabilities the service needs from the booru client: the paged substring search plus the three
-// canonical lookups that back exact mode. It is declared here, where it is consumed, so the policy stays testable
-// without an HTTP server.
+// TagSource is the capabilities the service needs from the booru client: the paged substring search
+// plus the three canonical lookups that back exact mode. It is declared here, where it is consumed,
+// so the policy stays testable without an HTTP server.
 type TagSource interface {
 	SearchTags(ctx context.Context, query booru.TagQuery) (booru.TagPage, error)
 	FindTag(ctx context.Context, name string) (booru.Tag, bool, error)
@@ -24,9 +24,10 @@ type TagSource interface {
 	Implications(ctx context.Context, name string) ([]string, error)
 }
 
-// RelationIndex answers the canonical alias and implication graphs from the ingested index without touching the
-// network. A nil index is valid and simply means nothing is known locally. Ready distinguishes "no such alias" from
-// "not crawled yet", so callers can decide whether to fall back to an upstream lookup.
+// RelationIndex answers the canonical alias and implication graphs from the ingested index without
+// touching the network. A nil index is valid and simply means nothing is known locally. Ready
+// distinguishes "no such alias" from "not crawled yet", so callers can decide whether to fall back
+// to an upstream lookup.
 type RelationIndex interface {
 	Implications(name string) []string
 	Synonyms(name string) []string
@@ -41,8 +42,8 @@ type Options struct {
 	Clock     func() time.Time
 }
 
-// Service owns the policy around a tag search: what a valid search is, which window sizes are allowed, and how an
-// alias, an implication, and an empty result are reported.
+// Service owns the policy around a tag search: what a valid search is, which window sizes are
+// allowed, and how an alias, an implication, and an empty result are reported.
 type Service struct {
 	source TagSource
 	opts   Options

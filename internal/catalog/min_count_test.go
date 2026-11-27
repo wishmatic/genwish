@@ -11,7 +11,10 @@ import (
 func TestTagsRejectsNegativeMinCount(t *testing.T) {
 	source := &fakeSource{}
 
-	_, err := New(source, testOptions()).Tags(context.Background(), TagsInput{Search: "blue", Limit: 5, MinCount: -1})
+	_, err := New(
+		source,
+		testOptions(),
+	).Tags(context.Background(), TagsInput{Search: "blue", Limit: 5, MinCount: -1})
 	if err == nil || !strings.Contains(err.Error(), "min_count") {
 		t.Fatalf("Tags() error = %v, want it to name min_count", err)
 	}
@@ -24,7 +27,10 @@ func TestTagsRejectsNegativeMinCount(t *testing.T) {
 func TestTagsPassesMinCountUpstream(t *testing.T) {
 	source := &fakeSource{}
 
-	if _, err := New(source, testOptions()).Tags(context.Background(), TagsInput{Search: "blue", Limit: 5, MinCount: 0}); err != nil {
+	if _, err := New(source, testOptions()).Tags(
+		context.Background(),
+		TagsInput{Search: "blue", Limit: 5, MinCount: 0},
+	); err != nil {
 		t.Fatalf("Tags() error: %v", err)
 	}
 
@@ -36,7 +42,10 @@ func TestTagsPassesMinCountUpstream(t *testing.T) {
 func TestTagsSurfacesWithheld(t *testing.T) {
 	source := &fakeSource{page: booru.TagPage{Tags: []booru.Tag{}, Withheld: 1, WithheldBest: 0}}
 
-	result, err := New(source, testOptions()).Tags(context.Background(), TagsInput{Search: "ass_grabeye_contact", Limit: 5, MinCount: 1})
+	result, err := New(
+		source,
+		testOptions(),
+	).Tags(context.Background(), TagsInput{Search: "ass_grabeye_contact", Limit: 5, MinCount: 1})
 	if err != nil {
 		t.Fatalf("Tags() error: %v", err)
 	}

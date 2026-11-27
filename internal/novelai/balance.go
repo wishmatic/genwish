@@ -71,7 +71,9 @@ func parseAnlas(raw json.RawMessage) (int64, error) {
 
 	var integer int64
 	if err := json.Unmarshal(raw, &integer); err != nil {
-		return 0, fmt.Errorf("novelai: subscription.trainingStepsLeft is neither a number nor an object")
+		return 0, fmt.Errorf(
+			"novelai: subscription.trainingStepsLeft is neither a number nor an object",
+		)
 	}
 
 	return integer, nil

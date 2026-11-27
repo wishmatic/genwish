@@ -29,7 +29,10 @@ func TestTagsEchoesTheRequest(t *testing.T) {
 		}},
 	}
 
-	out := Tags(result, catalog.TagsInput{Search: "blue hair", Offset: 5, Limit: 10, MinCount: 2, Exact: true})
+	out := Tags(
+		result,
+		catalog.TagsInput{Search: "blue hair", Offset: 5, Limit: 10, MinCount: 2, Exact: true},
+	)
 
 	if out.Search != "blue_hair" || out.Status != "ok" || out.SnapshotDate != "2026-09-24" {
 		t.Errorf("output = %+v, want the result's search, status, and snapshot date", out)
@@ -89,8 +92,19 @@ func TestRenderPage(t *testing.T) {
 		Synonyms: []string{"pee", "urine"},
 		More:     true,
 		Tags: []TagOutput{
-			{Name: "blue_hair", Category: "general", Count: 482913, Implications: []string{"aqua_hair"}},
-			{Name: "dickgirl", Category: "general", Count: 52264, AliasOf: "futanari", CountIsTarget: true},
+			{
+				Name:         "blue_hair",
+				Category:     "general",
+				Count:        482913,
+				Implications: []string{"aqua_hair"},
+			},
+			{
+				Name:          "dickgirl",
+				Category:      "general",
+				Count:         52264,
+				AliasOf:       "futanari",
+				CountIsTarget: true,
+			},
 		},
 	}
 
@@ -106,7 +120,9 @@ func TestRenderPage(t *testing.T) {
 }
 
 func TestRenderAliasWithoutTheTargetCount(t *testing.T) {
-	out := TagsOutput{Tags: []TagOutput{{Name: "dickgirl", Category: "general", AliasOf: "futanari"}}}
+	out := TagsOutput{
+		Tags: []TagOutput{{Name: "dickgirl", Category: "general", AliasOf: "futanari"}},
+	}
 
 	if got, want := Render(out), "- dickgirl (general): alias of futanari"; got != want {
 		t.Errorf("Render() = %q, want %q", got, want)
@@ -130,8 +146,9 @@ func TestRenderHonestEmpties(t *testing.T) {
 				Withheld:     1,
 				WithheldBest: 0,
 			},
-			want: `No tag name contains "ass_grabeye_contact" with at least 1 works; one canonical match with 0 works ` +
-				`was hidden by the floor. Set min_count=0 to include it.`,
+			want: `No tag name contains "ass_grabeye_contact" with at least 1 works; ` +
+				`one canonical match with 0 works was hidden by the floor. ` +
+				`Set min_count=0 to include it.`,
 		},
 		"many withheld": {
 			out: TagsOutput{
@@ -141,8 +158,9 @@ func TestRenderHonestEmpties(t *testing.T) {
 				Withheld:     3,
 				WithheldBest: 1,
 			},
-			want: `No tag name contains "blue" with at least 2 works; 3 canonical matches were hidden by the floor ` +
-				`(the best has 1 works). Set min_count=0 to include them.`,
+			want: `No tag name contains "blue" with at least 2 works; ` +
+				`3 canonical matches were hidden by the floor (the best has 1 works). ` +
+				`Set min_count=0 to include them.`,
 		},
 		"offset past end": {
 			out: TagsOutput{
@@ -151,16 +169,17 @@ func TestRenderHonestEmpties(t *testing.T) {
 				Offset:   50,
 				Synonyms: []string{"pee"},
 			},
-			want: `Offset 50 is past the last result for "blue"; there is no further page. Try a smaller offset. ` +
-				`Known aliases: pee.`,
+			want: `Offset 50 is past the last result for "blue"; there is no further page. ` +
+				`Try a smaller offset. Known aliases: pee.`,
 		},
 		"exact miss": {
 			out:  TagsOutput{Search: "no_such_tag", Status: string(catalog.StatusExactNotFound)},
 			want: `No tag named "no_such_tag" exists.`,
 		},
 		"unknown": {
-			out:  TagsOutput{Search: "maybe_tag", Status: string(catalog.StatusUnknown)},
-			want: `Could not confirm whether "maybe_tag" exists because the tag index was unavailable; try again.`,
+			out: TagsOutput{Search: "maybe_tag", Status: string(catalog.StatusUnknown)},
+			want: `Could not confirm whether "maybe_tag" exists because the tag index was ` +
+				`unavailable; try again.`,
 		},
 		"unset status": {
 			out:  TagsOutput{},
@@ -190,8 +209,10 @@ func TestTagsJSONShape(t *testing.T) {
 	}
 
 	for _, key := range []string{
-		`"search"`, `"exact"`, `"status"`, `"snapshot_date"`, `"offset"`, `"limit"`, `"min_count"`, `"more"`,
-		`"alias_of"`, `"withheld"`, `"withheld_best_count"`, `"synonyms"`, `"tags"`, `"name"`, `"category"`, `"count"`,
+		`"search"`, `"exact"`, `"status"`, `"snapshot_date"`, `"offset"`,
+		`"limit"`, `"min_count"`, `"more"`, `"alias_of"`, `"withheld"`,
+		`"withheld_best_count"`, `"synonyms"`, `"tags"`, `"name"`,
+		`"category"`, `"count"`, `"count_is_target"`, `"implications"`,
 		`"count_is_target"`, `"implications"`,
 	} {
 		if !strings.Contains(string(raw), key) {
@@ -199,7 +220,8 @@ func TestTagsJSONShape(t *testing.T) {
 		}
 	}
 
-	if !strings.Contains(string(raw), `"synonyms":[]`) || !strings.Contains(string(raw), `"implications":[]`) {
+	if !strings.Contains(string(raw), `"synonyms":[]`) ||
+		!strings.Contains(string(raw), `"implications":[]`) {
 		t.Errorf("JSON %s renders empty slices as null", raw)
 	}
 }

@@ -71,8 +71,14 @@ func TestGenerateTxt2ImgWithoutInitImage(t *testing.T) {
 
 	payload := payloadOf(t, recorded.body)
 
-	if payload["width"] != float64(defaultDimension) || payload["height"] != float64(defaultDimension) {
-		t.Errorf("dimensions = %vx%v, want the %d default", payload["width"], payload["height"], defaultDimension)
+	if payload["width"] != float64(defaultDimension) ||
+		payload["height"] != float64(defaultDimension) {
+		t.Errorf(
+			"dimensions = %vx%v, want the %d default",
+			payload["width"],
+			payload["height"],
+			defaultDimension,
+		)
 	}
 
 	if _, ok := payload["init_images"]; ok {
@@ -83,14 +89,21 @@ func TestGenerateTxt2ImgWithoutInitImage(t *testing.T) {
 func TestGenerateTxt2ImgDefaultsOnlyTheMissingDimension(t *testing.T) {
 	client, recorded := newRecordingForge(t)
 
-	if _, err := client.Generate(context.Background(), GenerateRequest{Prompt: "a cat", Width: 768}); err != nil {
+	if _, err := client.Generate(
+		context.Background(), GenerateRequest{Prompt: "a cat", Width: 768},
+	); err != nil {
 		t.Fatalf("Generate() error: %v", err)
 	}
 
 	payload := payloadOf(t, recorded.body)
 
 	if payload["width"] != float64(768) || payload["height"] != float64(defaultDimension) {
-		t.Errorf("dimensions = %vx%v, want 768x%d", payload["width"], payload["height"], defaultDimension)
+		t.Errorf(
+			"dimensions = %vx%v, want 768x%d",
+			payload["width"],
+			payload["height"],
+			defaultDimension,
+		)
 	}
 }
 
@@ -99,7 +112,9 @@ func TestGenerateImg2ImgWithInitImage(t *testing.T) {
 
 	initImage := initImagePNG(t, 1024, 768)
 
-	if _, err := client.Generate(context.Background(), GenerateRequest{Prompt: "a cat", InitImage: initImage}); err != nil {
+	if _, err := client.Generate(
+		context.Background(), GenerateRequest{Prompt: "a cat", InitImage: initImage},
+	); err != nil {
 		t.Fatalf("Generate() error: %v", err)
 	}
 
@@ -110,7 +125,11 @@ func TestGenerateImg2ImgWithInitImage(t *testing.T) {
 	payload := payloadOf(t, recorded.body)
 
 	if payload["denoising_strength"] != defaultDenoisingStrength {
-		t.Errorf("denoising_strength = %v, want %v", payload["denoising_strength"], defaultDenoisingStrength)
+		t.Errorf(
+			"denoising_strength = %v, want %v",
+			payload["denoising_strength"],
+			defaultDenoisingStrength,
+		)
 	}
 
 	images, ok := payload["init_images"].([]any)
@@ -119,14 +138,22 @@ func TestGenerateImg2ImgWithInitImage(t *testing.T) {
 	}
 
 	if payload["width"] != float64(1024) || payload["height"] != float64(768) {
-		t.Errorf("dimensions = %vx%v, want the init image's 1024x768", payload["width"], payload["height"])
+		t.Errorf(
+			"dimensions = %vx%v, want the init image's 1024x768",
+			payload["width"],
+			payload["height"],
+		)
 	}
 }
 
 func TestGenerateImg2ImgKeepsRequestedStrength(t *testing.T) {
 	client, recorded := newRecordingForge(t)
 
-	req := GenerateRequest{Prompt: "a cat", InitImage: initImagePNG(t, 512, 512), DenoisingStrength: 0.4}
+	req := GenerateRequest{
+		Prompt:            "a cat",
+		InitImage:         initImagePNG(t, 512, 512),
+		DenoisingStrength: 0.4,
+	}
 
 	if _, err := client.Generate(context.Background(), req); err != nil {
 		t.Fatalf("Generate() error: %v", err)

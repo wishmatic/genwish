@@ -165,7 +165,13 @@ func TestGenerateSizesImg2ImgFromInitImage(t *testing.T) {
 
 			width, height := asFloat(t, params, "width"), asFloat(t, params, "height")
 			if width != tt.wantWidth || height != tt.wantHeight {
-				t.Errorf("dimensions = %vx%v, want %vx%v", width, height, tt.wantWidth, tt.wantHeight)
+				t.Errorf(
+					"dimensions = %vx%v, want %vx%v",
+					width,
+					height,
+					tt.wantWidth,
+					tt.wantHeight,
+				)
 			}
 		})
 	}

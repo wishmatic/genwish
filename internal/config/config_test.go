@@ -37,7 +37,8 @@ func TestLoad(t *testing.T) {
 			t.Fatalf("Load() error: %v", err)
 		}
 
-		if cfg.Output.Format != "webp" || cfg.Output.Path != filepath.Join(home, ".genwish", "out") {
+		if cfg.Output.Format != "webp" ||
+			cfg.Output.Path != filepath.Join(home, ".genwish", "out") {
 			t.Errorf("Output = %+v, want webp under the home directory", cfg.Output)
 		}
 
@@ -78,7 +79,8 @@ timeout = 30
 			t.Errorf("Output = %+v, want a png under the expanded home path", cfg.Output)
 		}
 
-		if cfg.Neo.URL != "http://forge:7860" || cfg.Neo.ModelsFile != filepath.Join(home, "models.txt") {
+		if cfg.Neo.URL != "http://forge:7860" ||
+			cfg.Neo.ModelsFile != filepath.Join(home, "models.txt") {
 			t.Errorf("Neo = %+v, want the configured URL and model list", cfg.Neo)
 		}
 
@@ -101,7 +103,8 @@ format = "jpeg"
 			t.Fatalf("Load() error: %v", err)
 		}
 
-		if cfg.Output.Format != "jpeg" || cfg.Output.Path != filepath.Join(home, ".genwish", "out") {
+		if cfg.Output.Format != "jpeg" ||
+			cfg.Output.Path != filepath.Join(home, ".genwish", "out") {
 			t.Errorf("Output = %+v, want only the format overridden", cfg.Output)
 		}
 
@@ -132,7 +135,8 @@ format = "jpeg"
 		path := filepath.Join(t.TempDir(), "missing.toml")
 
 		_, err := Load(path)
-		if err == nil || !strings.Contains(err.Error(), "config file") || !strings.Contains(err.Error(), path) {
+		if err == nil || !strings.Contains(err.Error(), "config file") ||
+			!strings.Contains(err.Error(), path) {
 			t.Errorf("Load() error = %v, want the missing path named", err)
 		}
 	})
@@ -145,7 +149,8 @@ formatt = "png"
 `)
 
 		_, err := Load(path)
-		if err == nil || !strings.Contains(err.Error(), "unknown key") || !strings.Contains(err.Error(), "output.formatt") {
+		if err == nil || !strings.Contains(err.Error(), "unknown key") ||
+			!strings.Contains(err.Error(), "output.formatt") {
 			t.Errorf("Load() error = %v, want the unknown key named", err)
 		}
 	})
@@ -186,7 +191,8 @@ formatt = "png"
 			t.Fatalf("Load() error: %v", err)
 		}
 
-		if cfg.Output.Format != "webp" || cfg.Output.Path != filepath.Join(home, ".genwish", "out") {
+		if cfg.Output.Format != "webp" ||
+			cfg.Output.Path != filepath.Join(home, ".genwish", "out") {
 			t.Errorf("Output = %+v, want the defaults", cfg.Output)
 		}
 

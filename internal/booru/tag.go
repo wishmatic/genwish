@@ -14,8 +14,8 @@ const (
 	CategoryMeta      TagCategory = "meta"
 )
 
-// danbooruCategories is Danbooru's numeric encoding: general 0, artist 1, copyright 3, character 4, meta 5. The value 2
-// is skipped.
+// danbooruCategories is Danbooru's numeric encoding: general 0, artist 1, copyright 3, character 4,
+// meta 5. The value 2 is skipped.
 var danbooruCategories = map[TagCategory]int{
 	CategoryGeneral:   0,
 	CategoryArtist:    1,
@@ -32,7 +32,13 @@ var categoriesByCode = map[int]TagCategory{
 	5: CategoryMeta,
 }
 
-var categoryNames = []TagCategory{CategoryGeneral, CategoryArtist, CategoryCopyright, CategoryCharacter, CategoryMeta}
+var categoryNames = []TagCategory{
+	CategoryGeneral,
+	CategoryArtist,
+	CategoryCopyright,
+	CategoryCharacter,
+	CategoryMeta,
+}
 
 func (c TagCategory) String() string {
 	return string(c)
@@ -74,8 +80,8 @@ type Tag struct {
 	Count        int
 	AliasOf      string
 	Implications []string
-	// CountIsTarget marks a row whose Count belongs to AliasOf rather than to Name, so a caller does not read it as
-	// the alias' own work count.
+	// CountIsTarget marks a row whose Count belongs to AliasOf rather than to Name, so a caller does
+	// not read it as the alias' own work count.
 	CountIsTarget bool
 }
 

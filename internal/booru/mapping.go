@@ -23,13 +23,16 @@ func toTags(raw []tagJSON) []Tag {
 			continue
 		}
 
-		tags = append(tags, Tag{Name: name, Category: tagCategory(item.Category), Count: item.PostCount})
+		tags = append(
+			tags,
+			Tag{Name: name, Category: tagCategory(item.Category), Count: item.PostCount},
+		)
 	}
 
 	return tags
 }
 
-// relationJSON covers both tag_aliases.json and tag_implications.json, which share these two fields.
+// relationJSON covers tag_aliases.json and tag_implications.json, which share these fields.
 type relationJSON struct {
 	AntecedentName string `json:"antecedent_name"`
 	ConsequentName string `json:"consequent_name"`

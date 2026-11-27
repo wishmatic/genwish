@@ -7,10 +7,14 @@ import (
 	"github.com/wishmatic/genwish/internal/booru"
 )
 
-// exact resolves aliases before looking the name up, so `dickgirl` answers with `futanari` and its count rather than a
-// bare zero. An alias that resolves to a missing tag still reports the alias, which is what makes it distinct from a
-// genuine miss.
-func (s *Service) exact(ctx context.Context, search string, categories []booru.TagCategory) (TagsResult, error) {
+// exact resolves aliases before looking the name up, so `dickgirl` answers with `futanari` and its
+// count rather than a bare zero. An alias that resolves to a missing tag still reports the alias,
+// which is what makes it distinct from a genuine miss.
+func (s *Service) exact(
+	ctx context.Context,
+	search string,
+	categories []booru.TagCategory,
+) (TagsResult, error) {
 	aliasOf, aliased, aliasErr := s.canonical(ctx, search)
 
 	lookup := search
@@ -55,13 +59,18 @@ func (s *Service) exactMiss(search string, aliased bool, aliasOf string) TagsRes
 		return s.result(search, []booru.Tag{}, false, StatusExactNotFound, "")
 	}
 
-	aliasRow := booru.Tag{Name: search, Category: booru.CategoryGeneral, AliasOf: aliasOf, Implications: []string{}}
+	aliasRow := booru.Tag{
+		Name:         search,
+		Category:     booru.CategoryGeneral,
+		AliasOf:      aliasOf,
+		Implications: []string{},
+	}
 
 	return s.result(search, []booru.Tag{aliasRow}, false, StatusOK, aliasOf)
 }
 
-// exactImplications prefers the local graph but falls back to one upstream call, so an exact answer is never blocked on
-// whether the background index has been built yet.
+// exactImplications prefers the local graph but falls back to one upstream call, so an exact answer
+// is never blocked on whether the background index has been built yet.
 func (s *Service) exactImplications(ctx context.Context, name string) []string {
 	if s.opts.Relations != nil && s.opts.Relations.Ready() {
 		return knownImplications(s.opts.Relations, name)
@@ -75,8 +84,9 @@ func (s *Service) exactImplications(ctx context.Context, name string) []string {
 	return known
 }
 
-// canonical resolves name through the local alias graph when it is ready, and otherwise asks upstream, so a built index
-// removes the alias lookup from the request path and an unbuilt one still answers correctly.
+// canonical resolves name through the local alias graph when it is ready, and otherwise asks
+// upstream, so a built index removes the alias lookup from the request path and an unbuilt one
+// still answers correctly.
 func (s *Service) canonical(ctx context.Context, name string) (string, bool, error) {
 	if s.opts.Relations != nil && s.opts.Relations.Ready() {
 		target, ok := s.opts.Relations.Canonical(name)

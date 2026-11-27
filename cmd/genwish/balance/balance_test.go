@@ -15,9 +15,11 @@ import (
 func TestNewCommand(t *testing.T) {
 	t.Run("accepts the nano aliases", func(t *testing.T) {
 		for _, alias := range []string{"nano-gpt", "nanogpt", "nano gpt"} {
-			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-				_, _ = w.Write([]byte(`{"usd_balance":"1","nano_balance":"2"}`))
-			}))
+			server := httptest.NewServer(
+				http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+					_, _ = w.Write([]byte(`{"usd_balance":"1","nano_balance":"2"}`))
+				}),
+			)
 
 			deps := cli.Deps{Out: &bytes.Buffer{}, Nano: testutil.NewNanoClient(t, server.URL)}
 			err := testutil.Run(t, NewCommand(deps), alias)
@@ -31,9 +33,11 @@ func TestNewCommand(t *testing.T) {
 
 	t.Run("accepts the novel aliases", func(t *testing.T) {
 		for _, alias := range []string{"novel-ai", "novel ai", "novelai"} {
-			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-				_, _ = w.Write([]byte(`{"subscription":{"trainingStepsLeft":7}}`))
-			}))
+			server := httptest.NewServer(
+				http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+					_, _ = w.Write([]byte(`{"subscription":{"trainingStepsLeft":7}}`))
+				}),
+			)
 
 			out := &bytes.Buffer{}
 			deps := cli.Deps{Out: out, Novel: novelai.New(server.URL, "key")}

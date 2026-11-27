@@ -133,7 +133,10 @@ func TestGenerateImageDownloadsAURLResult(t *testing.T) {
 	server, requests := testutil.CaptureServerFunc(t, func(r *http.Request) (int, string) {
 		switch r.URL.Path {
 		case "/api/v1/images/generations":
-			return http.StatusOK, fmt.Sprintf(`{"data":[{"url":%q}],"cost":0.03}`, serverURL+"/asset.png")
+			return http.StatusOK, fmt.Sprintf(
+				`{"data":[{"url":%q}],"cost":0.03}`,
+				serverURL+"/asset.png",
+			)
 		case "/asset.png":
 			return http.StatusOK, string(testutil.PNG)
 		default:
@@ -174,7 +177,10 @@ func TestGenerateImageLeavesNoFileWhenADownloadFails(t *testing.T) {
 	server, _ := testutil.CaptureServerFunc(t, func(r *http.Request) (int, string) {
 		switch r.URL.Path {
 		case "/api/v1/images/generations":
-			return http.StatusOK, fmt.Sprintf(`{"data":[{"url":%q}],"cost":0.03}`, serverURL+"/asset.png")
+			return http.StatusOK, fmt.Sprintf(
+				`{"data":[{"url":%q}],"cost":0.03}`,
+				serverURL+"/asset.png",
+			)
 		case "/asset.png":
 			return http.StatusInternalServerError, "boom"
 		default:

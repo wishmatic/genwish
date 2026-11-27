@@ -9,15 +9,15 @@ import (
 // maxRelationPages bounds a crawl so a misbehaving upstream cannot make Refresh run forever.
 const maxRelationPages = 1000
 
-// RelationSource is the two canonical tables the index ingests: the active implication graph and the active alias
-// graph.
+// RelationSource is the two canonical tables the index ingests: the active implication graph and
+// the active alias graph.
 type RelationSource interface {
 	ImplicationPage(ctx context.Context, page, limit int) ([]Implication, error)
 	AliasPage(ctx context.Context, page, limit int) ([]Alias, error)
 }
 
-// Refresh crawls every page of both graphs and swaps them in atomically. A crawl that fails part way leaves the
-// previous graphs untouched.
+// Refresh crawls every page of both graphs and swaps them in atomically. A crawl that fails part
+// way leaves the previous graphs untouched.
 func (i *RelationIndex) Refresh(ctx context.Context) error {
 	if i == nil || i.source == nil {
 		return nil
@@ -43,8 +43,8 @@ func (i *RelationIndex) Refresh(ctx context.Context) error {
 	return nil
 }
 
-// Start refreshes in the background until ctx is cancelled. An interval of zero disables the index, leaving the graphs
-// empty and every lookup a miss.
+// Start refreshes in the background until ctx is cancelled. An interval of zero disables the index,
+// leaving the graphs empty and every lookup a miss.
 func (i *RelationIndex) Start(ctx context.Context, onError func(error)) {
 	if i == nil || i.source == nil || i.interval <= 0 {
 		return
@@ -86,7 +86,10 @@ func (i *RelationIndex) crawlImplications(ctx context.Context) (map[string][]str
 		}
 
 		for _, relation := range batch {
-			collected[relation.Antecedent] = append(collected[relation.Antecedent], relation.Consequent)
+			collected[relation.Antecedent] = append(
+				collected[relation.Antecedent],
+				relation.Consequent,
+			)
 		}
 
 		if len(batch) < i.pageSize {
@@ -101,7 +104,9 @@ func (i *RelationIndex) crawlImplications(ctx context.Context) (map[string][]str
 	return collected, nil
 }
 
-func (i *RelationIndex) crawlAliases(ctx context.Context) (map[string]string, map[string][]string, error) {
+func (i *RelationIndex) crawlAliases(
+	ctx context.Context,
+) (map[string]string, map[string][]string, error) {
 	aliasOf := map[string]string{}
 	aliasesOf := map[string][]string{}
 

@@ -9,8 +9,8 @@ import (
 	"github.com/wishmatic/genwish/internal/fetch"
 )
 
-// Danbooru reports a rejected request as a JSON body whose message is the useful part and whose backtrace is not, so
-// only the message is surfaced.
+// Danbooru reports a rejected request as a JSON body whose message is the useful part and whose
+// backtrace is not, so only the message is surfaced.
 type apiErrorBody struct {
 	Message string `json:"message"`
 }

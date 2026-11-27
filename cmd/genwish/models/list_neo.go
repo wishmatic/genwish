@@ -63,7 +63,13 @@ func runNeo(deps cli.Deps, args []string, query string, limit int) error {
 		return err
 	}
 
-	fmt.Fprintf(deps.Out, "%d of %d models shown (%d matched)\n", len(shown), len(models), len(matched))
+	fmt.Fprintf(
+		deps.Out,
+		"%d of %d models shown (%d matched)\n",
+		len(shown),
+		len(models),
+		len(matched),
+	)
 
 	return nil
 }

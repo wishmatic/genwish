@@ -6,9 +6,10 @@ import (
 	"time"
 )
 
-// RelationIndex is the only ingested dataset in the tool. Danbooru's implication and alias graphs are small enough to
-// hold in memory and change slowly, so they are crawled once and refreshed on an interval rather than queried per
-// result. Query code only ever reads the index, which keeps the crawl off the request path.
+// RelationIndex is the only ingested dataset in the tool. Danbooru's implication and alias graphs
+// are small enough to hold in memory and change slowly, so they are crawled once and refreshed on
+// an interval rather than queried per result. Query code only ever reads the index, which keeps the
+// crawl off the request path.
 type RelationIndex struct {
 	source   RelationSource
 	pageSize int
@@ -48,8 +49,8 @@ func (i *RelationIndex) Implications(name string) []string {
 	return copyNames(i.byCause[NormalizeTag(name)])
 }
 
-// Canonical follows the active alias chain from name to the first name that is not itself aliased. It reports false
-// when name is not an alias.
+// Canonical follows the active alias chain from name to the first name that is not itself aliased.
+// It reports false when name is not an alias.
 func (i *RelationIndex) Canonical(name string) (string, bool) {
 	if i == nil {
 		return "", false
@@ -61,9 +62,9 @@ func (i *RelationIndex) Canonical(name string) (string, bool) {
 	return i.canonicalLocked(NormalizeTag(name))
 }
 
-// Synonyms returns the canonical names this concept is also known by: the alias target when name is an alias, and the
-// active aliases of name and of its target. It is the recall half of alias resolution; the names are canonical tags,
-// not substring matches.
+// Synonyms returns the canonical names this concept is also known by: the alias target when name is
+// an alias, and the active aliases of name and of its target. It is the recall half of alias
+// resolution; the names are canonical tags, not substring matches.
 func (i *RelationIndex) Synonyms(name string) []string {
 	if i == nil {
 		return nil
@@ -96,8 +97,8 @@ func (i *RelationIndex) Synonyms(name string) []string {
 	return keys(known)
 }
 
-// Ready reports whether the graph has been built at least once, so a caller can tell "no such alias" from "not crawled
-// yet".
+// Ready reports whether the graph has been built at least once, so a caller can tell "no such
+// alias" from "not crawled yet".
 func (i *RelationIndex) Ready() bool {
 	if i == nil {
 		return false

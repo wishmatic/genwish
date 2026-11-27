@@ -124,7 +124,10 @@ func TestTagsRejectsWindowOutOfRange(t *testing.T) {
 			source := &fakeSource{}
 			service := New(source, testOptions())
 
-			_, err := service.Tags(context.Background(), TagsInput{Search: "blue", Offset: tt.offset, Limit: tt.limit})
+			_, err := service.Tags(
+				context.Background(),
+				TagsInput{Search: "blue", Offset: tt.offset, Limit: tt.limit},
+			)
 			if err == nil {
 				t.Fatal("Tags() error = nil, want an error")
 			}
@@ -144,7 +147,10 @@ func TestTagsPassesTheWindowThrough(t *testing.T) {
 	source := &fakeSource{page: booru.TagPage{Tags: []booru.Tag{{Name: "blue_hair"}}, More: true}}
 	service := New(source, testOptions())
 
-	result, err := service.Tags(context.Background(), TagsInput{Search: "blue", Offset: 30, Limit: 25})
+	result, err := service.Tags(
+		context.Background(),
+		TagsInput{Search: "blue", Offset: 30, Limit: 25},
+	)
 	if err != nil {
 		t.Fatalf("Tags() error: %v", err)
 	}
@@ -161,7 +167,10 @@ func TestTagsPassesTheWindowThrough(t *testing.T) {
 func TestTagsPropagatesProviderError(t *testing.T) {
 	source := &fakeSource{err: errors.New("danbooru: boom")}
 
-	_, err := New(source, testOptions()).Tags(context.Background(), TagsInput{Search: "blue", Limit: 25})
+	_, err := New(
+		source,
+		testOptions(),
+	).Tags(context.Background(), TagsInput{Search: "blue", Limit: 25})
 	if err == nil {
 		t.Fatal("Tags() error = nil, want an error")
 	}

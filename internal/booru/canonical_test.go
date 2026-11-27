@@ -16,7 +16,11 @@ func TestSearchTagsSendsCategories(t *testing.T) {
 		_, _ = w.Write([]byte(`[]`))
 	})
 
-	query := TagQuery{Search: "piss", Limit: 5, Categories: []TagCategory{CategoryGeneral, CategoryArtist}}
+	query := TagQuery{
+		Search:     "piss",
+		Limit:      5,
+		Categories: []TagCategory{CategoryGeneral, CategoryArtist},
+	}
 
 	if _, err := client.SearchTags(context.Background(), query); err != nil {
 		t.Fatalf("SearchTags() error: %v", err)
@@ -35,7 +39,9 @@ func TestSearchTagsOmitsCategoryWhenUnset(t *testing.T) {
 		_, _ = w.Write([]byte(`[]`))
 	})
 
-	if _, err := client.SearchTags(context.Background(), TagQuery{Search: "piss", Limit: 5}); err != nil {
+	if _, err := client.SearchTags(
+		context.Background(), TagQuery{Search: "piss", Limit: 5},
+	); err != nil {
 		t.Fatalf("SearchTags() error: %v", err)
 	}
 
@@ -55,7 +61,10 @@ func TestSearchTagsWithholdsTheZeroCountTail(t *testing.T) {
 		]`))
 	})
 
-	page, err := client.SearchTags(context.Background(), TagQuery{Search: "real", Limit: 5, MinCount: 1})
+	page, err := client.SearchTags(
+		context.Background(),
+		TagQuery{Search: "real", Limit: 5, MinCount: 1},
+	)
 	if err != nil {
 		t.Fatalf("SearchTags() error: %v", err)
 	}
@@ -127,7 +136,10 @@ func TestSearchTagsMatchedWhenOffsetRunsPastTheEnd(t *testing.T) {
 		serveTagPage(w, r, tagNames(3))
 	})
 
-	page, err := client.SearchTags(context.Background(), TagQuery{Search: "blue", Offset: 10, Limit: 5})
+	page, err := client.SearchTags(
+		context.Background(),
+		TagQuery{Search: "blue", Offset: 10, Limit: 5},
+	)
 	if err != nil {
 		t.Fatalf("SearchTags() error: %v", err)
 	}
@@ -142,7 +154,10 @@ func TestSearchTagsOffsetWithinRangeIsNotPastEnd(t *testing.T) {
 		serveTagPage(w, r, tagNames(30))
 	})
 
-	page, err := client.SearchTags(context.Background(), TagQuery{Search: "blue", Offset: 5, Limit: 5})
+	page, err := client.SearchTags(
+		context.Background(),
+		TagQuery{Search: "blue", Offset: 5, Limit: 5},
+	)
 	if err != nil {
 		t.Fatalf("SearchTags() error: %v", err)
 	}
@@ -160,7 +175,10 @@ func TestSearchTagsUnmatchedAtANonZeroOffset(t *testing.T) {
 		_, _ = w.Write([]byte(`[]`))
 	})
 
-	page, err := client.SearchTags(context.Background(), TagQuery{Search: "qzxwvjklm", Offset: 1000, Limit: 5})
+	page, err := client.SearchTags(
+		context.Background(),
+		TagQuery{Search: "qzxwvjklm", Offset: 1000, Limit: 5},
+	)
 	if err != nil {
 		t.Fatalf("SearchTags() error: %v", err)
 	}
@@ -261,7 +279,11 @@ func TestAliasTargetFollowsAndTerminates(t *testing.T) {
 			return
 		}
 
-		_, _ = w.Write([]byte(`[{"antecedent_name":"` + antecedent + `","consequent_name":"` + consequent + `"}]`))
+		_, _ = w.Write(
+			[]byte(
+				`[{"antecedent_name":"` + antecedent + `","consequent_name":"` + consequent + `"}]`,
+			),
+		)
 	})
 
 	target, aliased, err := client.AliasTarget(context.Background(), "dickgirl")
@@ -282,7 +304,8 @@ func TestAliasTargetFollowsAndTerminates(t *testing.T) {
 		t.Errorf("AliasTarget(loop_a) = %q aliased %v, want a terminating answer", looped, aliased)
 	}
 
-	if _, aliased, err := client.AliasTarget(context.Background(), "futanari"); err != nil || aliased {
+	if _, aliased, err := client.AliasTarget(context.Background(), "futanari"); err != nil ||
+		aliased {
 		t.Errorf("AliasTarget(futanari) aliased %v error %v, want not aliased", aliased, err)
 	}
 }
@@ -319,7 +342,11 @@ func TestImplicationPageMapsRows(t *testing.T) {
 			return
 		}
 
-		_, _ = w.Write([]byte(`[{"antecedent_name":"a","consequent_name":"b"},{"antecedent_name":"","consequent_name":"c"}]`))
+		_, _ = w.Write(
+			[]byte(
+				`[{"antecedent_name":"a","consequent_name":"b"},{"antecedent_name":"","consequent_name":"c"}]`,
+			),
+		)
 	})
 
 	relations, err := client.ImplicationPage(context.Background(), 1, 1000)

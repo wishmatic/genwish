@@ -48,8 +48,9 @@ type HTTPError struct {
 	Body       string
 }
 
-// BodyError is a 200 response whose body is not the JSON document the caller asked for. It exists so a block page, a
-// redirect to HTML, or an upstream message string is diagnosed instead of surfacing as a Go type error.
+// BodyError is a 200 response whose body is not the JSON document the caller asked for. It exists
+// so a block page, a redirect to HTML, or an upstream message string is diagnosed instead of
+// surfacing as a Go type error.
 type BodyError struct {
 	Label       string
 	Path        string
@@ -116,11 +117,22 @@ func (c *Client) BaseURL() string {
 	return c.baseURL
 }
 
-func GetJSON[T any](ctx context.Context, c *Client, label, path string, query url.Values) (T, error) {
+func GetJSON[T any](
+	ctx context.Context,
+	c *Client,
+	label, path string,
+	query url.Values,
+) (T, error) {
 	return GetJSONWithHeaders[T](ctx, c, label, path, query, nil)
 }
 
-func GetJSONWithHeaders[T any](ctx context.Context, c *Client, label, path string, query url.Values, headers http.Header) (T, error) {
+func GetJSONWithHeaders[T any](
+	ctx context.Context,
+	c *Client,
+	label, path string,
+	query url.Values,
+	headers http.Header,
+) (T, error) {
 	var out T
 
 	resp, err := c.get(ctx, label, path, query, headers)
@@ -158,7 +170,8 @@ func excerpt(body []byte) string {
 	return string(body)
 }
 
-// rejectBody reports whether a body cannot be a JSON document for these APIs, before any unmarshal is attempted.
+// rejectBody reports whether a body cannot be a JSON document for these APIs, before any unmarshal
+// is attempted.
 func rejectBody(body []byte) (string, bool) {
 	if len(body) == 0 {
 		return "an empty body", true
@@ -184,7 +197,11 @@ func rejectBody(body []byte) (string, bool) {
 	}
 }
 
-func (c *Client) bodyError(label, path string, resp *http.Response, body, reason string) *BodyError {
+func (c *Client) bodyError(
+	label, path string,
+	resp *http.Response,
+	body, reason string,
+) *BodyError {
 	return &BodyError{
 		Label:       label,
 		Path:        path,
@@ -203,7 +220,12 @@ func mediaType(contentType string) string {
 	return strings.TrimSpace(contentType)
 }
 
-func (c *Client) get(ctx context.Context, label, path string, query url.Values, headers http.Header) (*http.Response, error) {
+func (c *Client) get(
+	ctx context.Context,
+	label, path string,
+	query url.Values,
+	headers http.Header,
+) (*http.Response, error) {
 	var lastErr error
 
 	for attempt := 0; attempt < maxAttempts; attempt++ {
@@ -237,7 +259,12 @@ func (c *Client) get(ctx context.Context, label, path string, query url.Values, 
 	return nil, lastErr
 }
 
-func (c *Client) do(ctx context.Context, path string, query url.Values, headers http.Header) (*http.Response, error) {
+func (c *Client) do(
+	ctx context.Context,
+	path string,
+	query url.Values,
+	headers http.Header,
+) (*http.Response, error) {
 	rawURL := c.baseURL + path
 	if len(query) > 0 {
 		rawURL += "?" + query.Encode()

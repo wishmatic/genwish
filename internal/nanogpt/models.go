@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	// ModelKindImage and ModelKindVideo name the two lists this server reads, and the word each
-	// one contributes to NanoGPT's own path.
+	// ModelKindImage and ModelKindVideo name the two lists this server reads, and the word each one
+	// contributes to NanoGPT's own path.
 	ModelKindImage = "image"
 	ModelKindVideo = "video"
 )
@@ -16,8 +16,8 @@ const (
 // ModelKinds enumerates the lists, in the order a caller should offer them.
 var ModelKinds = []string{ModelKindImage, ModelKindVideo}
 
-// Model is one entry of either list. Capabilities, supported parameters, and pricing stay as
-// they arrived, because their shape varies by model and NanoGPT adds fields without notice.
+// Model is one entry of either list. Capabilities, supported parameters, and pricing stay as they
+// arrived, because their shape varies by model and NanoGPT adds fields without notice.
 type Model struct {
 	ID                  string         `json:"id"`
 	Name                string         `json:"name"`

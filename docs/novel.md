@@ -33,21 +33,19 @@ Defaults:
 
 Flags:
 
-| Flag                   | Default                  | Purpose                                             |
-| ---------------------- | ------------------------ | --------------------------------------------------- |
-| `--model`              | `nai-diffusion-5-full`   | NovelAI model id. Must not be empty.                |
-| `--negative-prompt`    | provider default         | Things to avoid.                                    |
-| `--sampler-name`       | `k_euler_ancestral`      | NovelAI sampler.                                    |
-| `--steps`              | `20`                     | Sampling steps.                                     |
-| `--width` / `--height` | `0`                      | Output size; 0 uses 512 or the init image's size.   |
-| `--cfg-scale`          | `7`                      | Classifier-free guidance scale.                     |
-| `--seed`               | `-1`                     | Random seed; -1 is random.                          |
-| `--init-image`         | empty                    | Local image to transform.                           |
-| `--init-image-url`     | empty                    | Address to transform. Use only one init image flag. |
-| `--denoising-strength` | `0.75`                   | How much of the init image to change.               |
-| `--noise`              | `0`                      | Extra image noise; only used with an init image.    |
-| `--format`             | `output.format` (`webp`) | `png`, `jpeg`, `jxl`, or `webp`.                    |
-| `--out`                | `output.path`            | Base output directory.                              |
+- `--model` (`nai-diffusion-5-full`): NovelAI model id; must not be empty.
+- `--negative-prompt` (provider default): things to avoid.
+- `--sampler-name` (`k_euler_ancestral`): NovelAI sampler.
+- `--steps` (`20`): sampling steps.
+- `--width` / `--height` (`0`): output size; 0 uses 512 or the init image's size.
+- `--cfg-scale` (`7`): classifier-free guidance scale.
+- `--seed` (`-1`): random seed; -1 is random.
+- `--init-image` (empty): local image to transform.
+- `--init-image-url` (empty): address to transform; use only one init image flag.
+- `--denoising-strength` (`0.75`): how much of the init image to change.
+- `--noise` (`0`): extra image noise; only used with an init image.
+- `--format` (`output.format`, default `webp`): `png`, `jpeg`, `jxl`, or `webp`.
+- `--out` (`output.path`): base output directory.
 
 Images are written under `<out>/images/<date>/<uuid>.<ext>`.
 
@@ -60,7 +58,9 @@ genwish models list novel
 genwish models list novel --query 4-5 --limit 5
 ```
 
-The list covers the V5, V4.5, V4, V3, and Furry V3 image families. `--query` filters ids and `--limit` caps the output. `genwish models list novel video` is rejected because NovelAI serves only image models.
+The list covers the V5, V4.5, V4, V3, and Furry V3 image families. `--query` filters ids and
+`--limit` caps the output. `genwish models list novel video` is rejected because NovelAI serves
+only image models.
 
 ## Balance and Anlas
 
@@ -70,7 +70,9 @@ genwish balance novel
 
 Prints `Anlas: N`, and `Tier: ...` when NovelAI reports one.
 
-The balance comes from `GET https://image.novelai.net/user/data` with the API key as a Bearer token. The Anlas total is read from `subscription.trainingStepsLeft`, either as an object with `fixedTrainingStepsLeft` plus `purchasedTrainingSteps`, or as a plain integer on older responses.
+The balance comes from `GET https://image.novelai.net/user/data` with the API key as a Bearer
+token. The Anlas total is read from `subscription.trainingStepsLeft`, either as an object with
+`fixedTrainingStepsLeft` plus `purchasedTrainingSteps`, or as a plain integer on older responses.
 
 ## Agent model knowledge
 

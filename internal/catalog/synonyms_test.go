@@ -50,7 +50,10 @@ func TestTagsSynonymsDropNamesAlreadyShown(t *testing.T) {
 func TestTagsWithoutIndexHasNoSynonyms(t *testing.T) {
 	source := &fakeSource{}
 
-	result, err := New(source, testOptions()).Tags(context.Background(), TagsInput{Search: "piss", Limit: 5})
+	result, err := New(
+		source,
+		testOptions(),
+	).Tags(context.Background(), TagsInput{Search: "piss", Limit: 5})
 	if err != nil {
 		t.Fatalf("Tags() error: %v", err)
 	}
@@ -66,13 +69,19 @@ func TestTagsExactUsesTheIndexCanonical(t *testing.T) {
 	opts := testOptions()
 	opts.Relations = relationsWithSynonyms()
 
-	result, err := New(source, opts).Tags(context.Background(), TagsInput{Search: "piss", Exact: true})
+	result, err := New(
+		source,
+		opts,
+	).Tags(context.Background(), TagsInput{Search: "piss", Exact: true})
 	if err != nil {
 		t.Fatalf("Tags() error: %v", err)
 	}
 
 	if result.AliasOf != "pee" || len(result.Tags) != 2 || result.Tags[0].Name != "piss" {
-		t.Fatalf("result = %+v, want the alias resolved from the index without an upstream call", result)
+		t.Fatalf(
+			"result = %+v, want the alias resolved from the index without an upstream call",
+			result,
+		)
 	}
 
 	if source.calls != 1 {

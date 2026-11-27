@@ -103,7 +103,11 @@ func TestGenerateImagesReadsTheBytesHoweverTheyAreWrapped(t *testing.T) {
 
 	for name, encoded := range tests {
 		t.Run(name, func(t *testing.T) {
-			srv, _ := recordingServer(t, `{"data":[{"b64_json":`+jsonString(encoded)+`}]}`, http.StatusOK)
+			srv, _ := recordingServer(
+				t,
+				`{"data":[{"b64_json":`+jsonString(encoded)+`}]}`,
+				http.StatusOK,
+			)
 
 			result, err := newTestClient(t, srv.URL).GenerateImages(
 				context.Background(), ImageRequest{Prompt: "a lake"},
@@ -120,9 +124,16 @@ func TestGenerateImagesReadsTheBytesHoweverTheyAreWrapped(t *testing.T) {
 }
 
 func TestGenerateImagesKeepsTheURLItFallsBackTo(t *testing.T) {
-	srv, _ := recordingServer(t, `{"data":[{"url":"https://cdn.example.com/a.png"}]}`, http.StatusOK)
+	srv, _ := recordingServer(
+		t,
+		`{"data":[{"url":"https://cdn.example.com/a.png"}]}`,
+		http.StatusOK,
+	)
 
-	result, err := newTestClient(t, srv.URL).GenerateImages(context.Background(), ImageRequest{Prompt: "a lake"})
+	result, err := newTestClient(
+		t,
+		srv.URL,
+	).GenerateImages(context.Background(), ImageRequest{Prompt: "a lake"})
 	if err != nil {
 		t.Fatalf("GenerateImages() error: %v", err)
 	}
@@ -142,16 +153,25 @@ func TestGenerateImagesReportsAnUnusableEntry(t *testing.T) {
 		want     string
 	}{
 		"no images at all": {response: `{"data":[]}`, want: "no images"},
-		"neither field":    {response: `{"data":[{"b64_json":"` + testImageB64 + `"},{}]}`, want: "image 2 of 2"},
-		"invalid base64":   {response: `{"data":[{"b64_json":"not base64!"}]}`, want: "not base64"},
-		"unfinished URI":   {response: `{"data":[{"b64_json":"data:image/png;base64"}]}`, want: "data URI"},
+		"neither field": {
+			response: `{"data":[{"b64_json":"` + testImageB64 + `"},{}]}`,
+			want:     "image 2 of 2",
+		},
+		"invalid base64": {response: `{"data":[{"b64_json":"not base64!"}]}`, want: "not base64"},
+		"unfinished URI": {
+			response: `{"data":[{"b64_json":"data:image/png;base64"}]}`,
+			want:     "data URI",
+		},
 	}
 
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			srv, _ := recordingServer(t, tt.response, http.StatusOK)
 
-			_, err := newTestClient(t, srv.URL).GenerateImages(context.Background(), ImageRequest{Prompt: "a lake"})
+			_, err := newTestClient(
+				t,
+				srv.URL,
+			).GenerateImages(context.Background(), ImageRequest{Prompt: "a lake"})
 			if err == nil || !strings.Contains(err.Error(), tt.want) {
 				t.Errorf("GenerateImages() error = %v, want it to carry %q", err, tt.want)
 			}
@@ -176,10 +196,18 @@ func TestGenerateImagesRejectsAnEmptyPrompt(t *testing.T) {
 }
 
 func TestGenerateImagesSurfacesAnUpstreamRefusal(t *testing.T) {
-	srv, _ := recordingServer(t, `{"error":{"message":"out of credit"}}`, http.StatusPaymentRequired)
+	srv, _ := recordingServer(
+		t,
+		`{"error":{"message":"out of credit"}}`,
+		http.StatusPaymentRequired,
+	)
 
-	_, err := newTestClient(t, srv.URL).GenerateImages(context.Background(), ImageRequest{Prompt: "a lake"})
-	if err == nil || !strings.Contains(err.Error(), "402") || !strings.Contains(err.Error(), "out of credit") {
+	_, err := newTestClient(
+		t,
+		srv.URL,
+	).GenerateImages(context.Background(), ImageRequest{Prompt: "a lake"})
+	if err == nil || !strings.Contains(err.Error(), "402") ||
+		!strings.Contains(err.Error(), "out of credit") {
 		t.Errorf("GenerateImages() error = %v, want the status and the message", err)
 	}
 }

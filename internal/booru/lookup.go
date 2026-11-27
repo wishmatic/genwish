@@ -12,7 +12,8 @@ import (
 
 const relationFields = "antecedent_name,consequent_name"
 
-// FindTag looks up one canonical tag by exact name. It reports false, with no error, when no such tag exists.
+// FindTag looks up one canonical tag by exact name. It reports false, with no error, when no such
+// tag exists.
 func (c *Client) FindTag(ctx context.Context, name string) (Tag, bool, error) {
 	name = NormalizeTag(name)
 	if name == "" {
@@ -37,8 +38,8 @@ func (c *Client) FindTag(ctx context.Context, name string) (Tag, bool, error) {
 	return tags[0], true, nil
 }
 
-// AliasTarget follows active aliases from name to the first name that is not itself aliased, reporting whether any alias
-// was followed. It never loops, even on a cyclic alias chain.
+// AliasTarget follows active aliases from name to the first name that is not itself aliased,
+// reporting whether any alias was followed. It never loops, even on a cyclic alias chain.
 func (c *Client) AliasTarget(ctx context.Context, name string) (string, bool, error) {
 	name = NormalizeTag(name)
 	if name == "" {
@@ -92,8 +93,8 @@ func (c *Client) Implications(ctx context.Context, name string) ([]string, error
 	return consequents, nil
 }
 
-// ImplicationPage reads one page of the active implication graph. The caller drives the page walk, so the crawl is
-// owned by the index rather than by the client.
+// ImplicationPage reads one page of the active implication graph. The caller drives the page walk,
+// so the crawl is owned by the index rather than by the client.
 func (c *Client) ImplicationPage(ctx context.Context, page, limit int) ([]Implication, error) {
 	raw, err := c.relationPage(ctx, "/tag_implications.json", page, limit)
 	if err != nil {
@@ -103,7 +104,10 @@ func (c *Client) ImplicationPage(ctx context.Context, page, limit int) ([]Implic
 	relations := make([]Implication, 0, len(raw))
 
 	for _, item := range raw {
-		relations = append(relations, Implication{Antecedent: item.Antecedent, Consequent: item.Consequent})
+		relations = append(
+			relations,
+			Implication{Antecedent: item.Antecedent, Consequent: item.Consequent},
+		)
 	}
 
 	return relations, nil
@@ -125,8 +129,13 @@ func (c *Client) AliasPage(ctx context.Context, page, limit int) ([]Alias, error
 	return aliases, nil
 }
 
-// relationPage reads one status-filtered page of a relation table, dropping rows that are missing either name.
-func (c *Client) relationPage(ctx context.Context, path string, page, limit int) ([]relation, error) {
+// relationPage reads one status-filtered page of a relation table, dropping rows that are missing
+// either name.
+func (c *Client) relationPage(
+	ctx context.Context,
+	path string,
+	page, limit int,
+) ([]relation, error) {
 	params := url.Values{}
 	params.Set("search[status]", "active")
 	params.Set("only", relationFields)
@@ -159,7 +168,11 @@ func (c *Client) relationPage(ctx context.Context, path string, page, limit int)
 	return relations, nil
 }
 
-func (c *Client) consequents(ctx context.Context, path, antecedent string, limit int) ([]string, error) {
+func (c *Client) consequents(
+	ctx context.Context,
+	path, antecedent string,
+	limit int,
+) ([]string, error) {
 	params := url.Values{}
 	params.Set("search[antecedent_name]", antecedent)
 	params.Set("search[status]", "active")

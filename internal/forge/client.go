@@ -1,6 +1,6 @@
-// Package forge is the Stable Diffusion WebUI (Forge Neo) API in two layers: Generate and Bgkill are the domain
-// operations, and the unexported requests, payloads, and HTTP calls under them are the client that speaks Forge's own
-// payloads.
+// Package forge is the Stable Diffusion WebUI (Forge Neo) API in two layers: Generate and Bgkill
+// are the domain operations, and the unexported requests, payloads, and HTTP calls under them are
+// the client that speaks Forge's own payloads.
 package forge
 
 import (
@@ -35,8 +35,8 @@ func New(baseURL string, warn io.Writer) *Client {
 
 // postJSON sends a POST request directly to the Forge API.
 //
-// It is the responsibility of the calling client method to ensure that the payload is valid for
-// the given endpoint, especially given that extensions may add more valid fields to the payload.
+// It is the responsibility of the calling client method to ensure that the payload is valid for the
+// given endpoint, especially given that extensions may add more valid fields to the payload.
 func (c *Client) postJSON[T any](ctx context.Context, label, path string, payload any) (T, error) {
 	var out T
 
@@ -45,7 +45,12 @@ func (c *Client) postJSON[T any](ctx context.Context, label, path string, payloa
 		return out, fmt.Errorf("marshal %s payload: %w", label, err)
 	}
 
-	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, c.baseURL+path, bytes.NewReader(body))
+	httpReq, err := http.NewRequestWithContext(
+		ctx,
+		http.MethodPost,
+		c.baseURL+path,
+		bytes.NewReader(body),
+	)
 	if err != nil {
 		return out, fmt.Errorf("build %s request: %w", label, err)
 	}

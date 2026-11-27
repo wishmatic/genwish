@@ -23,9 +23,11 @@ func TestFetchFollowsRedirectToPlainURL(t *testing.T) {
 	}))
 	defer origin.Close()
 
-	redirector := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		http.Redirect(w, req, origin.URL+"/x.png", http.StatusMovedPermanently)
-	}))
+	redirector := httptest.NewServer(
+		http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			http.Redirect(w, req, origin.URL+"/x.png", http.StatusMovedPermanently)
+		}),
+	)
 	defer redirector.Close()
 
 	data, err := r.Fetch(context.Background(), redirector.URL)
@@ -57,10 +59,12 @@ func TestFetchSetsUserAgent(t *testing.T) {
 	}))
 	defer origin.Close()
 
-	redirector := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		record(req)
-		http.Redirect(w, req, origin.URL+"/x.png", http.StatusFound)
-	}))
+	redirector := httptest.NewServer(
+		http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			record(req)
+			http.Redirect(w, req, origin.URL+"/x.png", http.StatusFound)
+		}),
+	)
 	defer redirector.Close()
 
 	if _, err := New().Fetch(context.Background(), redirector.URL+"/start"); err != nil {
@@ -76,7 +80,11 @@ func TestFetchSetsUserAgent(t *testing.T) {
 
 	for i, agent := range agents {
 		if !strings.Contains(agent, "genwish") || !strings.Contains(agent, "bot") {
-			t.Errorf("hop %d User-Agent = %q, want a descriptive agent naming genwish and bot", i, agent)
+			t.Errorf(
+				"hop %d User-Agent = %q, want a descriptive agent naming genwish and bot",
+				i,
+				agent,
+			)
 		}
 	}
 }

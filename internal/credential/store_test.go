@@ -38,7 +38,12 @@ func TestStorageWarning(t *testing.T) {
 		want       string
 	}{
 		{name: "silent on a healthy keyring", keyringErr: nil, path: "/tmp/key", want: ""},
-		{name: "silent when no key is stored", keyringErr: keyring.ErrNotFound, path: "/tmp/key", want: ""},
+		{
+			name:       "silent when no key is stored",
+			keyringErr: keyring.ErrNotFound,
+			path:       "/tmp/key",
+			want:       "",
+		},
 		{
 			name:       "names the fallback path",
 			keyringErr: errors.New("dbus unavailable"),
@@ -106,7 +111,10 @@ func TestFileStore(t *testing.T) {
 	})
 
 	t.Run("rejects an empty key", func(t *testing.T) {
-		if err := NewFileStoreAt(filepath.Join(t.TempDir(), "api_key")).Save(" "); !errors.Is(err, ErrEmptyKey) {
+		if err := NewFileStoreAt(filepath.Join(t.TempDir(), "api_key")).Save(" "); !errors.Is(
+			err,
+			ErrEmptyKey,
+		) {
 			t.Errorf("Save() error = %v, want ErrEmptyKey", err)
 		}
 	})

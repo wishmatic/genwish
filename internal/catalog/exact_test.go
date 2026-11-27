@@ -52,7 +52,10 @@ func TestTagsExactResolvesAlias(t *testing.T) {
 	}
 	opts.Clock = fixedClock()
 
-	result, err := New(source, opts).Tags(context.Background(), TagsInput{Search: "dickgirl", Exact: true})
+	result, err := New(
+		source,
+		opts,
+	).Tags(context.Background(), TagsInput{Search: "dickgirl", Exact: true})
 	if err != nil {
 		t.Fatalf("Tags() error: %v", err)
 	}
@@ -66,7 +69,8 @@ func TestTagsExactResolvesAlias(t *testing.T) {
 	}
 
 	alias := result.Tags[0]
-	if alias.Name != "dickgirl" || alias.AliasOf != "futanari" || alias.Count != 52264 || alias.Category != booru.CategoryGeneral {
+	if alias.Name != "dickgirl" || alias.AliasOf != "futanari" || alias.Count != 52264 ||
+		alias.Category != booru.CategoryGeneral {
 		t.Errorf("alias row = %+v, want the alias carrying the target's count", alias)
 	}
 
@@ -74,13 +78,17 @@ func TestTagsExactResolvesAlias(t *testing.T) {
 		t.Error("count_is_target = false, want the alias row to flag the borrowed count")
 	}
 
-	if result.Tags[1].Name != "futanari" || result.Tags[1].AliasOf != "" || result.Tags[1].CountIsTarget {
+	if result.Tags[1].Name != "futanari" || result.Tags[1].AliasOf != "" ||
+		result.Tags[1].CountIsTarget {
 		t.Errorf("canonical row = %+v, want futanari with its own count", result.Tags[1])
 	}
 }
 
 func TestTagsExactNotFound(t *testing.T) {
-	result, err := New(&fakeSource{}, testOptions()).Tags(context.Background(), TagsInput{Search: "qzxwvjklm", Exact: true})
+	result, err := New(
+		&fakeSource{},
+		testOptions(),
+	).Tags(context.Background(), TagsInput{Search: "qzxwvjklm", Exact: true})
 	if err != nil {
 		t.Fatalf("Tags() error: %v", err)
 	}
@@ -93,7 +101,10 @@ func TestTagsExactNotFound(t *testing.T) {
 func TestTagsExactAliasToMissingTagStillReportsAlias(t *testing.T) {
 	source := &fakeSource{aliasTarget: "ghost_tag", aliased: true}
 
-	result, err := New(source, testOptions()).Tags(context.Background(), TagsInput{Search: "old_tag", Exact: true})
+	result, err := New(
+		source,
+		testOptions(),
+	).Tags(context.Background(), TagsInput{Search: "old_tag", Exact: true})
 	if err != nil {
 		t.Fatalf("Tags() error: %v", err)
 	}
@@ -110,7 +121,10 @@ func TestTagsExactAliasToMissingTagStillReportsAlias(t *testing.T) {
 func TestTagsExactUnknownWhenAliasLookupFails(t *testing.T) {
 	source := &fakeSource{aliasErr: errors.New("alias endpoint down")}
 
-	result, err := New(source, testOptions()).Tags(context.Background(), TagsInput{Search: "maybe", Exact: true})
+	result, err := New(
+		source,
+		testOptions(),
+	).Tags(context.Background(), TagsInput{Search: "maybe", Exact: true})
 	if err != nil {
 		t.Fatalf("Tags() error: %v", err)
 	}
@@ -127,7 +141,10 @@ func TestTagsExactReturnsImplications(t *testing.T) {
 		implications: []string{"futanari", "pov"},
 	}
 
-	result, err := New(source, testOptions()).Tags(context.Background(), TagsInput{Search: "futanari_pov", Exact: true})
+	result, err := New(
+		source,
+		testOptions(),
+	).Tags(context.Background(), TagsInput{Search: "futanari_pov", Exact: true})
 	if err != nil {
 		t.Fatalf("Tags() error: %v", err)
 	}
@@ -152,7 +169,10 @@ func TestTagsExactPrefersTheRelationIndex(t *testing.T) {
 	opts := testOptions()
 	opts.Relations = stubRelations{byName: map[string][]string{"futanari_pov": {"futanari", "pov"}}}
 
-	result, err := New(source, opts).Tags(context.Background(), TagsInput{Search: "futanari_pov", Exact: true})
+	result, err := New(
+		source,
+		opts,
+	).Tags(context.Background(), TagsInput{Search: "futanari_pov", Exact: true})
 	if err != nil {
 		t.Fatalf("Tags() error: %v", err)
 	}
@@ -163,7 +183,10 @@ func TestTagsExactPrefersTheRelationIndex(t *testing.T) {
 }
 
 func TestTagsExactRespectsCategoryFilter(t *testing.T) {
-	source := &fakeSource{tag: booru.Tag{Name: "some_artist", Category: booru.CategoryArtist, Count: 10}, found: true}
+	source := &fakeSource{
+		tag:   booru.Tag{Name: "some_artist", Category: booru.CategoryArtist, Count: 10},
+		found: true,
+	}
 
 	result, err := New(source, testOptions()).Tags(context.Background(), TagsInput{
 		Search:     "some_artist",
@@ -175,12 +198,18 @@ func TestTagsExactRespectsCategoryFilter(t *testing.T) {
 	}
 
 	if result.Status != StatusExactNotFound {
-		t.Errorf("status = %q, want exact_not_found when the category is filtered out", result.Status)
+		t.Errorf(
+			"status = %q, want exact_not_found when the category is filtered out",
+			result.Status,
+		)
 	}
 }
 
 func TestTagsSubstringReportsNoMatch(t *testing.T) {
-	result, err := New(&fakeSource{}, testOptions()).Tags(context.Background(), TagsInput{Search: "qzxwvjklm", Limit: 5})
+	result, err := New(
+		&fakeSource{},
+		testOptions(),
+	).Tags(context.Background(), TagsInput{Search: "qzxwvjklm", Limit: 5})
 	if err != nil {
 		t.Fatalf("Tags() error: %v", err)
 	}
@@ -199,7 +228,10 @@ func TestTagsSubstringEnrichesFromTheIndex(t *testing.T) {
 	opts := testOptions()
 	opts.Relations = stubRelations{byName: map[string][]string{"futanari_pov": {"futanari", "pov"}}}
 
-	result, err := New(source, opts).Tags(context.Background(), TagsInput{Search: "futanari", Limit: 5})
+	result, err := New(
+		source,
+		opts,
+	).Tags(context.Background(), TagsInput{Search: "futanari", Limit: 5})
 	if err != nil {
 		t.Fatalf("Tags() error: %v", err)
 	}
@@ -221,7 +253,10 @@ func TestTagsSnapshotDate(t *testing.T) {
 	opts := testOptions()
 	opts.Clock = fixedClock()
 
-	result, err := New(&fakeSource{}, opts).Tags(context.Background(), TagsInput{Search: "blue", Limit: 5})
+	result, err := New(
+		&fakeSource{},
+		opts,
+	).Tags(context.Background(), TagsInput{Search: "blue", Limit: 5})
 	if err != nil {
 		t.Fatalf("Tags() error: %v", err)
 	}

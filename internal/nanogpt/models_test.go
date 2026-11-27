@@ -19,7 +19,9 @@ const modelsResponseBody = `{
 			"owned_by": "google",
 			"name": "Nano Banana",
 			"description": "Fast image editing.",
-			"architecture": {"modality": "text->image", "input_modalities": ["text"], "output_modalities": ["image"]},
+			"architecture": {
+				"modality": "text->image", "input_modalities": ["text"], "output_modalities": ["image"]
+			},
 			"pricing": {"per_image": {"1024*1024": 0.005}, "currency": "USD"},
 			"capabilities": {"image_generation": true, "image_to_image": true, "inpainting": false},
 			"supported_parameters": {"resolutions": ["1024x1024", "auto"], "max_images": 4},
@@ -55,7 +57,10 @@ func TestModelsReadsEachListOverGET(t *testing.T) {
 			}
 
 			if got := rec.query.Get("detailed"); got != "true" {
-				t.Errorf("detailed = %q, want true, which is what carries capabilities and pricing", got)
+				t.Errorf(
+					"detailed = %q, want true, which is what carries capabilities and pricing",
+					got,
+				)
 			}
 
 			rec.assertHeader(t, "Authorization", "Bearer "+testKey)
@@ -95,7 +100,10 @@ func TestModelsDecodesTheDetailedFields(t *testing.T) {
 
 	resolutions, ok := model.SupportedParameters["resolutions"].([]any)
 	if !ok || !slices.Equal(resolutions, []any{"1024x1024", "auto"}) {
-		t.Errorf("resolutions = %v, want them passed through", model.SupportedParameters["resolutions"])
+		t.Errorf(
+			"resolutions = %v, want them passed through",
+			model.SupportedParameters["resolutions"],
+		)
 	}
 
 	perImage, ok := model.Pricing["per_image"].(map[string]any)
@@ -116,7 +124,11 @@ func TestModelsRejectsAnUnknownKind(t *testing.T) {
 }
 
 func TestModelsReportsUpstreamFailures(t *testing.T) {
-	for _, status := range []int{http.StatusUnauthorized, http.StatusTooManyRequests, http.StatusInternalServerError} {
+	for _, status := range []int{
+		http.StatusUnauthorized,
+		http.StatusTooManyRequests,
+		http.StatusInternalServerError,
+	} {
 		t.Run(strconv.Itoa(status), func(t *testing.T) {
 			srv, _ := recordingServer(t, `{"error":"upstream said no"}`, status)
 

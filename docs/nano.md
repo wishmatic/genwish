@@ -37,7 +37,8 @@ Flags:
 
 Input images accept an http(s) URL, a data URI, or raw base64.
 
-Generated images are written under `<out>/images/<date>/<uuid>.<ext>` in the configured format. The command prints each path and `Cost: $...`.
+Generated images are written under `<out>/images/<date>/<uuid>.<ext>` in the configured format. The
+command prints each path and `Cost: $...`.
 
 ## Generate a video
 
@@ -49,21 +50,20 @@ genwish gen video nano "waves at sunset" --model veo2-video --out ./media
 
 Flags:
 
-| Flag                | Default          | Purpose                                                                   |
-| ------------------- | ---------------- | ------------------------------------------------------------------------- |
-| `--model`           | required         | Video model id.                                                           |
-| `--image`           | empty            | Image to animate; sets `--mode image-to-video` when no mode is given.     |
-| `--negative-prompt` | empty            | Content to suppress.                                                      |
-| `--duration`        | provider default | Length in seconds.                                                        |
-| `--aspect-ratio`    | provider default | `16:9`, `9:16`, `1:1`, `4:3`, or `3:4`.                                   |
-| `--resolution`      | provider default | `480p`, `720p`, `1080p`, `2k`, or `4k`.                                   |
-| `--mode`            | empty            | `text-to-video`, `image-to-video`, `reference-to-video`, or `video-edit`. |
-| `--seed`            | unset            | Seed for providers that honour one.                                       |
-| `--generate-audio`  | false            | Add AI audio on models that support it.                                   |
-| `--video-url`       | empty            | Source video to extend, edit, or upscale.                                 |
-| `--out`             | `output.path`    | Base output directory.                                                    |
+- `--model` (required): video model id.
+- `--image` (empty): image to animate; sets `--mode image-to-video` when no mode is given.
+- `--negative-prompt` (empty): content to suppress.
+- `--duration` (provider default): length in seconds.
+- `--aspect-ratio` (provider default): `16:9`, `9:16`, `1:1`, `4:3`, or `3:4`.
+- `--resolution` (provider default): `480p`, `720p`, `1080p`, `2k`, or `4k`.
+- `--mode` (empty): `text-to-video`, `image-to-video`, `reference-to-video`, or `video-edit`.
+- `--seed` (unset): seed for providers that honour one.
+- `--generate-audio` (false): add AI audio on models that support it.
+- `--video-url` (empty): source video to extend, edit, or upscale.
+- `--out` (`output.path`): base output directory.
 
-The result is written under `<out>/videos/<date>/<uuid>.<ext>`, and the command prints the path and cost.
+The result is written under `<out>/videos/<date>/<uuid>.<ext>`, and the command prints the path and
+cost.
 
 ## Models
 
@@ -73,7 +73,8 @@ genwish models list nano image --query anime --limit 10
 genwish models list nano video
 ```
 
-Flags: `--query` filters by id, name, description, owner, or tags; `--limit` defaults to 25 and is capped at 100. With no kind, both image and video models are listed.
+Flags: `--query` filters by id, name, description, owner, or tags; `--limit` defaults to 25 and is
+capped at 100. With no kind, both image and video models are listed.
 
 ## Balance
 

@@ -16,7 +16,11 @@ import (
 )
 
 func TestGenerateVideoSubmitsTheExposedFields(t *testing.T) {
-	srv, calls := videoUpstream(t, `{"runId":"vid_1","status":"pending"}`, completedStatus("https://cdn.example.com/a.mp4"))
+	srv, calls := videoUpstream(
+		t,
+		`{"runId":"vid_1","status":"pending"}`,
+		completedStatus("https://cdn.example.com/a.mp4"),
+	)
 
 	seed := 7
 	audio := true
@@ -43,7 +47,10 @@ func TestGenerateVideoSubmitsTheExposedFields(t *testing.T) {
 	}
 
 	if video.Model != "veo2-video" {
-		t.Errorf("Model = %q, want the requested model back when the submit response omits it", video.Model)
+		t.Errorf(
+			"Model = %q, want the requested model back when the submit response omits it",
+			video.Model,
+		)
 	}
 
 	post := calls.submit(t)
@@ -69,7 +76,11 @@ func TestGenerateVideoSubmitsTheExposedFields(t *testing.T) {
 }
 
 func TestGenerateVideoOmitsUnsetFields(t *testing.T) {
-	srv, calls := videoUpstream(t, `{"runId":"vid_1"}`, completedStatus("https://cdn.example.com/a.mp4"))
+	srv, calls := videoUpstream(
+		t,
+		`{"runId":"vid_1"}`,
+		completedStatus("https://cdn.example.com/a.mp4"),
+	)
 
 	_, err := videoTestClient(t, srv.URL).GenerateVideo(context.Background(), VideoRequest{
 		Model:  "veo2-video",
@@ -107,7 +118,10 @@ func TestGenerateVideoPollsUntilTheJobIsDone(t *testing.T) {
 
 	polls, query := calls.polling(t)
 	if polls != 3 {
-		t.Errorf("polls = %d, want one per queued and processing status plus the completed one", polls)
+		t.Errorf(
+			"polls = %d, want one per queued and processing status plus the completed one",
+			polls,
+		)
 	}
 
 	if got := query.Get("requestId"); got != "vid_1" {
@@ -195,7 +209,10 @@ func TestGenerateVideoGivesUpAfterItsBudget(t *testing.T) {
 	c := videoTestClient(t, srv.URL)
 	c.videoWaitBudget = 30 * time.Millisecond
 
-	_, err := c.GenerateVideo(context.Background(), VideoRequest{Model: "veo2-video", Prompt: "a lake"})
+	_, err := c.GenerateVideo(
+		context.Background(),
+		VideoRequest{Model: "veo2-video", Prompt: "a lake"},
+	)
 	if err == nil || !strings.Contains(err.Error(), "still processing") {
 		t.Fatalf("GenerateVideo() error = %v, want a timeout naming the last status", err)
 	}
@@ -259,8 +276,8 @@ func completedStatus(videoURL string) string {
 	return `{"data":{"status":"COMPLETED","cost":0.35,"output":{"video":{"url":"` + videoURL + `"}}}}`
 }
 
-// videoTestClient shortens the poll loop so a test drives a whole generation without waiting
-// out NanoGPT's own cadence.
+// videoTestClient shortens the poll loop so a test drives a whole generation without waiting out
+// NanoGPT's own cadence.
 func videoTestClient(t *testing.T, baseURL string) *Client {
 	t.Helper()
 
@@ -342,9 +359,13 @@ func (c *videoCalls) polling(t *testing.T) (int, url.Values) {
 	return c.polls, c.query
 }
 
-// videoUpstream answers one submit and then the queued status bodies in order, repeating the
-// last of them once the queue runs out, so a stalled job stays stalled until the caller gives up.
-func videoUpstream(t *testing.T, submit string, statuses ...string) (*httptest.Server, *videoCalls) {
+// videoUpstream answers one submit and then the queued status bodies in order, repeating the last
+// of them once the queue runs out, so a stalled job stays stalled until the caller gives up.
+func videoUpstream(
+	t *testing.T,
+	submit string,
+	statuses ...string,
+) (*httptest.Server, *videoCalls) {
 	t.Helper()
 
 	calls := &videoCalls{}

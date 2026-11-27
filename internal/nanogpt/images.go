@@ -11,8 +11,8 @@ import (
 const (
 	imagesPath = "/api/v1/images/generations"
 
-	// ImageGenerationBudget bounds one synchronous generation. The endpoint holds the connection
-	// until the image exists, which the documented models take well past FastTimeout for.
+	// ImageGenerationBudget bounds one synchronous generation. The endpoint holds the connection until
+	// the image exists, which the documented models take well past FastTimeout for.
 	ImageGenerationBudget = 5 * time.Minute
 
 	// ResponseFormatBase64 asks for the bytes inline. It is NanoGPT's own default, and is named
@@ -23,8 +23,8 @@ const (
 // ImageRequest is the part of NanoGPT's OpenAI-compatible image request this server exposes; the
 // rest of the documented fields are knobs a single model each.
 //
-// Pointers keep an unset field distinguishable from an explicit zero, which several of these
-// accept as a value.
+// Pointers keep an unset field distinguishable from an explicit zero, which several of these accept
+// as a value.
 type ImageRequest struct {
 	Model  string `json:"model,omitempty"`
 	Prompt string `json:"prompt"`

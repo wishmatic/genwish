@@ -73,7 +73,11 @@ func Render(out TagsOutput) string {
 	}
 
 	if out.More {
-		fmt.Fprintf(&b, "\nMore matches exist; continue with offset %d.\n", out.Offset+len(out.Tags))
+		fmt.Fprintf(
+			&b,
+			"\nMore matches exist; continue with offset %d.\n",
+			out.Offset+len(out.Tags),
+		)
 	}
 
 	return strings.TrimRight(b.String(), "\n")
@@ -110,7 +114,13 @@ func renderTag(tag TagOutput) string {
 	}
 
 	if tag.CountIsTarget {
-		return fmt.Sprintf("- %s (%s): alias of %s (%d works there)", tag.Name, tag.Category, tag.AliasOf, tag.Count)
+		return fmt.Sprintf(
+			"- %s (%s): alias of %s (%d works there)",
+			tag.Name,
+			tag.Category,
+			tag.AliasOf,
+			tag.Count,
+		)
 	}
 
 	return fmt.Sprintf("- %s (%s): alias of %s", tag.Name, tag.Category, tag.AliasOf)
@@ -124,7 +134,8 @@ func renderEmpty(out TagsOutput) string {
 	case string(catalog.StatusOffsetPastEnd):
 		return fmt.Sprintf(
 			"Offset %d is past the last result for %q; there is no further page. Try a smaller offset.",
-			out.Offset, out.Search,
+			out.Offset,
+			out.Search,
 		) + renderSynonyms(out)
 
 	case string(catalog.StatusExactNotFound):
@@ -148,8 +159,8 @@ func renderSynonyms(out TagsOutput) string {
 	return fmt.Sprintf(" Known aliases: %s.", strings.Join(out.Synonyms, ", "))
 }
 
-// renderNoSubstringMatch names the filter that emptied the page. A withheld canonical tag exists; saying only that the
-// substring matched nothing would assert that it does not.
+// renderNoSubstringMatch names the filter that emptied the page. A withheld canonical tag exists;
+// saying only that the substring matched nothing would assert that it does not.
 func renderNoSubstringMatch(out TagsOutput) string {
 	if out.Withheld == 0 {
 		return fmt.Sprintf("No tag name contains %q.", out.Search) + renderSynonyms(out)
@@ -157,15 +168,22 @@ func renderNoSubstringMatch(out TagsOutput) string {
 
 	if out.Withheld == 1 {
 		return fmt.Sprintf(
-			"No tag name contains %q with at least %d works; one canonical match with %d works was hidden by the floor. "+
+			"No tag name contains %q with at least %d works; "+
+				"one canonical match with %d works was hidden by the floor. "+
 				"Set min_count=0 to include it.",
-			out.Search, out.MinCount, out.WithheldBest,
+			out.Search,
+			out.MinCount,
+			out.WithheldBest,
 		) + renderSynonyms(out)
 	}
 
 	return fmt.Sprintf(
-		"No tag name contains %q with at least %d works; %d canonical matches were hidden by the floor (the best has %d "+
-			"works). Set min_count=0 to include them.",
-		out.Search, out.MinCount, out.Withheld, out.WithheldBest,
+		"No tag name contains %q with at least %d works; "+
+			"%d canonical matches were hidden by the floor (the best has %d works). "+
+			"Set min_count=0 to include them.",
+		out.Search,
+		out.MinCount,
+		out.Withheld,
+		out.WithheldBest,
 	) + renderSynonyms(out)
 }

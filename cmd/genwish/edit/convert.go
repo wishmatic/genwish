@@ -26,7 +26,8 @@ func NewConvertCommand(deps cli.Deps) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&flags.format, "format", "", "format to convert to: png, jpeg, jxl, or webp")
+	cmd.Flags().
+		StringVar(&flags.format, "format", "", "format to convert to: png, jpeg, jxl, or webp")
 	cmd.Flags().StringVar(&flags.out, "out", "",
 		"base directory for the converted image (default: output.path)")
 

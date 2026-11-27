@@ -28,12 +28,20 @@ func TestBgkillPayload(t *testing.T) {
 				gotBody []byte
 			)
 
-			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				gotPath = r.URL.Path
-				gotBody, _ = io.ReadAll(r.Body)
-				w.Header().Set("Content-Type", "application/json")
-				_, _ = w.Write([]byte(`{"output_image": "` + base64.StdEncoding.EncodeToString([]byte("foreground")) + `"}`))
-			}))
+			server := httptest.NewServer(
+				http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					gotPath = r.URL.Path
+					gotBody, _ = io.ReadAll(r.Body)
+					w.Header().Set("Content-Type", "application/json")
+					_, _ = w.Write(
+						[]byte(
+							`{"output_image": "` + base64.StdEncoding.EncodeToString(
+								[]byte("foreground"),
+							) + `"}`,
+						),
+					)
+				}),
+			)
 			defer server.Close()
 
 			c := New(server.URL, io.Discard)

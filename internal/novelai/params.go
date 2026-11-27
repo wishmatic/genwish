@@ -10,10 +10,12 @@ const (
 	maxPixels         = 3047424
 )
 
-const defaultNegativePrompt = "lowres, artistic error, film grain, scan artifacts, worst quality, bad quality, " +
-	"jpeg artifacts, very displeasing, chromatic aberration, dithering, halftone, screentone, multiple views, " +
-	"logo, too many watermarks, negative space, blank page, multiple views, character sheet, reference sheet, " +
-	"turnaround, front and back, back view, from behind, multiple angles, split screen, dual view, text"
+const defaultNegativePrompt = "lowres, artistic error, film grain, scan artifacts, " +
+	"worst quality, bad quality, jpeg artifacts, very displeasing, chromatic aberration, " +
+	"dithering, halftone, screentone, multiple views, logo, too many watermarks, " +
+	"negative space, blank page, multiple views, character sheet, reference sheet, " +
+	"turnaround, front and back, back view, from behind, multiple angles, split screen, " +
+	"dual view, text"
 
 type paramsInput struct {
 	Prompt         string

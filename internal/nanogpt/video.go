@@ -16,8 +16,8 @@ const (
 	// VideoPollInterval is the cadence NanoGPT's own polling example uses.
 	VideoPollInterval = 5 * time.Second
 
-	// VideoWaitBudget is how long one call waits for a video, which is that example's whole
-	// window of 120 polls five seconds apart.
+	// VideoWaitBudget is how long one call waits for a video, which is that example's whole window of
+	// 120 polls five seconds apart.
 	VideoWaitBudget = 10 * time.Minute
 
 	StateQueued     = "queued"
@@ -46,8 +46,8 @@ type VideoRequest struct {
 	Seed          *int  `json:"seed,omitempty"`
 	GenerateAudio *bool `json:"generateAudio,omitempty"`
 
-	// ImageDataURL is the resolved image, base64-encoded inline, because the address it came from
-	// is usually one only this deployment can read.
+	// ImageDataURL is the resolved image, base64-encoded inline, because the address it came from is
+	// usually one only this deployment can read.
 	ImageDataURL string `json:"imageDataUrl,omitempty"`
 	VideoURL     string `json:"videoUrl,omitempty"`
 }
@@ -89,8 +89,8 @@ type VideoStatus struct {
 	} `json:"data"`
 }
 
-// GenerateVideo submits a job and waits it out, so a caller gets a finished asset rather than a
-// run id to poll.
+// GenerateVideo submits a job and waits it out, so a caller gets a finished asset rather than a run
+// id to poll.
 func (c *Client) GenerateVideo(ctx context.Context, req VideoRequest) (*Video, error) {
 	if err := req.validate(); err != nil {
 		return nil, err
@@ -136,8 +136,8 @@ func (c *Client) waitForVideo(ctx context.Context, run *VideoRun) (*Video, error
 
 		status, err := c.videoStatus(ctx, run.RunID)
 		if err != nil {
-			// A poll that the wait budget ran out on reports the deadline rather than the
-			// transport error it surfaces as, which says nothing about the job itself.
+			// A poll that the wait budget ran out on reports the deadline rather than the transport error it
+			// surfaces as, which says nothing about the job itself.
 			if ctx.Err() != nil {
 				return nil, waitFailure(ctx, run.RunID, state, c.videoWaitBudget)
 			}
@@ -192,8 +192,8 @@ func waitFailure(ctx context.Context, runID, state string, budget time.Duration)
 	return fmt.Errorf("video %s is still %s: %w", runID, state, ctx.Err())
 }
 
-// state reduces the two documented status vocabularies to the lowercase set the unified
-// endpoint's schema names.
+// state reduces the two documented status vocabularies to the lowercase set the unified endpoint's
+// schema names.
 func (s VideoStatus) state() string {
 	state := s.Status
 	if state == "" {

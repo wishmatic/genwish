@@ -19,12 +19,18 @@ func TestModelsListNeo(t *testing.T) {
 			t.Fatalf("WriteFile() error: %v", err)
 		}
 
-		out, err := runList(t, cli.Deps{Config: config.Config{Neo: config.NeoConfig{ModelsFile: path}}}, "neo")
+		out, err := runList(
+			t,
+			cli.Deps{Config: config.Config{Neo: config.NeoConfig{ModelsFile: path}}},
+			"neo",
+		)
 		if err != nil {
 			t.Fatalf("Execute() error: %v", err)
 		}
 
-		for _, want := range []string{"NEO MODELS", "sd.safetensors", "xl.safetensors", "2 of 2 models shown"} {
+		for _, want := range []string{
+			"NEO MODELS", "sd.safetensors", "xl.safetensors", "2 of 2 models shown",
+		} {
 			if !strings.Contains(out, want) {
 				t.Errorf("stdout does not contain %q:\n%s", want, out)
 			}
@@ -49,7 +55,11 @@ func TestModelsListNeo(t *testing.T) {
 	t.Run("reports a missing configured file", func(t *testing.T) {
 		path := filepath.Join(t.TempDir(), "missing.txt")
 
-		_, err := runList(t, cli.Deps{Config: config.Config{Neo: config.NeoConfig{ModelsFile: path}}}, "neo")
+		_, err := runList(
+			t,
+			cli.Deps{Config: config.Config{Neo: config.NeoConfig{ModelsFile: path}}},
+			"neo",
+		)
 		if err == nil || !strings.Contains(err.Error(), "neo.models_file") {
 			t.Errorf("Execute() error = %v, want the missing file reported", err)
 		}

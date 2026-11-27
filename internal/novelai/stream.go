@@ -21,12 +21,13 @@ var errNoFinalImage = errors.New("novelai stream ended without producing an imag
 
 type streamEvent struct {
 	EventType string `msgpack:"event_type" json:"event_type"`
-	Image     any    `msgpack:"image" json:"image"`
-	Message   string `msgpack:"message" json:"message"`
+	Image     any    `msgpack:"image"      json:"image"`
+	Message   string `msgpack:"message"    json:"message"`
 }
 
-// decodeFinalImage reads NovelAI's generation stream and returns the first final image. The stream is framed as
-// length-prefixed msgpack unless the server picks Server-Sent Events instead, so the framing is detected up front.
+// decodeFinalImage reads NovelAI's generation stream and returns the first final image. The stream
+// is framed as length-prefixed msgpack unless the server picks Server-Sent Events instead, so the
+// framing is detected up front.
 func decodeFinalImage(r io.Reader) ([]byte, error) {
 	buffered := bufio.NewReader(r)
 

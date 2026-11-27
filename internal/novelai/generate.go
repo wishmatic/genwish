@@ -14,9 +14,9 @@ const (
 	gridStep         = 8
 )
 
-// GenerateRequest is one generation to run. An unset InitImage generates from the prompt alone; a set one transforms
-// that image instead, which is also the only case that reads Strength and Noise. Width and Height left at 0 are filled
-// in from the init image, or with 512 pixels each without one.
+// GenerateRequest is one generation to run. An unset InitImage generates from the prompt alone; a
+// set one transforms that image instead, which is also the only case that reads Strength and Noise.
+// Width and Height at 0 come from the init image, or default to 512 each without one.
 type GenerateRequest struct {
 	InitImage []byte
 
@@ -77,10 +77,11 @@ func (c *Client) Generate(ctx context.Context, req GenerateRequest) ([][]byte, e
 	})
 }
 
-// outputSize fills in whichever of width and height the caller left out: 512 each without an init image, and otherwise
-// the init image's size, both of them when neither is set and the missing one from the init image's aspect ratio when
-// only one is set. Derived sizes land on the eight pixel grid first, so NovelAI's round up to a multiple of 64 stays
-// as close to what the caller was told as its own grid allows.
+// outputSize fills in whichever of width and height the caller left out: 512 each without an init
+// image, and otherwise the init image's size, both of them when neither is set and the missing one
+// from the init image's aspect ratio when only one is set. Derived sizes land on the eight pixel
+// grid first, so NovelAI's round up to a multiple of 64 stays as close to what the caller was told
+// as its own grid allows.
 func outputSize(req GenerateRequest) (int, int, error) {
 	if len(req.InitImage) == 0 {
 		return dimensionOrDefault(req.Width), dimensionOrDefault(req.Height), nil

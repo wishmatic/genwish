@@ -30,7 +30,8 @@ genwish
     booru <search...>
 ```
 
-Provider names are case-insensitive. `nano` also accepts `nano-gpt`, `nanogpt`, and `nano gpt`. `novel` also accepts `novel-ai`, `novel ai`, and `novelai`.
+Provider names are case-insensitive. `nano` also accepts `nano-gpt`, `nanogpt`, and `nano gpt`.
+`novel` also accepts `novel-ai`, `novel ai`, and `novelai`.
 
 ## Where to look
 

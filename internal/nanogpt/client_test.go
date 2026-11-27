@@ -59,7 +59,11 @@ type recordedRequest struct {
 	body    map[string]any
 }
 
-func recordingServer(t *testing.T, response string, status int) (*httptest.Server, *recordedRequest) {
+func recordingServer(
+	t *testing.T,
+	response string,
+	status int,
+) (*httptest.Server, *recordedRequest) {
 	t.Helper()
 
 	rec := &recordedRequest{}

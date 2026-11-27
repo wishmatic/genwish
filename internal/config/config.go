@@ -135,22 +135,32 @@ func (c *Config) normalize() error {
 
 func (c Config) Validate() error {
 	if c.Booru.RateLimit.RPS <= 0 {
-		return fmt.Errorf("booru.rate_limit.rps must be greater than 0, got %v", c.Booru.RateLimit.RPS)
+		return fmt.Errorf(
+			"booru.rate_limit.rps must be greater than 0, got %v",
+			c.Booru.RateLimit.RPS,
+		)
 	}
 
 	if c.Booru.RateLimit.Burst < 1 {
-		return fmt.Errorf("booru.rate_limit.burst must be at least 1, got %d", c.Booru.RateLimit.Burst)
+		return fmt.Errorf(
+			"booru.rate_limit.burst must be at least 1, got %d",
+			c.Booru.RateLimit.Burst,
+		)
 	}
 
 	if c.Booru.RateLimit.Timeout < 1 {
-		return fmt.Errorf("booru.rate_limit.timeout must be at least 1, got %d", c.Booru.RateLimit.Timeout)
+		return fmt.Errorf(
+			"booru.rate_limit.timeout must be at least 1, got %d",
+			c.Booru.RateLimit.Timeout,
+		)
 	}
 
 	return nil
 }
 
 func expandHome(path string) (string, error) {
-	if path != "~" && !strings.HasPrefix(path, "~/") && !strings.HasPrefix(path, "~"+string(os.PathSeparator)) {
+	if path != "~" && !strings.HasPrefix(path, "~/") &&
+		!strings.HasPrefix(path, "~"+string(os.PathSeparator)) {
 		return path, nil
 	}
 

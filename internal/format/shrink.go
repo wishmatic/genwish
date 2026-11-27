@@ -68,7 +68,11 @@ func downscaleToEdge(img image.Image, maxEdge int) image.Image {
 
 	scale := float64(maxEdge) / float64(longest)
 
-	return resample(img, max(1, int(math.Round(float64(width)*scale))), max(1, int(math.Round(float64(height)*scale))))
+	return resample(
+		img,
+		max(1, int(math.Round(float64(width)*scale))),
+		max(1, int(math.Round(float64(height)*scale))),
+	)
 }
 
 func halve(img image.Image) image.Image {
@@ -97,8 +101,8 @@ func resample(img image.Image, width, height int) *image.NRGBA {
 	return dst
 }
 
-// averagePixels averages alpha-premultiplied samples and unpremultiplies, so transparent regions do not darken the
-// edges they blend into.
+// averagePixels averages alpha-premultiplied samples and unpremultiplies, so transparent regions do
+// not darken the edges they blend into.
 func averagePixels(img image.Image, x0, y0, x1, y1 int) color.NRGBA {
 	var r, g, b, a, n uint64
 
