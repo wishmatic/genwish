@@ -97,6 +97,27 @@ func TestGenerateVideoOmitsUnsetFields(t *testing.T) {
 	}
 }
 
+func TestGenerateVideoResolvesARelativeURL(t *testing.T) {
+	srv, _ := videoUpstream(
+		t,
+		`{"runId":"vid_1","status":"pending"}`,
+		completedStatus("/api/generate-video/content?runId=vid_1&sig=abc"),
+	)
+
+	video, err := videoTestClient(t, srv.URL).GenerateVideo(context.Background(), VideoRequest{
+		Model:  "alibaba/wan-3.0/text-to-video",
+		Prompt: "a wave",
+	})
+	if err != nil {
+		t.Fatalf("GenerateVideo() error: %v", err)
+	}
+
+	want := srv.URL + "/api/generate-video/content?runId=vid_1&sig=abc"
+	if video.URL != want {
+		t.Errorf("URL = %q, want %q", video.URL, want)
+	}
+}
+
 func TestGenerateVideoPollsUntilTheJobIsDone(t *testing.T) {
 	srv, calls := videoUpstream(t, `{"runId":"vid_1","status":"pending"}`,
 		`{"data":{"status":"IN_QUEUE","requestId":"vid_1"}}`,

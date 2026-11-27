@@ -149,14 +149,20 @@ func (c *Client) waitForVideo(ctx context.Context, run *VideoRun) (*Video, error
 
 		switch state {
 		case StateCompleted:
-			if status.videoURL() == "" {
+			rawURL := status.videoURL()
+			if rawURL == "" {
 				return nil, fmt.Errorf("video %s completed without a URL", run.RunID)
+			}
+
+			videoURL, err := c.absoluteURL(rawURL)
+			if err != nil {
+				return nil, fmt.Errorf("video %s: %w", run.RunID, err)
 			}
 
 			return &Video{
 				RunID:   run.RunID,
 				Model:   run.Model,
-				URL:     status.videoURL(),
+				URL:     videoURL,
 				CostUSD: status.Data.Cost,
 			}, nil
 		case StateFailed, StateCancelled:
@@ -212,6 +218,24 @@ func (s VideoStatus) state() string {
 	default:
 		return strings.ToLower(strings.TrimSpace(state))
 	}
+}
+
+func (c *Client) absoluteURL(raw string) (string, error) {
+	parsed, err := url.Parse(strings.TrimSpace(raw))
+	if err != nil {
+		return "", fmt.Errorf("video URL %q: %w", raw, err)
+	}
+
+	if parsed.IsAbs() {
+		return parsed.String(), nil
+	}
+
+	base, err := url.Parse(c.baseURL)
+	if err != nil {
+		return "", fmt.Errorf("base URL %q: %w", c.baseURL, err)
+	}
+
+	return base.ResolveReference(parsed).String(), nil
 }
 
 func (s VideoStatus) videoURL() string {
