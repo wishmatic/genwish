@@ -1,6 +1,0 @@
-Human comprehension: 60%
-
-## What's left?
-
-Since adding the old diffusion domian-specific logic to this client, making it a fuller client,
-I now need to understand how those domain features work.
