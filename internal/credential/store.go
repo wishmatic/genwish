@@ -157,6 +157,8 @@ func credentialFile(p provider.Name) (string, error) {
 		return "nanogpt_api_key", nil
 	case provider.Novel:
 		return "novelai_api_key", nil
+	case provider.Danbooru:
+		return "danbooru", nil
 	default:
 		return "", fmt.Errorf("provider %q does not use an API key", p)
 	}
@@ -168,6 +170,8 @@ func keyringUser(p provider.Name) (string, error) {
 		return "nanogpt-api-key", nil
 	case provider.Novel:
 		return "novelai-api-key", nil
+	case provider.Danbooru:
+		return "danbooru", nil
 	default:
 		return "", fmt.Errorf("provider %q does not use an API key", p)
 	}

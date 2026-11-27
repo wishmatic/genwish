@@ -44,6 +44,9 @@ Implemented natively. Automated verification passes: `go build ./...`, `go vet .
 - Neo edit command names and flags stay as they are today: `trim`, `square`, `circle`, `convert`, `bgkill`.
 - Nano, Neo, NovelAI, and Booru generation flags stay as they are today unless a task explicitly changes them.
 - Do not edit `booru-mcp`, `nano-mcp`, `neo-mcp`, or `novel-mcp`; copy from them.
+- API keys are login-only. No API key environment variable is read.
+- Danbooru credentials come from `genwish login danbooru`, which prompts for the login first and the API key second. Anonymous access still works when none is stored.
+- The Danbooru user agent is hardcoded at `genwish/0.1.0`.
 - Preserve every documented env var, flag, JSON shape, and behavior in the new docs. Server-only env vars are removed and recorded in the migration doc.
 - Do not run git write commands (no commits, branches, stashes) unless the user explicitly asks.
 
@@ -248,37 +251,33 @@ package config
 
 type Config struct {
 	LogLevel string
-	NanoGPTAPIKey string
-	NovelAIAPIKey string
 	ImageURLMap string
 	DefaultOutput string
 	SDURL string
 	ErrorDetail string
-	UserAgent string
 	RateLimitRPS float64
 	RateLimitBurst int
 	RequestTimeoutSeconds int
 	MaxLimit int
 	MaxOffset int
 	NEOModelsFile string
-	DanbooruLogin string
-	DanbooruAPIKey string
 	BlockedTagsRaw string
 }
 ```
 
 - [ ] Write failing tests for `provider.Parse` with the alias table: `nano`, `nano-gpt`, `nanogpt`, `nano gpt`, `NANO GPT`, `neo`, `novel`, `novel-ai`, `novel ai`, `novelai`, `Novel AI`; unknown and empty values must error.
-- [ ] Write `ParseBalance` and `ParseCredential` tests: `neo` must error; nano and novel aliases must pass.
+- [ ] Write `ParseBalance` and `ParseCredential` tests: `neo` must error; nano, novel, and danbooru must pass `ParseCredential`, while `Parse` rejects danbooru.
 - [ ] Implement `provider` with `strings.ToLower`, `strings.TrimSpace`, and removal of spaces and hyphens before matching.
-- [ ] Write credential tests with `NewFileStoreAt(t.TempDir()+"/key")`: save, load, delete, empty key, missing key; separate `Open(provider.Nano)` and `Open(provider.Novel)` stores must not see each other's key; `GENWISH_CREDENTIAL_BACKEND=bogus` must error.
+- [ ] Write credential tests with `NewFileStoreAt(t.TempDir()+"/key")`: save, load, delete, empty key, missing key; separate `Open(provider.Nano)`, `Open(provider.Novel)`, and `Open(provider.Danbooru)` stores must not see each other's key; `GENWISH_CREDENTIAL_BACKEND=bogus` must error.
 - [ ] Implement the credential store:
   - Keyring service: `genwish`.
-  - Keyring users: `nanogpt-api-key`, `novelai-api-key`.
-  - File fallback: `os.UserConfigDir()/genwish/nanogpt_api_key` and `.../novelai_api_key`.
+  - Keyring users: `nanogpt-api-key`, `novelai-api-key`, `danbooru`.
+  - File fallback: `os.UserConfigDir()/genwish/nanogpt_api_key`, `.../novelai_api_key`, and `.../danbooru`.
+  - The Danbooru entry stores a login and API key together.
   - Backend env: `GENWISH_CREDENTIAL_BACKEND` with `auto`, `keyring`, `file`.
   - Keep the auto store behavior from the source: keyring first, file fallback, delete both.
-- [ ] Write config tests for defaults and the helpers that do not depend on the Booru package (`DanbooruAuthenticated`, `VerboseErrors`). `BlockedTags` is added and tested in Unit 4 with the copied `booru` package.
-- [ ] Implement config env tags with these names: `NANOGPT_API_KEY`, `NOVELAI_API_KEY`, `IMAGE_URL_MAP`, `OUTPUT_FORMAT` (default `webp`), `SD_URL` (default `http://127.0.0.1:7860`), `ERROR_DETAIL`, `USER_AGENT`, `RATE_LIMIT_RPS`, `RATE_LIMIT_BURST`, `REQUEST_TIMEOUT_SECONDS`, `MAX_LIMIT`, `MAX_OFFSET`, `NEO_MODELS_FILE` (default empty), `DANBOORU_LOGIN`, `DANBOORU_API_KEY`, `BLOCKED_TAGS`, `LOG_LEVEL`. Booru fields are inert until Unit 4 wires them.
+- [ ] Write config tests for defaults and `VerboseErrors`. `BlockedTags` is added and tested in Unit 4 with the copied `booru` package.
+- [ ] Implement config env tags with these names: `IMAGE_URL_MAP`, `OUTPUT_FORMAT` (default `webp`), `SD_URL` (default `http://127.0.0.1:7860`), `ERROR_DETAIL`, `RATE_LIMIT_RPS`, `RATE_LIMIT_BURST`, `REQUEST_TIMEOUT_SECONDS`, `MAX_LIMIT`, `MAX_OFFSET`, `NEO_MODELS_FILE` (default empty), `BLOCKED_TAGS`, `LOG_LEVEL`. No API key, Danbooru credential, or user agent variable is read. Booru fields are inert until Unit 4 wires them.
 - [ ] Rewrite `internal/cli/deps.go` with the fields available at this point:
 
 ```go
@@ -296,10 +295,10 @@ type Deps struct {
 Later units add exactly one block each: Unit 4 adds `Catalog *catalog.Service`; Unit 5 adds `Forge *forge.Client`; Unit 6 adds `Novel *novelai.Client`. Each addition is accompanied by its constructor in the same unit.
 
 - [ ] Provide constructors:
-  - `NanoClient(deps)`: env `NANOGPT_API_KEY` first, then `credential.Open(provider.Nano)`; error message says `run `genwish login nano` or set NANOGPT_API_KEY`.
-  - `NovelClient(deps)` (Unit 6): env `NOVELAI_API_KEY` first, then `credential.Open(provider.Novel)`; error message says `run `genwish login novel` or set NOVELAI_API_KEY`.
+  - `NanoClient(deps)`: reads `credential.Open(provider.Nano)`; error message says `run `genwish login nano``.
+  - `NovelClient(deps)` (Unit 6): reads `credential.Open(provider.Novel)`; error message says `run `genwish login novel``.
   - `ForgeClient(deps)` (Unit 5): from `Config.SDURL`.
-  - `CatalogService(deps)` (Unit 4): from Booru config.
+  - `CatalogService(deps)` (Unit 4): loads the Danbooru login and API key from `provider.Danbooru`, falls back to anonymous when absent, and uses the hardcoded user agent.
   - `ImageResolver(deps)`: parses `IMAGE_URL_MAP` and returns a `resolve.Client`.
   - `ReadImage(ctx, resolver, address)`: local file if it exists, otherwise resolve.
 
@@ -554,7 +553,7 @@ nai-diffusion-furry-3-inpainting
   - `video` errors: `novel does not serve video models`.
   - `--query` filters model IDs.
   - `--limit` applies.
-- [ ] Add `NovelClient` to `cli` using `provider.Novel` and `NOVELAI_API_KEY`; the error message names `genwish login novel`.
+- [ ] Add `NovelClient` to `cli` using `provider.Novel`; the error message names `genwish login novel`.
 - [ ] Port the NovelAI CLI tests, adapting command paths. Keep `TestGenImageNovel` subtests for: default model, init image from file, init image from URL, denoising default, format conversion, out directory.
 
 **Acceptance Criteria:**
@@ -686,30 +685,27 @@ func newGenVideoNovelCommand(deps cli.Deps) *cobra.Command
 - [ ] Write `README.md` as a short, high-level overview: install, quick start, provider list, command tree, and links to the detailed docs.
 - [ ] Write `docs/nano.md` covering every nano generation flag, output behavior, media type handling, `IMAGE_URL_MAP`, and the NanoGPT balance fields.
 - [ ] Write `docs/neo.md` covering Forge Neo setup (`--api`), `SD_URL`, `OUTPUT_FORMAT`, `IMAGE_URL_MAP`, every generation flag, every edit command and flag, `bgkill`, `models list neo` from `NEO_MODELS_FILE`, and the Haoming02 Neo fork requirement.
-- [ ] Write `docs/novel.md` covering NovelAI key resolution (`NOVELAI_API_KEY`, keyring, file fallback, `GENWISH_CREDENTIAL_BACKEND`), every generation flag, local `--init-image` versus `--init-image-url`, `models list novel`, `balance novel`, and Anlas.
+- [ ] Write `docs/novel.md` covering NovelAI login, every generation flag, local `--init-image` versus `--init-image-url`, `models list novel`, `balance novel`, and Anlas.
 - [ ] Write `docs/booru.md` covering the tag search arguments, the JSON shape, status values (`ok`, `no_substring_match`, `exact_not_found`, `offset_past_end`, `unknown`), `min_count`, synonyms, implications, and the empty `synonyms`/`implications` behavior of the CLI.
 - [ ] Write `docs/configuration.md` with a table of every env var read by `internal/config` and `internal/credential`, its default, and its purpose:
 
 ```text
-NANOGPT_API_KEY
-NOVELAI_API_KEY
 IMAGE_URL_MAP
 OUTPUT_FORMAT            default webp
 SD_URL                   default http://127.0.0.1:7860
 ERROR_DETAIL             default useful
-USER_AGENT               default genwish/0.1.0
 RATE_LIMIT_RPS           default 1
 RATE_LIMIT_BURST         default 1
 REQUEST_TIMEOUT_SECONDS  default 20
 MAX_LIMIT                default 100
 MAX_OFFSET               default 1000
 NEO_MODELS_FILE          default empty
-DANBOORU_LOGIN
-DANBOORU_API_KEY
 BLOCKED_TAGS
 LOG_LEVEL                default info
 GENWISH_CREDENTIAL_BACKEND  default auto
 ```
+
+- [ ] Document the login-only credentials: `genwish login nano`, `genwish login novel`, and `genwish login danbooru` (login first, then API key). Record that no key environment variable and no user agent variable is read.
 
 - [ ] Write `docs/migration.md` mapping the old commands, env vars, and credential locations to the new ones:
   - `nano-cli gen image` → `genwish gen image nano`.
@@ -722,8 +718,8 @@ GENWISH_CREDENTIAL_BACKEND  default auto
   - `neo-cli edit ...` → `genwish edit ...`.
   - `booru-cli tags` → `genwish util booru`.
   - Removed commands: `serve`, `web *`.
-  - Removed env vars: `HOST`, `PORT`, `API_KEY`, `PUBLIC_HOST`, `FILES_DIR`.
-  - Old credential locations: keyring `nano-mcp`/`nanogpt-api-key`, `novel-cli`/`novelai-api-key`; files `~/.config/nano/api_key`, `~/.config/novel/novelai_api_key`; backend envs `NANO_CREDENTIAL_BACKEND`, `NOVEL_CREDENTIAL_BACKEND`. New: keyring service `genwish`, users `nanogpt-api-key` and `novelai-api-key`; files `~/.config/genwish/{nanogpt,novelai}_api_key`; backend env `GENWISH_CREDENTIAL_BACKEND`.
+  - Removed env vars: `HOST`, `PORT`, `API_KEY`, `PUBLIC_HOST`, `FILES_DIR`, `NANOGPT_API_KEY`, `NOVELAI_API_KEY`, `DANBOORU_LOGIN`, `DANBOORU_API_KEY`, `USER_AGENT`.
+  - Old credential locations: keyring `nano-mcp`/`nanogpt-api-key`, `novel-cli`/`novelai-api-key`; files `~/.config/nano/api_key`, `~/.config/novel/novelai_api_key`; Danbooru was environment-only; backend envs `NANO_CREDENTIAL_BACKEND`, `NOVEL_CREDENTIAL_BACKEND`. New: keyring service `genwish`, users `nanogpt-api-key`, `novelai-api-key`, and `danbooru`; files `~/.config/genwish/{nanogpt_api_key,novelai_api_key,danbooru}`; backend env `GENWISH_CREDENTIAL_BACKEND`.
 - [ ] Add `.env.example` listing the new env vars with comments.
 
 **Acceptance Criteria:**
@@ -757,12 +753,12 @@ GENWISH_CREDENTIAL_BACKEND  default auto
 - [ ] Grep the tree for `modelcontextprotocol`, `go-chi`, `jsonschema`, `google/uuid`, `nano-mcp`, `neo-mcp`, `novel-cli`, and `booru-mcp`; all must return nothing.
 - [ ] Grep for server-only env names (`PUBLIC_HOST`, `FILES_DIR`, `HOST`, `PORT`, `API_KEY`) in Go sources; none may remain except in `docs/migration.md`.
 - [ ] Human smoke tests, marked here because they need real services:
-  - `genwish gen image nano "a red fox" --out ./tmp` with a real NanoGPT key.
+  - `genwish login nano`, then `genwish gen image nano "a red fox" --out ./tmp`.
   - `genwish gen image neo "a red fox" --model <checkpoint> --forge-preset <preset> --out ./tmp` with Forge running.
   - `genwish edit square ./some.png --out ./tmp`.
-  - `genwish gen image novel "a red fox" --out ./tmp` with a real NovelAI key.
+  - `genwish login novel`, then `genwish gen image novel "a red fox" --out ./tmp`.
   - `genwish balance nano` and `genwish balance novel`.
-  - `genwish util booru blue_hair --limit 3`.
+  - `genwish login danbooru` (login first, then key), then `genwish util booru blue_hair --limit 3`.
 
 **Acceptance Criteria:**
 

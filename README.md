@@ -12,11 +12,11 @@ go install github.com/wishmatic/genwish/cmd/genwish@latest
 
 ## Providers
 
-| Provider | Generation                   | Balance      | API key                                    |
-| -------- | ---------------------------- | ------------ | ------------------------------------------ |
-| `nano`   | image, video                 | USD and Nano | `NANOGPT_API_KEY` or `genwish login nano`  |
-| `neo`    | image, edit, convert, bgkill | none         | none, uses local Forge                     |
-| `novel`  | image                        | Anlas        | `NOVELAI_API_KEY` or `genwish login novel` |
+| Provider | Generation                   | Balance      | API key                |
+| -------- | ---------------------------- | ------------ | ---------------------- |
+| `nano`   | image, video                 | USD and Nano | `genwish login nano`   |
+| `neo`    | image, edit, convert, bgkill | none         | none, uses local Forge |
+| `novel`  | image                        | Anlas        | `genwish login novel`  |
 
 ## Quick start
 

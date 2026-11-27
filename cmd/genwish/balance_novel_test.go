@@ -52,8 +52,6 @@ func TestBalanceNovel(t *testing.T) {
 	})
 
 	t.Run("reports a missing key", func(t *testing.T) {
-		t.Setenv("NOVELAI_API_KEY", "")
-
 		_, _, err := runCommand(t, cli.Deps{Credentials: &memoryStore{}}, "balance", "novel")
 		if err == nil || !strings.Contains(err.Error(), "genwish login novel") {
 			t.Errorf("Execute() error = %v, want a login hint", err)

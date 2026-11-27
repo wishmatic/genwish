@@ -12,7 +12,7 @@ import (
 func newLogoutCommand(deps cli.Deps) *cobra.Command {
 	return &cobra.Command{
 		Use:   "logout <provider>",
-		Short: "Delete a stored NanoGPT or NovelAI API key",
+		Short: "Delete a stored NanoGPT, NovelAI, or Danbooru credential",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(_ *cobra.Command, args []string) error {
 			name, err := provider.ParseCredential(args[0])

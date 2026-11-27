@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/wishmatic/genwish/internal/booru"
@@ -21,6 +20,8 @@ import (
 	"github.com/wishmatic/genwish/internal/sourcemap"
 	"go.uber.org/zap"
 )
+
+const userAgent = "genwish/0.1.0"
 
 type Deps struct {
 	In  io.Reader
@@ -80,25 +81,17 @@ func NanoClient(deps Deps) (*nanogpt.Client, error) {
 		return deps.Nano, nil
 	}
 
-	cfg, err := ResolveConfig(deps)
+	store, err := OpenCredentials(deps, provider.Nano)
 	if err != nil {
 		return nil, err
 	}
 
-	key := strings.TrimSpace(cfg.NanoGPTAPIKey)
-	if key == "" {
-		store, err := OpenCredentials(deps, provider.Nano)
-		if err != nil {
-			return nil, err
-		}
-
-		key, err = store.Load()
-		if errors.Is(err, credential.ErrNotFound) {
-			return nil, fmt.Errorf("not logged in: run `genwish login nano` or set NANOGPT_API_KEY")
-		}
-		if err != nil {
-			return nil, fmt.Errorf("load API key: %w", err)
-		}
+	key, err := store.Load()
+	if errors.Is(err, credential.ErrNotFound) {
+		return nil, fmt.Errorf("not logged in: run `genwish login nano`")
+	}
+	if err != nil {
+		return nil, fmt.Errorf("load API key: %w", err)
 	}
 
 	return nanogpt.New(nanogpt.Config{APIKey: key})
@@ -109,25 +102,17 @@ func NovelClient(deps Deps) (*novelai.Client, error) {
 		return deps.Novel, nil
 	}
 
-	cfg, err := ResolveConfig(deps)
+	store, err := OpenCredentials(deps, provider.Novel)
 	if err != nil {
 		return nil, err
 	}
 
-	key := strings.TrimSpace(cfg.NovelAIAPIKey)
-	if key == "" {
-		store, err := OpenCredentials(deps, provider.Novel)
-		if err != nil {
-			return nil, err
-		}
-
-		key, err = store.Load()
-		if errors.Is(err, credential.ErrNotFound) {
-			return nil, fmt.Errorf("not logged in: run `genwish login novel` or set NOVELAI_API_KEY")
-		}
-		if err != nil {
-			return nil, fmt.Errorf("load API key: %w", err)
-		}
+	key, err := store.Load()
+	if errors.Is(err, credential.ErrNotFound) {
+		return nil, fmt.Errorf("not logged in: run `genwish login novel`")
+	}
+	if err != nil {
+		return nil, fmt.Errorf("load API key: %w", err)
 	}
 
 	return novelai.New(novelai.DefaultBaseURL, key), nil
@@ -151,12 +136,17 @@ func CatalogService(deps Deps) (*catalog.Service, error) {
 		return nil, err
 	}
 
-	provider, err := booruProvider(cfg)
+	creds, err := danbooruCredentials(deps)
 	if err != nil {
 		return nil, err
 	}
 
-	return catalog.New(provider, catalog.Options{
+	danbooruClient, err := booruProvider(cfg, creds)
+	if err != nil {
+		return nil, err
+	}
+
+	return catalog.New(danbooruClient, catalog.Options{
 		BlockedTags: cfg.BlockedTags(),
 		MaxLimit:    cfg.MaxLimit,
 		MaxOffset:   cfg.MaxOffset,
@@ -164,10 +154,27 @@ func CatalogService(deps Deps) (*catalog.Service, error) {
 	}), nil
 }
 
-func booruProvider(cfg config.Config) (*booru.Client, error) {
+func danbooruCredentials(deps Deps) (credential.DanbooruCredentials, error) {
+	store, err := OpenCredentials(deps, provider.Danbooru)
+	if err != nil {
+		return credential.DanbooruCredentials{}, err
+	}
+
+	creds, err := credential.LoadDanbooru(store)
+	if errors.Is(err, credential.ErrNotFound) {
+		return credential.DanbooruCredentials{}, nil
+	}
+	if err != nil {
+		return credential.DanbooruCredentials{}, err
+	}
+
+	return creds, nil
+}
+
+func booruProvider(cfg config.Config, creds credential.DanbooruCredentials) (*booru.Client, error) {
 	transport, err := fetch.New(fetch.Config{
 		BaseURL:       booru.DefaultBaseURL,
-		UserAgent:     cfg.UserAgent,
+		UserAgent:     userAgent,
 		Timeout:       time.Duration(cfg.RequestTimeoutSeconds) * time.Second,
 		Limiter:       fetch.NewLimiter(cfg.RateLimitRPS, cfg.RateLimitBurst),
 		VerboseErrors: cfg.VerboseErrors(),
@@ -178,8 +185,8 @@ func booruProvider(cfg config.Config) (*booru.Client, error) {
 
 	return booru.New(booru.Config{
 		BaseURL:  booru.DefaultBaseURL,
-		Login:    cfg.DanbooruLogin,
-		APIKey:   cfg.DanbooruAPIKey,
+		Login:    creds.Login,
+		APIKey:   creds.APIKey,
 		MaxLimit: cfg.MaxLimit,
 		HTTP:     transport,
 	}), nil

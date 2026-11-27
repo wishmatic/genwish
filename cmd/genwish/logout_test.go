@@ -41,3 +41,20 @@ func TestLogoutReportsADeleteFailure(t *testing.T) {
 		t.Errorf("Execute() error = %v, want a delete failure", err)
 	}
 }
+
+func TestLogoutDeletesTheDanbooruCredential(t *testing.T) {
+	store := &memoryStore{key: "user\nkey"}
+
+	out, _, err := runCommand(t, cli.Deps{Credentials: store}, "logout", "danbooru")
+	if err != nil {
+		t.Fatalf("Execute() error: %v", err)
+	}
+
+	if !store.deleted || store.key != "" {
+		t.Errorf("store after logout = %+v, want the credential deleted", store)
+	}
+
+	if !strings.Contains(out, "logged out") {
+		t.Errorf("stdout = %q, want a logout confirmation", out)
+	}
+}

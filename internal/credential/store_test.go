@@ -80,18 +80,19 @@ func TestFileStore(t *testing.T) {
 	})
 
 	t.Run("keeps providers apart", func(t *testing.T) {
-		nano, err := NewFileStore(provider.Nano)
-		if err != nil {
-			t.Fatalf("NewFileStore(nano) error: %v", err)
-		}
+		paths := make(map[string]string)
 
-		novel, err := NewFileStore(provider.Novel)
-		if err != nil {
-			t.Fatalf("NewFileStore(novel) error: %v", err)
-		}
+		for _, name := range []provider.Name{provider.Nano, provider.Novel, provider.Danbooru} {
+			store, err := NewFileStore(name)
+			if err != nil {
+				t.Fatalf("NewFileStore(%s) error: %v", name, err)
+			}
 
-		if nano.path == novel.path {
-			t.Errorf("both providers share the path %q", nano.path)
+			if other, ok := paths[store.path]; ok {
+				t.Errorf("%s and %s share the path %q", other, name, store.path)
+			}
+
+			paths[store.path] = name.String()
 		}
 	})
 

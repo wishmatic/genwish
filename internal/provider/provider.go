@@ -8,9 +8,10 @@ import (
 type Name string
 
 const (
-	Nano  Name = "nano"
-	Neo   Name = "neo"
-	Novel Name = "novel"
+	Nano     Name = "nano"
+	Neo      Name = "neo"
+	Novel    Name = "novel"
+	Danbooru Name = "danbooru"
 )
 
 func (n Name) String() string {
@@ -44,6 +45,10 @@ func ParseBalance(value string) (Name, error) {
 }
 
 func ParseCredential(value string) (Name, error) {
+	if normalize(value) == "danbooru" {
+		return Danbooru, nil
+	}
+
 	name, err := Parse(value)
 	if err != nil {
 		return "", err

@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-var ErrNoAPIKey = errors.New("NANOGPT_API_KEY is required")
+var ErrNoAPIKey = errors.New("NanoGPT API key is required")
 
 const (
 	DefaultBaseURL = "https://nano-gpt.com"

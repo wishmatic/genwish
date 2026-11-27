@@ -4,13 +4,13 @@
 
 ## Authentication
 
-Set `NOVELAI_API_KEY`, or store a key once:
+Store a key once:
 
 ```sh
 genwish login novel
 ```
 
-The stored key lives in the OS keyring, with a user-only file fallback, under the `genwish` keyring service. `genwish logout novel` deletes it. The environment variable wins over the stored key.
+`genwish logout novel` deletes the stored key. API keys are login-only; the environment is not read.
 
 Calls spend Anlas on the account the key belongs to.
 
@@ -33,21 +33,21 @@ Defaults:
 
 Flags:
 
-| Flag | Default | Purpose |
-| --- | --- | --- |
-| `--model` | `nai-diffusion-5-full` | NovelAI model id. Must not be empty. |
-| `--negative-prompt` | provider default | Things to avoid. |
-| `--sampler-name` | `k_euler_ancestral` | NovelAI sampler. |
-| `--steps` | `20` | Sampling steps. |
-| `--width` / `--height` | `0` | Output size; 0 uses 512 or the init image's size. |
-| `--cfg-scale` | `7` | Classifier-free guidance scale. |
-| `--seed` | `-1` | Random seed; -1 is random. |
-| `--init-image` | empty | Local image to transform. |
-| `--init-image-url` | empty | Address to transform. Use only one init image flag. |
-| `--denoising-strength` | `0.75` | How much of the init image to change. |
-| `--noise` | `0` | Extra image noise; only used with an init image. |
-| `--format` | `OUTPUT_FORMAT` (`webp`) | `png`, `jpeg`, `jxl`, or `webp`. |
-| `--out` | `.` | Output directory. |
+| Flag                   | Default                  | Purpose                                             |
+| ---------------------- | ------------------------ | --------------------------------------------------- |
+| `--model`              | `nai-diffusion-5-full`   | NovelAI model id. Must not be empty.                |
+| `--negative-prompt`    | provider default         | Things to avoid.                                    |
+| `--sampler-name`       | `k_euler_ancestral`      | NovelAI sampler.                                    |
+| `--steps`              | `20`                     | Sampling steps.                                     |
+| `--width` / `--height` | `0`                      | Output size; 0 uses 512 or the init image's size.   |
+| `--cfg-scale`          | `7`                      | Classifier-free guidance scale.                     |
+| `--seed`               | `-1`                     | Random seed; -1 is random.                          |
+| `--init-image`         | empty                    | Local image to transform.                           |
+| `--init-image-url`     | empty                    | Address to transform. Use only one init image flag. |
+| `--denoising-strength` | `0.75`                   | How much of the init image to change.               |
+| `--noise`              | `0`                      | Extra image noise; only used with an init image.    |
+| `--format`             | `OUTPUT_FORMAT` (`webp`) | `png`, `jpeg`, `jxl`, or `webp`.                    |
+| `--out`                | `.`                      | Output directory.                                   |
 
 Images are written with the `novel-image-` prefix.
 

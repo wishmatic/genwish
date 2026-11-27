@@ -10,14 +10,14 @@ genwish util booru blue_hair --json
 
 Flags:
 
-| Flag | Default | Purpose |
-| --- | --- | --- |
-| `--offset` | `0` | How many matching tags to skip. |
-| `--limit` | `25` | How many matching tags to return. |
-| `--min-count` | `1` | Lowest work count a substring match may have. `0` includes the zero-work canonical tail. |
-| `--exact` | `false` | The search is the whole tag name and aliases resolve to their target. |
-| `--category` | all | Keep only this category, repeatable: `general`, `artist`, `copyright`, `character`, `meta`. |
-| `--json` | `false` | Print JSON instead of text. |
+| Flag          | Default | Purpose                                                                                     |
+| ------------- | ------- | ------------------------------------------------------------------------------------------- |
+| `--offset`    | `0`     | How many matching tags to skip.                                                             |
+| `--limit`     | `25`    | How many matching tags to return.                                                           |
+| `--min-count` | `1`     | Lowest work count a substring match may have. `0` includes the zero-work canonical tail.    |
+| `--exact`     | `false` | The search is the whole tag name and aliases resolve to their target.                       |
+| `--category`  | all     | Keep only this category, repeatable: `general`, `artist`, `copyright`, `character`, `meta`. |
+| `--json`      | `false` | Print JSON instead of text.                                                                 |
 
 The search is a literal substring of the tag name, so `blue hair` and `blue_hair` are the same search.
 
@@ -41,8 +41,18 @@ An offset past the end is never reported as "no such tag". Use `--exact` to ask 
 
 The MCP server built an alias and implication graph in the background. The CLI does not build that index, so `synonyms` and per-tag `implications` are empty. Counts are read live, and `snapshot_date` records the date they were read.
 
+## Authentication
+
+Danbooru answers anonymously, so `genwish util booru` works with nothing configured. To raise the anonymous rate limit, log in once:
+
+```sh
+genwish login danbooru
+```
+
+The command prompts for the Danbooru login first, then the API key. `genwish logout danbooru` deletes the stored pair.
+
 ## Configuration
 
-See [configuration.md](configuration.md). The relevant variables are `DANBOORU_LOGIN`, `DANBOORU_API_KEY`, `USER_AGENT`, `ERROR_DETAIL`, `RATE_LIMIT_RPS`, `RATE_LIMIT_BURST`, `REQUEST_TIMEOUT_SECONDS`, `MAX_LIMIT`, `MAX_OFFSET`, and `BLOCKED_TAGS`.
+See [configuration.md](configuration.md). The relevant variables are `ERROR_DETAIL`, `RATE_LIMIT_RPS`, `RATE_LIMIT_BURST`, `REQUEST_TIMEOUT_SECONDS`, `MAX_LIMIT`, `MAX_OFFSET`, and `BLOCKED_TAGS`. The user agent is hardcoded.
 
 `BLOCKED_TAGS` is a comma-separated denylist. No list ships with this repository. Tag names are third-party and unreviewed.

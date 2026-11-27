@@ -60,7 +60,7 @@ func TestParseBalance(t *testing.T) {
 }
 
 func TestParseCredential(t *testing.T) {
-	for _, value := range []string{"nano", "nanogpt", "novel", "novelai"} {
+	for _, value := range []string{"nano", "nanogpt", "novel", "novelai", "danbooru", "Danbooru"} {
 		t.Run("accepts "+value, func(t *testing.T) {
 			if _, err := ParseCredential(value); err != nil {
 				t.Errorf("ParseCredential(%q) error: %v", value, err)
@@ -73,4 +73,10 @@ func TestParseCredential(t *testing.T) {
 			t.Error("ParseCredential(neo) error = nil, want an error")
 		}
 	})
+}
+
+func TestParseRejectsDanbooru(t *testing.T) {
+	if _, err := Parse("danbooru"); err == nil {
+		t.Error("Parse(danbooru) error = nil, want the generation providers only")
+	}
 }

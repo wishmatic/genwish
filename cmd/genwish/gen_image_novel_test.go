@@ -9,8 +9,6 @@ import (
 
 func TestGenImageNovel(t *testing.T) {
 	t.Run("reports a missing key", func(t *testing.T) {
-		t.Setenv("NOVELAI_API_KEY", "")
-
 		_, _, err := runCommand(t, cli.Deps{Credentials: &memoryStore{}}, "gen", "image", "novel", "a cat")
 		if err == nil || !strings.Contains(err.Error(), "genwish login novel") {
 			t.Errorf("Execute() error = %v, want a login hint", err)

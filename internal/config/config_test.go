@@ -8,21 +8,16 @@ import (
 func TestLoad(t *testing.T) {
 	t.Run("applies the defaults", func(t *testing.T) {
 		t.Setenv("LOG_LEVEL", "")
-		t.Setenv("NANOGPT_API_KEY", "")
-		t.Setenv("NOVELAI_API_KEY", "")
 		t.Setenv("IMAGE_URL_MAP", "")
 		t.Setenv("OUTPUT_FORMAT", "")
 		t.Setenv("SD_URL", "")
 		t.Setenv("ERROR_DETAIL", "")
-		t.Setenv("USER_AGENT", "")
 		t.Setenv("RATE_LIMIT_RPS", "")
 		t.Setenv("RATE_LIMIT_BURST", "")
 		t.Setenv("REQUEST_TIMEOUT_SECONDS", "")
 		t.Setenv("MAX_LIMIT", "")
 		t.Setenv("MAX_OFFSET", "")
 		t.Setenv("NEO_MODELS_FILE", "")
-		t.Setenv("DANBOORU_LOGIN", "")
-		t.Setenv("DANBOORU_API_KEY", "")
 		t.Setenv("BLOCKED_TAGS", "")
 
 		cfg, err := Load()
@@ -48,30 +43,21 @@ func TestLoad(t *testing.T) {
 	})
 
 	t.Run("reads the environment", func(t *testing.T) {
-		t.Setenv("NANOGPT_API_KEY", "nano-key")
-		t.Setenv("NOVELAI_API_KEY", "novel-key")
 		t.Setenv("IMAGE_URL_MAP", "https://a=https://b")
 		t.Setenv("OUTPUT_FORMAT", "png")
 		t.Setenv("SD_URL", "http://forge:7860")
 		t.Setenv("ERROR_DETAIL", "verbose")
-		t.Setenv("USER_AGENT", "agent")
 		t.Setenv("RATE_LIMIT_RPS", "2.5")
 		t.Setenv("RATE_LIMIT_BURST", "3")
 		t.Setenv("REQUEST_TIMEOUT_SECONDS", "30")
 		t.Setenv("MAX_LIMIT", "50")
 		t.Setenv("MAX_OFFSET", "500")
 		t.Setenv("NEO_MODELS_FILE", "/tmp/neo-models.txt")
-		t.Setenv("DANBOORU_LOGIN", "user")
-		t.Setenv("DANBOORU_API_KEY", "key")
 		t.Setenv("BLOCKED_TAGS", "gore, blood")
 
 		cfg, err := Load()
 		if err != nil {
 			t.Fatalf("Load() error: %v", err)
-		}
-
-		if cfg.NanoGPTAPIKey != "nano-key" || cfg.NovelAIAPIKey != "novel-key" {
-			t.Errorf("Load() = %+v, want both API keys", cfg)
 		}
 
 		if cfg.DefaultOutput != "png" || cfg.SDURL != "http://forge:7860" {
@@ -82,8 +68,8 @@ func TestLoad(t *testing.T) {
 			t.Errorf("NEOModelsFile = %q, want the configured path", cfg.NEOModelsFile)
 		}
 
-		if !cfg.DanbooruAuthenticated() || !cfg.VerboseErrors() {
-			t.Errorf("Load() = %+v, want the booru helpers to follow the environment", cfg)
+		if !cfg.VerboseErrors() {
+			t.Errorf("Load() = %+v, want verbose errors", cfg)
 		}
 	})
 }

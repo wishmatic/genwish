@@ -15,15 +15,11 @@ const maxTagLimit = 100
 type Config struct {
 	LogLevel string `env:"LOG_LEVEL" envDefault:"info"`
 
-	NanoGPTAPIKey string `env:"NANOGPT_API_KEY"`
-	NovelAIAPIKey string `env:"NOVELAI_API_KEY"`
-
 	ImageURLMap   string `env:"IMAGE_URL_MAP"`
 	DefaultOutput string `env:"OUTPUT_FORMAT" envDefault:"webp"`
 	SDURL         string `env:"SD_URL" envDefault:"http://127.0.0.1:7860"`
 
 	ErrorDetail    string  `env:"ERROR_DETAIL" envDefault:"useful"`
-	UserAgent      string  `env:"USER_AGENT" envDefault:"genwish/0.1.0"`
 	RateLimitRPS   float64 `env:"RATE_LIMIT_RPS" envDefault:"1"`
 	RateLimitBurst int     `env:"RATE_LIMIT_BURST" envDefault:"1"`
 
@@ -33,9 +29,6 @@ type Config struct {
 	MaxOffset int `env:"MAX_OFFSET" envDefault:"1000"`
 
 	NEOModelsFile string `env:"NEO_MODELS_FILE"`
-
-	DanbooruLogin  string `env:"DANBOORU_LOGIN"`
-	DanbooruAPIKey string `env:"DANBOORU_API_KEY"`
 
 	BlockedTagsRaw string `env:"BLOCKED_TAGS"`
 }
@@ -53,10 +46,6 @@ func Load() (Config, error) {
 
 func (c Config) VerboseErrors() bool {
 	return c.ErrorDetail == "verbose"
-}
-
-func (c Config) DanbooruAuthenticated() bool {
-	return c.DanbooruLogin != "" && c.DanbooruAPIKey != ""
 }
 
 func (c Config) BlockedTags() []string {

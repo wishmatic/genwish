@@ -4,13 +4,13 @@
 
 ## Authentication
 
-Set `NANOGPT_API_KEY`, or store a key once:
+Store a key once:
 
 ```sh
 genwish login nano
 ```
 
-`genwish logout nano` deletes the stored key. The environment variable wins over the stored key.
+`genwish logout nano` deletes the stored key. API keys are login-only; the environment is not read.
 
 ## Generate an image
 
