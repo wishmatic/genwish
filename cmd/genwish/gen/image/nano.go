@@ -2,6 +2,7 @@ package genimage
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -9,6 +10,8 @@ import (
 	"github.com/wishmatic/genwish/internal/format"
 	"github.com/wishmatic/genwish/internal/nanogpt"
 )
+
+const defaultImageModel = "bytedance/seedream-v5.0-pro"
 
 func NewNanoCommand(deps cli.Deps) *cobra.Command {
 	var (
@@ -33,6 +36,10 @@ func NewNanoCommand(deps cli.Deps) *cobra.Command {
 			prompt, err := cli.PromptFromArgs(args)
 			if err != nil {
 				return err
+			}
+
+			if strings.TrimSpace(model) == "" {
+				model = defaultImageModel
 			}
 
 			cfg, err := cli.ResolveConfig(deps)
@@ -108,7 +115,7 @@ func NewNanoCommand(deps cli.Deps) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&model, "model", "", "image model id; unset uses NanoGPT's default")
+	cmd.Flags().StringVar(&model, "model", defaultImageModel, "image model id")
 	cmd.Flags().Int("n", 0, "number of images to generate")
 	cmd.Flags().StringVar(&size, "size", "", "output size or model-specific resolution")
 	cmd.Flags().StringVar(&image, "image", "", "image to transform")

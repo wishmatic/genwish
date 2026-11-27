@@ -20,20 +20,18 @@ genwish gen image nano "a red fox in snow" --out ./media
 
 Flags:
 
-| Flag                    | Default          | Purpose                                           |
-| ----------------------- | ---------------- | ------------------------------------------------- |
-| `--model`               | NanoGPT default  | Image model id.                                   |
-| `--n`                   | provider default | Number of images to generate.                     |
-| `--size`                | provider default | Output size or model-specific resolution.         |
-| `--image`               | empty            | Image to transform.                               |
-| `--images`              | empty            | Additional input image, repeatable.               |
-| `--mask`                | empty            | Inpainting mask.                                  |
-| `--format`              | `output.format`  | `png`, `jpeg`, `jxl`, or `webp`.                  |
-| `--out`                 | `output.path`    | Base output directory.                            |
-| `--seed`                | unset            | Seed for models that take one.                    |
-| `--strength`            | unset            | How far the output may move from the input image. |
-| `--guidance-scale`      | unset            | How closely the model follows the prompt.         |
-| `--num-inference-steps` | unset            | Denoising steps.                                  |
+- `--model` (`bytedance/seedream-v5.0-pro`): image model id.
+- `--n` (provider default): number of images to generate.
+- `--size` (provider default): output size or model-specific resolution.
+- `--image` (empty): image to transform.
+- `--images` (empty): additional input image, repeatable.
+- `--mask` (empty): inpainting mask.
+- `--format` (`output.format`): `png`, `jpeg`, `jxl`, or `webp`.
+- `--out` (`output.path`): base output directory.
+- `--seed` (unset): seed for models that take one.
+- `--strength` (unset): how far the output may move from the input image.
+- `--guidance-scale` (unset): how closely the model follows the prompt.
+- `--num-inference-steps` (unset): denoising steps.
 
 Input images accept an http(s) URL, a data URI, or raw base64.
 

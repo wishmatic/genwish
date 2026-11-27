@@ -89,6 +89,26 @@ func TestGenerateImageWritesInlineImages(t *testing.T) {
 	}
 }
 
+func TestGenerateImageDefaultsTheModel(t *testing.T) {
+	encoded := base64.StdEncoding.EncodeToString(testutil.PNG)
+	server, requests := testutil.CaptureServer(t, http.StatusOK,
+		fmt.Sprintf(`{"data":[{"b64_json":%q}],"cost":0.01}`, encoded),
+	)
+
+	_, _, err := runNano(t, cli.Deps{Nano: testutil.NewNanoClient(t, server.URL)},
+		"a cat", "--format", "png", "--out", t.TempDir(),
+	)
+	if err != nil {
+		t.Fatalf("Execute() error: %v", err)
+	}
+
+	body := testutil.NextRequest(t, requests).JSONBody(t)
+
+	if got := body["model"]; got != defaultImageModel {
+		t.Errorf("model = %v, want %v", got, defaultImageModel)
+	}
+}
+
 func TestGenerateImageResolvesInputAddresses(t *testing.T) {
 	input := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		_, _ = w.Write(testutil.PNG)
