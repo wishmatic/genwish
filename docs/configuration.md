@@ -67,6 +67,9 @@ genwish login danbooru
 - `nano` and `novel` prompt for one API key.
 - `danbooru` prompts for the login first, then the API key.
 - `genwish logout <provider>` deletes the stored credential.
+- `genwish status` lists each provider, whether it has a stored credential, and the Danbooru login
+  when there is one.
+- Logging in when a credential is already stored warns first, then replaces it.
 - Danbooru also answers anonymous requests.
 
 Credentials use the OS keyring, falling back to a user-only file when the keyring is unavailable.

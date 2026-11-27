@@ -43,12 +43,14 @@ func NewLoginCommand(deps cli.Deps) *cobra.Command {
 func login(deps cli.Deps, name provider.Name) error {
 	warnAboutStorage(deps, name)
 
-	key, err := readAPIKey(deps, name)
+	store, err := cli.OpenCredentials(deps, name)
 	if err != nil {
 		return err
 	}
 
-	store, err := cli.OpenCredentials(deps, name)
+	warnAboutStored(deps, name, store)
+
+	key, err := readAPIKey(deps, name)
 	if err != nil {
 		return err
 	}
@@ -65,12 +67,14 @@ func login(deps cli.Deps, name provider.Name) error {
 func loginDanbooru(deps cli.Deps) error {
 	warnAboutStorage(deps, provider.Danbooru)
 
-	creds, err := readDanbooruCredentials(deps)
+	store, err := cli.OpenCredentials(deps, provider.Danbooru)
 	if err != nil {
 		return err
 	}
 
-	store, err := cli.OpenCredentials(deps, provider.Danbooru)
+	warnAboutStored(deps, provider.Danbooru, store)
+
+	creds, err := readDanbooruCredentials(deps)
 	if err != nil {
 		return err
 	}
@@ -82,6 +86,18 @@ func loginDanbooru(deps cli.Deps) error {
 	fmt.Fprintln(deps.Out, "logged in")
 
 	return nil
+}
+
+func warnAboutStored(deps cli.Deps, name provider.Name, store credential.Store) {
+	if _, err := store.Load(); err != nil {
+		return
+	}
+
+	fmt.Fprintf(
+		deps.Err,
+		"warning: %s is already logged in; the stored credential will be replaced\n",
+		name,
+	)
 }
 
 func warnAboutStorage(deps cli.Deps, name provider.Name) {

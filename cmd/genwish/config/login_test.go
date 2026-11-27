@@ -40,6 +40,34 @@ func TestLoginStoresTrimmedStdin(t *testing.T) {
 	if strings.Contains(out+errOut, "secret-key") {
 		t.Errorf("output leaked the API key: stdout %q, stderr %q", out, errOut)
 	}
+
+	if strings.Contains(errOut, "already logged in") {
+		t.Errorf("stderr = %q, want no replacement warning", errOut)
+	}
+}
+
+func TestLoginWarnsWhenAlreadyLoggedIn(t *testing.T) {
+	store := &memoryStore{key: "old-key"}
+
+	out, errOut, err := runLogin(t, cli.Deps{
+		In:          strings.NewReader("new-key\n"),
+		Credentials: store,
+	}, "nano")
+	if err != nil {
+		t.Fatalf("Execute() error: %v", err)
+	}
+
+	if !strings.Contains(errOut, "nano is already logged in") {
+		t.Errorf("stderr = %q, want the replacement warning", errOut)
+	}
+
+	if store.key != "new-key" {
+		t.Errorf("stored key = %q, want the replacement", store.key)
+	}
+
+	if !strings.Contains(out, "logged in") {
+		t.Errorf("stdout = %q, want a login confirmation", out)
+	}
 }
 
 func TestLoginRejectsMultipleLinesOfPipedInput(t *testing.T) {
@@ -135,6 +163,26 @@ func TestLoginDanbooru(t *testing.T) {
 
 		if store.key != "" {
 			t.Errorf("stored credentials = %q, want nothing", store.key)
+		}
+	})
+
+	t.Run("warns when already logged in", func(t *testing.T) {
+		store := &memoryStore{key: "old\nkey"}
+
+		_, errOut, err := runLogin(t, cli.Deps{
+			In:          strings.NewReader("user\nkey\n"),
+			Credentials: store,
+		}, "danbooru")
+		if err != nil {
+			t.Fatalf("Execute() error: %v", err)
+		}
+
+		if !strings.Contains(errOut, "danbooru is already logged in") {
+			t.Errorf("stderr = %q, want the replacement warning", errOut)
+		}
+
+		if store.key != "user\nkey" {
+			t.Errorf("stored credentials = %q, want the replacement", store.key)
 		}
 	})
 }

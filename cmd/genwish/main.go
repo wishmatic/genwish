@@ -42,6 +42,7 @@ func newRoot(deps cli.Deps) *cobra.Command {
 		balance.NewCommand(deps),
 		config.NewLoginCommand(deps),
 		config.NewLogoutCommand(deps),
+		config.NewStatusCommand(deps),
 		edit.NewCommand(deps),
 		gen.NewCommand(deps),
 		models.NewCommand(deps),

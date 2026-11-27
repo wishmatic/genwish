@@ -25,6 +25,7 @@ genwish
   balance <provider>
   login <provider>
   logout <provider>
+  status
   util
     booru <search...>
 ```
