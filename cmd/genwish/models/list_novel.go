@@ -10,11 +10,8 @@ import (
 )
 
 func runNovel(deps cli.Deps, args []string, query string, limit int) error {
-	if len(args) > 0 {
-		kind := strings.ToLower(strings.TrimSpace(args[0]))
-		if kind != "image" {
-			return fmt.Errorf("novel does not serve %s models", kind)
-		}
+	if err := noVideoKind("novel", args); err != nil {
+		return err
 	}
 
 	all := novelai.Models()

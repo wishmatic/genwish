@@ -71,10 +71,12 @@ cost.
 genwish models list nano
 genwish models list nano image --query anime --limit 10
 genwish models list nano video
+genwish models get nano <id> [image|video]
 ```
 
 Flags: `--query` filters by id, name, description, owner, or tags; `--limit` defaults to 25 and is
-capped at 100. With no kind, both image and video models are listed.
+capped at 100. With no kind, both image and video models are listed. `get` prints the full entry,
+including capabilities, supported parameters, and pricing.
 
 ## Balance
 

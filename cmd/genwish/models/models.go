@@ -9,10 +9,10 @@ import (
 func NewCommand(deps cli.Deps) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "models",
-		Short: "List the models a provider serves",
+		Short: "Look up the models a provider serves",
 	}
 
-	cmd.AddCommand(NewListCommand(deps))
+	cmd.AddCommand(NewListCommand(deps), NewGetCommand(deps))
 
 	return cmd
 }

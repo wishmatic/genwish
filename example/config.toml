@@ -13,9 +13,9 @@ path = "~/.genwish/out"
 [neo]
 # Forge Neo API base URL.
 url = "http://127.0.0.1:7860"
-# Newline-delimited checkpoint names for `genwish models list neo`.
-# Blank lines and lines starting with # are ignored.
-models_file = ""
+# TOML registry of Neo models, read by `genwish models list|get neo`.
+# Each model is a table under [neo.<id>]; see example/models.toml.
+models_file = "~/.genwish/models.toml"
 
 [booru.rate_limit]
 # Danbooru requests per second.

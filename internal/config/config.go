@@ -11,9 +11,10 @@ import (
 )
 
 const (
-	defaultConfigFile = "config.toml"
-	defaultOutputPath = "~/.genwish/out"
-	defaultNeoURL     = "http://127.0.0.1:7860"
+	defaultConfigFile    = "config.toml"
+	defaultOutputPath    = "~/.genwish/out"
+	defaultNeoURL        = "http://127.0.0.1:7860"
+	defaultNeoModelsFile = "~/.genwish/models.toml"
 )
 
 type Config struct {
@@ -48,11 +49,23 @@ func Defaults() Config {
 			Format: "webp",
 			Path:   defaultOutputPath,
 		},
-		Neo: NeoConfig{URL: defaultNeoURL},
+		Neo: NeoConfig{
+			URL:        defaultNeoURL,
+			ModelsFile: defaultNeoModelsFile,
+		},
 		Booru: BooruConfig{
 			RateLimit: RateLimitConfig{RPS: 1, Burst: 1, Timeout: 20},
 		},
 	}
+}
+
+func DefaultNeoModelsFile() string {
+	path, err := expandHome(defaultNeoModelsFile)
+	if err != nil {
+		return ""
+	}
+
+	return path
 }
 
 func Load(path string) (Config, error) {

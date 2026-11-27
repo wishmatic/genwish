@@ -37,9 +37,11 @@ func TestAddConfigFlag(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			dir := t.TempDir()
-			modelsFile := filepath.Join(dir, "neo-models.txt")
+			modelsFile := filepath.Join(dir, "models.toml")
 
-			if err := os.WriteFile(modelsFile, []byte("sd.safetensors\n"), 0o600); err != nil {
+			if err := os.WriteFile(
+				modelsFile, []byte("[neo.sd]\ncheckpoint = \"sd.safetensors\"\n"), 0o600,
+			); err != nil {
 				t.Fatalf("WriteFile() error: %v", err)
 			}
 

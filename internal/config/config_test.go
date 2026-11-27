@@ -42,8 +42,9 @@ func TestLoad(t *testing.T) {
 			t.Errorf("Output = %+v, want webp under the home directory", cfg.Output)
 		}
 
-		if cfg.Neo.URL != "http://127.0.0.1:7860" || cfg.Neo.ModelsFile != "" {
-			t.Errorf("Neo = %+v, want the local Forge URL", cfg.Neo)
+		if cfg.Neo.URL != "http://127.0.0.1:7860" ||
+			cfg.Neo.ModelsFile != filepath.Join(home, ".genwish", "models.toml") {
+			t.Errorf("Neo = %+v, want the local Forge URL and models file", cfg.Neo)
 		}
 
 		rate := cfg.Booru.RateLimit
@@ -196,7 +197,8 @@ formatt = "png"
 			t.Errorf("Output = %+v, want the defaults", cfg.Output)
 		}
 
-		if cfg.Neo.URL != "http://127.0.0.1:7860" || cfg.Neo.ModelsFile != "" {
+		if cfg.Neo.URL != "http://127.0.0.1:7860" ||
+			cfg.Neo.ModelsFile != filepath.Join(home, ".genwish", "models.toml") {
 			t.Errorf("Neo = %+v, want the defaults", cfg.Neo)
 		}
 
@@ -214,8 +216,11 @@ func TestDefaults(t *testing.T) {
 			t.Errorf("Output = %+v, want webp under ~/.genwish/out", cfg.Output)
 		}
 
-		if cfg.Neo != (NeoConfig{URL: "http://127.0.0.1:7860"}) {
-			t.Errorf("Neo = %+v, want the local Forge URL", cfg.Neo)
+		if cfg.Neo != (NeoConfig{
+			URL:        "http://127.0.0.1:7860",
+			ModelsFile: "~/.genwish/models.toml",
+		}) {
+			t.Errorf("Neo = %+v, want the local Forge URL and models file", cfg.Neo)
 		}
 	})
 }

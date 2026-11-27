@@ -20,7 +20,7 @@ path = "~/.genwish/out"
 
 [neo]
 url = "http://127.0.0.1:7860"
-models_file = ""
+models_file = "~/.genwish/models.toml"
 
 [booru.rate_limit]
 rps = 1.0
@@ -31,8 +31,8 @@ timeout = 20           # seconds
 - `output.format` (string, default `webp`): `png`, `jpeg`, `jxl`, or `webp`.
 - `output.path` (string, default `~/.genwish/out`): base directory for generated and edited media.
 - `neo.url` (string, default `http://127.0.0.1:7860`): Forge Neo API base URL.
-- `neo.models_file` (string, default empty): newline-delimited checkpoint names for
-  `models list neo`.
+- `neo.models_file` (string, default `~/.genwish/models.toml`): TOML model registry for
+  `models list neo` and `models get neo`. The format is described in [neo.md](neo.md).
 - `booru.rate_limit.rps` (float, default `1`): Danbooru requests per second.
 - `booru.rate_limit.burst` (integer, default `1`): Danbooru burst size.
 - `booru.rate_limit.timeout` (integer, default `20`): Danbooru request timeout in seconds.

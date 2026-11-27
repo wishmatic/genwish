@@ -1,0 +1,71 @@
+# Example Neo model registry.
+#
+# Copy to ~/.genwish/models.toml, or point neo.models_file at this file.
+# Every field is optional. usage and style are written as multi-line strings.
+
+[neo.krea]
+# Verbatim checkpoint file name, including its extension.
+checkpoint = "hyphoria_v002.safetensors"
+# Verbatim encoder file names, including their extensions. Usually zero or two.
+encoders = ["qwen_3_06b_base.safetensors", "qwen_3_4b_base.safetensors"]
+# Forge UI preset to apply.
+preset = "krea"
+# Output sizes as WxH.
+sizes = ["1024x1024", "832x1216"]
+
+[neo.krea.samplers]
+default = "Euler"
+options = ["Euler", "Euler a"]
+
+[neo.krea.schedulers]
+default = "Automatic"
+options = ["Automatic", "Karras"]
+
+[neo.krea.steps]
+default = 20
+min = 10
+max = 40
+
+[neo.krea.cfg]
+default = 5.0
+min = 1.0
+max = 15.0
+
+[neo.krea.hires]
+enabled = true
+
+[neo.krea.instructions]
+usage = """
+Load the krea preset and leave the encoders as configured.
+Pick a size from sizes, then copy one prompt prefix from style.
+Keep the negative prompt short; the preset carries the quality terms.
+"""
+style = """
+Anime: `masterpiece, best quality, anime screencap, 1girl, ...`
+Painterly: `illustration, painterly, thick brush strokes, ...`
+"""
+
+[neo.illustrious]
+checkpoint = "illustriousXL_v01.safetensors"
+preset = "illustrious"
+sizes = ["832x1216", "1216x832"]
+
+[neo.illustrious.samplers]
+default = "Euler a"
+options = ["Euler a", "DPM++ 2M"]
+
+[neo.illustrious.steps]
+default = 28
+
+[neo.illustrious.cfg]
+default = 5.5
+
+[neo.illustrious.instructions]
+usage = """
+Load the illustrious preset and use the Euler a sampler.
+Steps default to 28 and cfg to 5.5; keep overrides inside those values.
+"""
+style = """
+Anime: `masterpiece, best quality, anime coloring, 1girl, ...`
+Chibi: `chibi, super deformed, thick outlines, ...`
+"""

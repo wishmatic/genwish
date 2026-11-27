@@ -72,11 +72,65 @@ Flags: `--model` (default `General`), `--full-mode` (fp32 instead of fp16), `--f
 
 ## Models
 
-Model names come from a local file. Set `neo.models_file` in the config file, then run:
+Model metadata lives in a TOML registry, `~/.genwish/models.toml` by default. Set
+`neo.models_file` to read another path. Each model is a table under `[neo]`:
+
+```toml
+[neo.krea]
+checkpoint = "hyphoria_v002.safetensors"
+encoders = ["qwen_3_06b_base.safetensors", "qwen_3_4b_base.safetensors"]
+preset = "krea"
+sizes = ["1024x1024", "832x1216"]
+
+[neo.krea.samplers]
+default = "Euler"
+options = ["Euler", "Euler a"]
+
+[neo.krea.schedulers]
+default = "Automatic"
+options = ["Automatic", "Karras"]
+
+[neo.krea.steps]
+default = 20
+min = 10
+max = 40
+
+[neo.krea.cfg]
+default = 5.0
+min = 1.0
+max = 15.0
+
+[neo.krea.hires]
+enabled = true
+
+[neo.krea.instructions]
+usage = """
+Load the krea preset, then pick a size and copy one style prefix.
+Keep the negative prompt short.
+"""
+style = """
+Anime: `masterpiece, best quality, anime screencap, 1girl, ...`
+Painterly: `illustration, painterly, thick brush strokes, ...`
+"""
+```
+
+Every field is optional. `checkpoint` and each encoder are verbatim file names with their
+extensions. `samplers` and `schedulers` take a `default` and `options`, and the default must
+appear in the options. `steps` and `cfg` take `default`, `min`, and `max`: a bound requires both
+bounds and a default between them. `sizes` are `WxH` strings. `hires.enabled` defaults to false.
+
+`instructions.usage` says how to use the model. `instructions.style` lists the styles the model
+supports, with prompt examples for each. Write both as TOML multi-line strings so each line
+survives; `models get` prints them line by line. [example/models.toml](../example/models.toml)
+has two complete models.
 
 ```sh
 genwish models list neo
+genwish models get neo krea
 ```
 
-The file is newline-delimited. Blank lines and lines starting with `#` are ignored. `--query`
-filters names and `--limit` caps the output.
+`list` prints the id, checkpoint, and preset; `--query` filters those and `--limit` caps the
+output. `get` prints the whole entry, including the instructions.
+
+A missing default registry means no models are configured; a missing `neo.models_file` path is an
+error. Generation does not require a registry entry, so any checkpoint can be used.

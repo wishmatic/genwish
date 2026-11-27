@@ -56,10 +56,11 @@ The model list is fixed:
 ```sh
 genwish models list novel
 genwish models list novel --query 4-5 --limit 5
+genwish models get novel nai-diffusion-5-full
 ```
 
 The list covers the V5, V4.5, V4, V3, and Furry V3 image families. `--query` filters ids and
-`--limit` caps the output.
+`--limit` caps the output. `get` prints the id and kind of one model.
 
 ## Balance and Anlas
 

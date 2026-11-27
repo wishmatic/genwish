@@ -22,4 +22,18 @@ func TestNewCommand(t *testing.T) {
 			t.Errorf("Execute() error = %v, want the unknown provider reported", err)
 		}
 	})
+
+	t.Run("get requires a provider and an id", func(t *testing.T) {
+		err := testutil.Run(t, NewCommand(cli.Deps{}), "get")
+		if err == nil || !strings.Contains(err.Error(), "between 2 and 3") {
+			t.Errorf("Execute() error = %v, want the missing arguments reported", err)
+		}
+	})
+
+	t.Run("get rejects an unknown provider", func(t *testing.T) {
+		err := testutil.Run(t, NewCommand(cli.Deps{}), "get", "atlantean", "model")
+		if err == nil || !strings.Contains(err.Error(), "is not one of") {
+			t.Errorf("Execute() error = %v, want the unknown provider reported", err)
+		}
+	})
 }

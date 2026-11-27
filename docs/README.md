@@ -21,6 +21,7 @@ genwish
     bgkill <image>
   models
     list <provider> [image|video]
+    get <provider> <id> [image|video]
   balance <provider>
   login <provider>
   logout <provider>
