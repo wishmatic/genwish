@@ -4,10 +4,11 @@
 
 ## Config file
 
-The default path is `~/.genwish/config.toml`. Pass `--config-file <path>` to any command to read a
-different file. A complete example lives in [example/config.toml](../example/config.toml).
+The default path is `~/.genwish/config.toml`. Any command creates an empty file there if it is
+missing. Pass `--config-file <path>` to read a different file; that file must exist. A complete
+example lives in [example/config.toml](../example/config.toml).
 
-- When the default file is missing, the built-in defaults apply.
+- The empty file is valid; omitted keys keep their built-in defaults.
 - A missing `--config-file` path is an error.
 - Malformed TOML and unknown keys are errors.
 

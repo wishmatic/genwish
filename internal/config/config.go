@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -11,6 +12,7 @@ import (
 )
 
 const (
+	defaultConfigDir     = ".genwish"
 	defaultConfigFile    = "config.toml"
 	defaultOutputPath    = "~/.genwish/out"
 	defaultNeoURL        = "http://127.0.0.1:7860"
@@ -59,6 +61,37 @@ func Defaults() Config {
 	}
 }
 
+func DefaultPath() string {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return ""
+	}
+
+	return filepath.Join(home, defaultConfigDir, defaultConfigFile)
+}
+
+func EnsureDefaultFile() error {
+	path := DefaultPath()
+	if path == "" {
+		return nil
+	}
+
+	if err := os.MkdirAll(filepath.Dir(path), 0o700); err != nil {
+		return fmt.Errorf("create config directory: %w", err)
+	}
+
+	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o600)
+	if errors.Is(err, fs.ErrExist) {
+		return nil
+	}
+
+	if err != nil {
+		return fmt.Errorf("create config file %s: %w", path, err)
+	}
+
+	return file.Close()
+}
+
 func DefaultNeoModelsFile() string {
 	path, err := expandHome(defaultNeoModelsFile)
 	if err != nil {
@@ -75,12 +108,10 @@ func Load(path string) (Config, error) {
 	explicit := file != ""
 
 	if !explicit {
-		home, err := os.UserHomeDir()
-		if err != nil {
+		file = DefaultPath()
+		if file == "" {
 			return cfg.finish()
 		}
-
-		file = filepath.Join(home, ".genwish", defaultConfigFile)
 	}
 
 	data, err := os.ReadFile(file)

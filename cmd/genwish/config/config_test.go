@@ -72,4 +72,34 @@ func TestAddConfigFlag(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("creates the default config", func(t *testing.T) {
+		home := testutil.SetHome(t)
+
+		out := &bytes.Buffer{}
+		errOut := &bytes.Buffer{}
+		deps := cli.WithDefaults(cli.Deps{Out: out, Err: errOut})
+
+		root := &cobra.Command{Use: "root"}
+		root.SetOut(out)
+		root.SetErr(errOut)
+
+		AddConfigFlag(root, deps)
+		root.AddCommand(models.NewCommand(deps))
+
+		if err := testutil.Run(t, root, "models", "list", "neo"); err != nil {
+			t.Fatalf("Execute() error: %v", err)
+		}
+
+		path := filepath.Join(home, ".genwish", "config.toml")
+
+		info, err := os.Stat(path)
+		if err != nil {
+			t.Fatalf("Stat() error: %v", err)
+		}
+
+		if info.Size() != 0 {
+			t.Errorf("config size = %d, want an empty file", info.Size())
+		}
+	})
 }

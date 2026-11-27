@@ -74,6 +74,14 @@ func ResolveConfig(deps Deps) (config.Config, error) {
 	return config.Load(deps.configPath())
 }
 
+func EnsureDefaultConfig(deps Deps) error {
+	if deps.Flags != nil && deps.Flags.ConfigPath != "" {
+		return nil
+	}
+
+	return config.EnsureDefaultFile()
+}
+
 func (d Deps) configPath() string {
 	if d.Flags == nil {
 		return ""

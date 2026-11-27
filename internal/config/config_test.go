@@ -208,6 +208,54 @@ formatt = "png"
 	})
 }
 
+func TestEnsureDefaultFile(t *testing.T) {
+	t.Run("creates an empty config", func(t *testing.T) {
+		home := setHome(t)
+
+		if err := EnsureDefaultFile(); err != nil {
+			t.Fatalf("EnsureDefaultFile() error: %v", err)
+		}
+
+		path := filepath.Join(home, ".genwish", "config.toml")
+
+		data, err := os.ReadFile(path)
+		if err != nil {
+			t.Fatalf("ReadFile() error: %v", err)
+		}
+
+		if len(data) != 0 {
+			t.Errorf("config = %q, want an empty file", data)
+		}
+	})
+
+	t.Run("keeps an existing config", func(t *testing.T) {
+		home := setHome(t)
+		path := filepath.Join(home, ".genwish", "config.toml")
+
+		if err := os.MkdirAll(filepath.Dir(path), 0o700); err != nil {
+			t.Fatalf("MkdirAll() error: %v", err)
+		}
+
+		body := []byte("[output]\nformat = \"png\"\n")
+		if err := os.WriteFile(path, body, 0o600); err != nil {
+			t.Fatalf("WriteFile() error: %v", err)
+		}
+
+		if err := EnsureDefaultFile(); err != nil {
+			t.Fatalf("EnsureDefaultFile() error: %v", err)
+		}
+
+		data, err := os.ReadFile(path)
+		if err != nil {
+			t.Fatalf("ReadFile() error: %v", err)
+		}
+
+		if string(data) != string(body) {
+			t.Errorf("config = %q, want the existing file untouched", data)
+		}
+	})
+}
+
 func TestDefaults(t *testing.T) {
 	t.Run("matches the documented values", func(t *testing.T) {
 		cfg := Defaults()
