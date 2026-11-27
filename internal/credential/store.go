@@ -21,7 +21,7 @@ type Store interface {
 	Delete() error
 }
 
-const envBackend = "GENWISH_CREDENTIAL_BACKEND"
+const envBackend = "CREDENTIAL_BACKEND"
 
 const (
 	BackendAuto    = "auto"

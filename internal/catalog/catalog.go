@@ -35,20 +35,18 @@ type RelationIndex interface {
 }
 
 type Options struct {
-	BlockedTags []string
-	MaxLimit    int
-	MaxOffset   int
-	Relations   RelationIndex
-	Clock       func() time.Time
+	MaxLimit  int
+	MaxOffset int
+	Relations RelationIndex
+	Clock     func() time.Time
 }
 
-// Service owns the policy around a tag search: what a valid search is, which window sizes are allowed, which tag
-// names an operator has blocked, and how an alias, an implication, and an empty result are reported.
+// Service owns the policy around a tag search: what a valid search is, which window sizes are allowed, and how an
+// alias, an implication, and an empty result are reported.
 type Service struct {
-	source  TagSource
-	opts    Options
-	blocked map[string]bool
-	now     func() time.Time
+	source TagSource
+	opts   Options
+	now    func() time.Time
 }
 
 func New(source TagSource, opts Options) *Service {
@@ -64,35 +62,7 @@ func New(source TagSource, opts Options) *Service {
 		opts.Clock = time.Now
 	}
 
-	return &Service{source: source, opts: opts, blocked: blockedSet(opts.BlockedTags), now: opts.Clock}
-}
-
-func blockedSet(names []string) map[string]bool {
-	set := make(map[string]bool, len(names))
-
-	for _, name := range names {
-		set[name] = true
-	}
-
-	return set
-}
-
-func (s *Service) filterBlocked(tags []booru.Tag) []booru.Tag {
-	if len(s.blocked) == 0 {
-		return tags
-	}
-
-	kept := make([]booru.Tag, 0, len(tags))
-
-	for _, tag := range tags {
-		if s.blocked[tag.Name] {
-			continue
-		}
-
-		kept = append(kept, tag)
-	}
-
-	return kept
+	return &Service{source: source, opts: opts, now: opts.Clock}
 }
 
 func (s *Service) snapshotDate() string {

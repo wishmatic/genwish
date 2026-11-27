@@ -79,7 +79,7 @@ func (s *Service) Tags(ctx context.Context, input TagsInput) (TagsResult, error)
 		return TagsResult{}, fmt.Errorf("catalog: %w", err)
 	}
 
-	tags := s.enrich(s.filterBlocked(window.Tags))
+	tags := s.enrich(window.Tags)
 
 	status := StatusOK
 
@@ -153,7 +153,7 @@ func (s *Service) synonyms(search string, tags []booru.Tag) []string {
 	out := make([]string, 0)
 
 	for _, name := range s.opts.Relations.Synonyms(search) {
-		if name == search || shown[name] || s.blocked[name] {
+		if name == search || shown[name] {
 			continue
 		}
 

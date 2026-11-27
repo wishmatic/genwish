@@ -30,6 +30,9 @@ func newRoot(deps cli.Deps) *cobra.Command {
 	root.SetOut(deps.Out)
 	root.SetErr(deps.Err)
 
+	root.PersistentFlags().StringVar(&deps.Flags.ConfigPath, "config-file", "",
+		"path to config.toml (default ~/.genwish/config.toml)")
+
 	root.AddCommand(
 		newLoginCommand(deps),
 		newLogoutCommand(deps),

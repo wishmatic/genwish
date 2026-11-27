@@ -22,14 +22,14 @@ go install github.com/wishmatic/genwish/cmd/genwish@latest
 
 ```sh
 genwish login nano
-genwish gen image nano "a red fox in snow" --out ./images
-genwish gen video nano "waves at sunset" --model veo2-video --out ./videos
+genwish gen image nano "a red fox in snow" --out ./media
+genwish gen video nano "waves at sunset" --model veo2-video --out ./media
 
-genwish gen image neo "a red fox" --model sd.safetensors --forge-preset default --out ./images
-genwish edit square ./logo.png --out ./images
+genwish gen image neo "a red fox" --model sd.safetensors --forge-preset default --out ./media
+genwish edit square ./logo.png --out ./media
 
 genwish login novel
-genwish gen image novel "a cat" --out ./images
+genwish gen image novel "a cat" --out ./media
 genwish balance novel
 
 genwish util booru blue_hair --limit 5

@@ -17,8 +17,8 @@ Calls spend Anlas on the account the key belongs to.
 ## Generate an image
 
 ```sh
-genwish gen image novel "a cat" --out ./images
-genwish gen image novel "a cat" --init-image ./photo.png --out ./images
+genwish gen image novel "a cat" --out ./media
+genwish gen image novel "a cat" --init-image ./photo.png --out ./media
 ```
 
 Defaults:
@@ -29,7 +29,7 @@ Defaults:
 - Sampler: `k_euler_ancestral`.
 - Seed: `-1` (random).
 - Denoising strength: `0.75`.
-- Format: `OUTPUT_FORMAT` or `webp`.
+- Format: `output.format` (`webp`).
 
 Flags:
 
@@ -46,10 +46,10 @@ Flags:
 | `--init-image-url`     | empty                    | Address to transform. Use only one init image flag. |
 | `--denoising-strength` | `0.75`                   | How much of the init image to change.               |
 | `--noise`              | `0`                      | Extra image noise; only used with an init image.    |
-| `--format`             | `OUTPUT_FORMAT` (`webp`) | `png`, `jpeg`, `jxl`, or `webp`.                    |
-| `--out`                | `.`                      | Output directory.                                   |
+| `--format`             | `output.format` (`webp`) | `png`, `jpeg`, `jxl`, or `webp`.                    |
+| `--out`                | `output.path`            | Base output directory.                              |
 
-Images are written with the `novel-image-` prefix.
+Images are written under `<out>/images/<date>/<uuid>.<ext>`.
 
 ## Models
 

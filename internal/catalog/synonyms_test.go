@@ -47,23 +47,6 @@ func TestTagsSynonymsDropNamesAlreadyShown(t *testing.T) {
 	}
 }
 
-func TestTagsSynonymsHonourBlockedTags(t *testing.T) {
-	source := &fakeSource{}
-
-	opts := testOptions()
-	opts.Relations = relationsWithSynonyms()
-	opts.BlockedTags = []string{"urine"}
-
-	result, err := New(source, opts).Tags(context.Background(), TagsInput{Search: "piss", Limit: 5})
-	if err != nil {
-		t.Fatalf("Tags() error: %v", err)
-	}
-
-	if len(result.Synonyms) != 1 || result.Synonyms[0] != "pee" {
-		t.Errorf("synonyms = %v, want the blocked name dropped", result.Synonyms)
-	}
-}
-
 func TestTagsWithoutIndexHasNoSynonyms(t *testing.T) {
 	source := &fakeSource{}
 

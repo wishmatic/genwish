@@ -16,6 +16,8 @@ Implemented natively. Automated verification passes: `go build ./...`, `go vet .
 
 The image URL map was removed after implementation: `internal/sourcemap` and `IMAGE_URL_MAP` no longer exist, and `internal/resolve` fetches URLs unchanged. References to it below record the original build.
 
+Configuration moved after implementation: settings now come from `~/.genwish/config.toml` or `--config-file`, only `LOG_LEVEL`, `ERROR_DETAIL`, and `CREDENTIAL_BACKEND` remain environment variables, the tag limits are fixed at 100 and 1000, and blocked tags were removed entirely. Environment variable and config names below record the original build.
+
 ## Requirements
 
 - Deprecate `booru-mcp`, `nano-mcp`, `neo-mcp`, and `novel-mcp` in favor of two projects: `genwish` (generation) and `lukwish` (the rest of NanoGPT). This plan covers only `genwish`.

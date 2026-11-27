@@ -81,7 +81,8 @@ func newGenImageNeoCommand(deps cli.Deps) *cobra.Command {
 	cmd.Flags().Float64Var(&flags.hrCFG, "hr-cfg", 0, "CFG scale for the hi-res second pass")
 	cmd.Flags().StringVar(&flags.outputFormat, "format", "",
 		"output image format: png, jpeg, jxl, or webp")
-	cmd.Flags().StringVar(&flags.out, "out", ".", "directory for the generated image")
+	cmd.Flags().StringVar(&flags.out, "out", "",
+		"base directory for the generated image (default: output.path)")
 
 	return cmd
 }
@@ -121,7 +122,7 @@ func forgeRun(ctx context.Context, deps cli.Deps, flags forgeFlags, args []strin
 		return fmt.Errorf("forge: %w", err)
 	}
 
-	paths, err := cli.WriteImages(flags.out, "neo-image", images, target)
+	paths, err := cli.WriteImages(cli.OutputDir(cfg, flags.out), "images", images, target)
 	if err != nil {
 		return fmt.Errorf("forge: %w", err)
 	}

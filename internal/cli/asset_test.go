@@ -13,15 +13,15 @@ import (
 var testAssetPNG = []byte("\x89PNG\r\n\x1a\n test image")
 
 func TestWriteAssetWritesTheFile(t *testing.T) {
-	dir := filepath.Join(t.TempDir(), "nested", "output")
+	base := filepath.Join(t.TempDir(), "nested", "output")
 
-	path, err := WriteAsset(dir, "nano-image", []byte("image bytes"), "image/png")
+	path, err := WriteAsset(base, "images", []byte("image bytes"), "image/png")
 	if err != nil {
 		t.Fatalf("WriteAsset() error: %v", err)
 	}
 
-	if filepath.Dir(path) != dir {
-		t.Errorf("path = %s, want it under %s", path, dir)
+	if want := filepath.Join(base, "images"); filepath.Dir(filepath.Dir(path)) != want {
+		t.Errorf("path = %s, want it under %s", path, want)
 	}
 	if filepath.Ext(path) != ".png" {
 		t.Errorf("extension = %s, want .png", filepath.Ext(path))
@@ -45,7 +45,7 @@ func TestWriteAssetWritesTheFile(t *testing.T) {
 }
 
 func TestWriteAssetRejectsAnUnknownMediaType(t *testing.T) {
-	_, err := WriteAsset(t.TempDir(), "nano-image", []byte("data"), "application/pdf")
+	_, err := WriteAsset(t.TempDir(), "images", []byte("data"), "application/pdf")
 	if err == nil || !strings.Contains(err.Error(), "cannot store") {
 		t.Errorf("WriteAsset() error = %v, want a media-type rejection", err)
 	}

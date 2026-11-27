@@ -1,12 +1,15 @@
 package main
 
 import (
+	"bytes"
 	"encoding/base64"
 	"fmt"
+	"image"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -29,6 +32,7 @@ func TestGenerateImageWritesInlineImages(t *testing.T) {
 		"--strength", "0.5",
 		"--guidance-scale", "7.5",
 		"--num-inference-steps", "20",
+		"--format", "png",
 		"--out", dir,
 	)
 	if err != nil {
@@ -61,7 +65,7 @@ func TestGenerateImageWritesInlineImages(t *testing.T) {
 		}
 	}
 
-	files, err := filepath.Glob(filepath.Join(dir, "nano-image-*.png"))
+	files, err := filepath.Glob(filepath.Join(dir, "images", "*", "*.png"))
 	if err != nil {
 		t.Fatalf("Glob() error: %v", err)
 	}
@@ -100,6 +104,7 @@ func TestGenerateImageResolvesInputAddresses(t *testing.T) {
 		"--image", input.URL+"/image.png",
 		"--images", input.URL+"/extra.png",
 		"--mask", input.URL+"/mask.png",
+		"--format", "png",
 		"--out", t.TempDir(),
 	)
 	if err != nil {
@@ -139,14 +144,14 @@ func TestGenerateImageDownloadsAURLResult(t *testing.T) {
 	dir := t.TempDir()
 
 	if _, _, err := runCommand(t, cli.Deps{Nano: newClientAt(t, server.URL)},
-		"gen", "image", "nano", "a cat", "--out", dir,
+		"gen", "image", "nano", "a cat", "--format", "png", "--out", dir,
 	); err != nil {
 		t.Fatalf("Execute() error: %v", err)
 	}
 
 	nextRequestPath(t, requests, "/api/v1/images/generations")
 
-	files, err := filepath.Glob(filepath.Join(dir, "nano-image-*.png"))
+	files, err := filepath.Glob(filepath.Join(dir, "images", "*", "*.png"))
 	if err != nil {
 		t.Fatalf("Glob() error: %v", err)
 	}
@@ -199,5 +204,46 @@ func TestGenerateImageRejectsAnEmptyPrompt(t *testing.T) {
 	_, _, err := runCommand(t, cli.Deps{}, "gen", "image", "nano", "   ")
 	if err == nil || !strings.Contains(err.Error(), "prompt is empty") {
 		t.Errorf("Execute() error = %v, want an empty-prompt rejection", err)
+	}
+}
+
+func TestGenerateImageUsesTheConfiguredOutput(t *testing.T) {
+	source := validPNG(t, 4, 4)
+	encoded := base64.StdEncoding.EncodeToString(source)
+
+	server, _ := captureServer(t, http.StatusOK,
+		fmt.Sprintf(`{"data":[{"b64_json":%q}],"cost":0.01}`, encoded),
+	)
+
+	dir := t.TempDir()
+	configPath := filepath.Join(t.TempDir(), "config.toml")
+	body := "[output]\nformat = \"webp\"\npath = " + strconv.Quote(dir) + "\n"
+
+	if err := os.WriteFile(configPath, []byte(body), 0o600); err != nil {
+		t.Fatalf("WriteFile() error: %v", err)
+	}
+
+	_, _, err := runCommand(t, cli.Deps{Nano: newClientAt(t, server.URL)},
+		"gen", "image", "nano", "a cat", "--config-file", configPath,
+	)
+	if err != nil {
+		t.Fatalf("Execute() error: %v", err)
+	}
+
+	files, err := filepath.Glob(filepath.Join(dir, "images", "*", "*.webp"))
+	if err != nil {
+		t.Fatalf("Glob() error: %v", err)
+	}
+	if len(files) != 1 {
+		t.Fatalf("files = %v, want one webp image", files)
+	}
+
+	data, err := os.ReadFile(files[0])
+	if err != nil {
+		t.Fatalf("ReadFile() error: %v", err)
+	}
+
+	if _, name, err := image.DecodeConfig(bytes.NewReader(data)); err != nil || name != "webp" {
+		t.Errorf("DecodeConfig() = %q, %v, want webp", name, err)
 	}
 }

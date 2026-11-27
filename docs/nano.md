@@ -15,7 +15,7 @@ genwish login nano
 ## Generate an image
 
 ```sh
-genwish gen image nano "a red fox in snow" --out ./images
+genwish gen image nano "a red fox in snow" --out ./media
 ```
 
 Flags:
@@ -28,7 +28,8 @@ Flags:
 | `--image`               | empty            | Image to transform.                               |
 | `--images`              | empty            | Additional input image, repeatable.               |
 | `--mask`                | empty            | Inpainting mask.                                  |
-| `--out`                 | `.`              | Output directory.                                 |
+| `--format`              | `output.format`  | `png`, `jpeg`, `jxl`, or `webp`.                  |
+| `--out`                 | `output.path`    | Base output directory.                            |
 | `--seed`                | unset            | Seed for models that take one.                    |
 | `--strength`            | unset            | How far the output may move from the input image. |
 | `--guidance-scale`      | unset            | How closely the model follows the prompt.         |
@@ -36,12 +37,12 @@ Flags:
 
 Input images accept an http(s) URL, a data URI, or raw base64.
 
-Generated images are written locally with the media type NanoGPT returned, using the `nano-image-` prefix. The command prints each path and `Cost: $...`.
+Generated images are written under `<out>/images/<date>/<uuid>.<ext>` in the configured format. The command prints each path and `Cost: $...`.
 
 ## Generate a video
 
 ```sh
-genwish gen video nano "waves at sunset" --model veo2-video --out ./videos
+genwish gen video nano "waves at sunset" --model veo2-video --out ./media
 ```
 
 `--model` is required.
@@ -60,9 +61,9 @@ Flags:
 | `--seed`            | unset            | Seed for providers that honour one.                                       |
 | `--generate-audio`  | false            | Add AI audio on models that support it.                                   |
 | `--video-url`       | empty            | Source video to extend, edit, or upscale.                                 |
-| `--out`             | `.`              | Output directory.                                                         |
+| `--out`             | `output.path`    | Base output directory.                                                    |
 
-The result is written with the `nano-video-` prefix, and the command prints the path and cost.
+The result is written under `<out>/videos/<date>/<uuid>.<ext>`, and the command prints the path and cost.
 
 ## Models
 

@@ -32,7 +32,8 @@ func newEditBgkillCommand(deps cli.Deps) *cobra.Command {
 	cmd.Flags().BoolVar(&flags.fullMode, "full-mode", false, "run the model in fp32 instead of fp16")
 	cmd.Flags().StringVar(&flags.outputFormat, "format", "",
 		"output image format: png, jpeg, jxl, or webp")
-	cmd.Flags().StringVar(&flags.out, "out", ".", "directory for the foreground image")
+	cmd.Flags().StringVar(&flags.out, "out", "",
+		"base directory for the foreground image (default: output.path)")
 
 	return cmd
 }
@@ -64,7 +65,7 @@ func bgkillRun(cmd *cobra.Command, deps cli.Deps, flags bgkillFlags, image strin
 		return fmt.Errorf("bgkill: %w", err)
 	}
 
-	paths, err := cli.WriteImages(flags.out, "neo-image", [][]byte{out}, target)
+	paths, err := cli.WriteImages(cli.OutputDir(cfg, flags.out), "images", [][]byte{out}, target)
 	if err != nil {
 		return fmt.Errorf("bgkill: %w", err)
 	}

@@ -83,7 +83,7 @@ func TestGenerateVideoWritesTheDownloadedFile(t *testing.T) {
 		t.Errorf("status query = %q, want requestId=run-1", status.Query)
 	}
 
-	files, err := filepath.Glob(filepath.Join(dir, "nano-video-*.mp4"))
+	files, err := filepath.Glob(filepath.Join(dir, "videos", "*", "*.mp4"))
 	if err != nil {
 		t.Fatalf("Glob() error: %v", err)
 	}

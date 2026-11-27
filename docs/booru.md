@@ -53,6 +53,4 @@ The command prompts for the Danbooru login first, then the API key. `genwish log
 
 ## Configuration
 
-See [configuration.md](configuration.md). The relevant variables are `ERROR_DETAIL`, `RATE_LIMIT_RPS`, `RATE_LIMIT_BURST`, `REQUEST_TIMEOUT_SECONDS`, `MAX_LIMIT`, `MAX_OFFSET`, and `BLOCKED_TAGS`. The user agent is hardcoded.
-
-`BLOCKED_TAGS` is a comma-separated denylist. No list ships with this repository. Tag names are third-party and unreviewed.
+See [configuration.md](configuration.md). The relevant settings are `ERROR_DETAIL` and the `booru.rate_limit` table (`rps`, `burst`, `timeout`). The tag page size is fixed at 100 and the largest offset at 1000. The user agent is hardcoded.

@@ -158,25 +158,6 @@ func TestTagsPassesTheWindowThrough(t *testing.T) {
 	}
 }
 
-func TestTagsDropsBlockedTags(t *testing.T) {
-	source := &fakeSource{page: booru.TagPage{Tags: []booru.Tag{
-		{Name: "blocked_tag"},
-		{Name: "blue_hair"},
-	}}}
-
-	opts := testOptions()
-	opts.BlockedTags = []string{"blocked_tag"}
-
-	result, err := New(source, opts).Tags(context.Background(), TagsInput{Search: "blue", Limit: 25})
-	if err != nil {
-		t.Fatalf("Tags() error: %v", err)
-	}
-
-	if len(result.Tags) != 1 || result.Tags[0].Name != "blue_hair" {
-		t.Errorf("tags = %+v, want only the unblocked tag", result.Tags)
-	}
-}
-
 func TestTagsPropagatesProviderError(t *testing.T) {
 	source := &fakeSource{err: errors.New("danbooru: boom")}
 

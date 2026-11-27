@@ -27,7 +27,8 @@ func newEditConvertCommand(deps cli.Deps) *cobra.Command {
 	}
 
 	cmd.Flags().StringVar(&flags.format, "format", "", "format to convert to: png, jpeg, jxl, or webp")
-	cmd.Flags().StringVar(&flags.out, "out", ".", "directory for the converted image")
+	cmd.Flags().StringVar(&flags.out, "out", "",
+		"base directory for the converted image (default: output.path)")
 
 	return cmd
 }
@@ -36,6 +37,11 @@ func convertRun(cmd *cobra.Command, deps cli.Deps, flags convertFlags, image str
 	target, err := convertTarget(flags.format)
 	if err != nil {
 		return fmt.Errorf("convert: %w", err)
+	}
+
+	cfg, err := cli.ResolveConfig(deps)
+	if err != nil {
+		return err
 	}
 
 	resolver := cli.ImageResolver(deps)
@@ -50,7 +56,7 @@ func convertRun(cmd *cobra.Command, deps cli.Deps, flags convertFlags, image str
 		return fmt.Errorf("convert: %w", err)
 	}
 
-	path, err := cli.WriteImage(flags.out, "neo-image", out, target.MediaType())
+	path, err := cli.WriteImage(cli.OutputDir(cfg, flags.out), "images", out, target.MediaType())
 	if err != nil {
 		return fmt.Errorf("convert: %w", err)
 	}

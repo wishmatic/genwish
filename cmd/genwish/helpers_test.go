@@ -3,6 +3,8 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"image"
+	"image/png"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -60,8 +62,23 @@ func (s *memoryStore) Delete() error {
 	return nil
 }
 
+func validPNG(t *testing.T, width, height int) []byte {
+	t.Helper()
+
+	var buf bytes.Buffer
+	if err := png.Encode(&buf, image.NewRGBA(image.Rect(0, 0, width, height))); err != nil {
+		t.Fatalf("Encode() error: %v", err)
+	}
+
+	return buf.Bytes()
+}
+
 func runCommand(t *testing.T, deps cli.Deps, args ...string) (string, string, error) {
 	t.Helper()
+
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
 
 	out := &bytes.Buffer{}
 	errOut := &bytes.Buffer{}

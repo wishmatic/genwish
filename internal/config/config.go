@@ -1,98 +1,198 @@
 package config
 
 import (
+	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 
+	"github.com/BurntSushi/toml"
 	"github.com/caarlos0/env/v11"
 	"github.com/joho/godotenv"
-
-	"github.com/wishmatic/genwish/internal/booru"
 )
 
-const maxTagLimit = 100
+const (
+	defaultConfigFile = "config.toml"
+	defaultOutputPath = "~/.genwish/out"
+	defaultNeoURL     = "http://127.0.0.1:7860"
+)
 
 type Config struct {
-	LogLevel string `env:"LOG_LEVEL" envDefault:"info"`
+	LogLevel    string `toml:"-"`
+	ErrorDetail string `toml:"-"`
 
-	DefaultOutput string `env:"OUTPUT_FORMAT" envDefault:"webp"`
-	SDURL         string `env:"SD_URL" envDefault:"http://127.0.0.1:7860"`
-
-	ErrorDetail    string  `env:"ERROR_DETAIL" envDefault:"useful"`
-	RateLimitRPS   float64 `env:"RATE_LIMIT_RPS" envDefault:"1"`
-	RateLimitBurst int     `env:"RATE_LIMIT_BURST" envDefault:"1"`
-
-	RequestTimeoutSeconds int `env:"REQUEST_TIMEOUT_SECONDS" envDefault:"20"`
-
-	MaxLimit  int `env:"MAX_LIMIT" envDefault:"100"`
-	MaxOffset int `env:"MAX_OFFSET" envDefault:"1000"`
-
-	NEOModelsFile string `env:"NEO_MODELS_FILE"`
-
-	BlockedTagsRaw string `env:"BLOCKED_TAGS"`
+	Output OutputConfig
+	Neo    NeoConfig
+	Booru  BooruConfig
 }
 
-func Load() (Config, error) {
+type OutputConfig struct {
+	Format string `toml:"format"`
+	Path   string `toml:"path"`
+}
+
+type NeoConfig struct {
+	URL        string `toml:"url"`
+	ModelsFile string `toml:"models_file"`
+}
+
+type BooruConfig struct {
+	RateLimit RateLimitConfig `toml:"rate_limit"`
+}
+
+type RateLimitConfig struct {
+	RPS     float64 `toml:"rps"`
+	Burst   int     `toml:"burst"`
+	Timeout int     `toml:"timeout"`
+}
+
+type envConfig struct {
+	LogLevel    string `env:"LOG_LEVEL" envDefault:"info"`
+	ErrorDetail string `env:"ERROR_DETAIL" envDefault:"useful"`
+}
+
+func Defaults() Config {
+	return Config{
+		LogLevel:    "info",
+		ErrorDetail: "useful",
+		Output: OutputConfig{
+			Format: "webp",
+			Path:   defaultOutputPath,
+		},
+		Neo: NeoConfig{URL: defaultNeoURL},
+		Booru: BooruConfig{
+			RateLimit: RateLimitConfig{RPS: 1, Burst: 1, Timeout: 20},
+		},
+	}
+}
+
+func Load(path string) (Config, error) {
 	_ = godotenv.Load()
 
-	var cfg Config
-	if err := env.Parse(&cfg); err != nil {
+	var fromEnv envConfig
+	if err := env.Parse(&fromEnv); err != nil {
 		return Config{}, fmt.Errorf("parse environment: %w", err)
 	}
 
-	return cfg, nil
+	cfg := Defaults()
+	cfg.LogLevel = fromEnv.LogLevel
+	cfg.ErrorDetail = fromEnv.ErrorDetail
+
+	file := strings.TrimSpace(path)
+	explicit := file != ""
+
+	if !explicit {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return cfg.finish()
+		}
+
+		file = filepath.Join(home, ".genwish", defaultConfigFile)
+	}
+
+	data, err := os.ReadFile(file)
+	if err != nil {
+		if !explicit && errors.Is(err, os.ErrNotExist) {
+			return cfg.finish()
+		}
+
+		return Config{}, fmt.Errorf("config file %s: %w", file, err)
+	}
+
+	meta, err := toml.Decode(string(data), &cfg)
+	if err != nil {
+		return Config{}, fmt.Errorf("config file %s: %w", file, err)
+	}
+
+	if unknown := meta.Undecoded(); len(unknown) > 0 {
+		return Config{}, fmt.Errorf("config file %s: unknown key %s", file, formatKeys(unknown))
+	}
+
+	return cfg.finish()
+}
+
+func (c Config) finish() (Config, error) {
+	if err := c.normalize(); err != nil {
+		return Config{}, err
+	}
+
+	if err := c.Validate(); err != nil {
+		return Config{}, err
+	}
+
+	return c, nil
+}
+
+func (c *Config) normalize() error {
+	if strings.TrimSpace(c.Output.Format) == "" {
+		c.Output.Format = "webp"
+	}
+
+	if strings.TrimSpace(c.Output.Path) == "" {
+		c.Output.Path = defaultOutputPath
+	}
+
+	outputPath, err := expandHome(c.Output.Path)
+	if err != nil {
+		return err
+	}
+	c.Output.Path = outputPath
+
+	if strings.TrimSpace(c.Neo.URL) == "" {
+		c.Neo.URL = defaultNeoURL
+	}
+
+	if strings.TrimSpace(c.Neo.ModelsFile) != "" {
+		modelsFile, err := expandHome(c.Neo.ModelsFile)
+		if err != nil {
+			return err
+		}
+		c.Neo.ModelsFile = modelsFile
+	}
+
+	return nil
 }
 
 func (c Config) VerboseErrors() bool {
 	return c.ErrorDetail == "verbose"
 }
 
-func (c Config) BlockedTags() []string {
-	seen := make(map[string]bool)
-	out := make([]string, 0)
-
-	for _, raw := range splitList(c.BlockedTagsRaw) {
-		tag := booru.NormalizeTag(raw)
-		if tag == "" || seen[tag] {
-			continue
-		}
-
-		seen[tag] = true
-		out = append(out, tag)
-	}
-
-	return out
-}
-
-func splitList(value string) []string {
-	parts := strings.Split(value, ",")
-	out := make([]string, 0, len(parts))
-
-	for _, part := range parts {
-		if trimmed := strings.TrimSpace(part); trimmed != "" {
-			out = append(out, trimmed)
-		}
-	}
-
-	return out
-}
-
 func (c Config) Validate() error {
-	if c.RateLimitRPS <= 0 {
-		return fmt.Errorf("RATE_LIMIT_RPS must be greater than 0, got %v", c.RateLimitRPS)
+	if c.Booru.RateLimit.RPS <= 0 {
+		return fmt.Errorf("booru.rate_limit.rps must be greater than 0, got %v", c.Booru.RateLimit.RPS)
 	}
 
-	if c.RateLimitBurst < 1 {
-		return fmt.Errorf("RATE_LIMIT_BURST must be at least 1, got %d", c.RateLimitBurst)
+	if c.Booru.RateLimit.Burst < 1 {
+		return fmt.Errorf("booru.rate_limit.burst must be at least 1, got %d", c.Booru.RateLimit.Burst)
 	}
 
-	if c.MaxLimit < 1 || c.MaxLimit > maxTagLimit {
-		return fmt.Errorf("MAX_LIMIT must be between 1 and %d, got %d", maxTagLimit, c.MaxLimit)
-	}
-
-	if c.MaxOffset < 1 {
-		return fmt.Errorf("MAX_OFFSET must be at least 1, got %d", c.MaxOffset)
+	if c.Booru.RateLimit.Timeout < 1 {
+		return fmt.Errorf("booru.rate_limit.timeout must be at least 1, got %d", c.Booru.RateLimit.Timeout)
 	}
 
 	return nil
+}
+
+func expandHome(path string) (string, error) {
+	if path != "~" && !strings.HasPrefix(path, "~/") && !strings.HasPrefix(path, "~"+string(os.PathSeparator)) {
+		return path, nil
+	}
+
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", fmt.Errorf("expand %q: %w", path, err)
+	}
+
+	return filepath.Join(home, path[1:]), nil
+}
+
+func formatKeys(keys []toml.Key) string {
+	names := make([]string, 0, len(keys))
+
+	for _, key := range keys {
+		names = append(names, fmt.Sprintf("%q", key.String()))
+	}
+
+	return strings.Join(names, ", ")
 }

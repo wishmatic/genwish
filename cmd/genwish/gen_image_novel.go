@@ -9,7 +9,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/wishmatic/genwish/internal/cli"
-	"github.com/wishmatic/genwish/internal/format"
 	"github.com/wishmatic/genwish/internal/novelai"
 )
 
@@ -95,7 +94,7 @@ func newGenImageNovelCommand(deps cli.Deps) *cobra.Command {
 				return fmt.Errorf("novelai: %w", err)
 			}
 
-			paths, err := cli.WriteImages(out, "novel-image", images, imageFormat)
+			paths, err := cli.WriteImages(cli.OutputDir(cfg, out), "images", images, imageFormat)
 			if err != nil {
 				return fmt.Errorf("novelai: %w", err)
 			}
@@ -122,9 +121,9 @@ func newGenImageNovelCommand(deps cli.Deps) *cobra.Command {
 	cmd.Flags().Float64Var(&denoisingStrength, "denoising-strength", defaultDenoisingStrength,
 		"how much of the init image to change")
 	cmd.Flags().Float64Var(&noise, "noise", 0, "extra image noise; only used with an init image")
-	cmd.Flags().StringVar(&outputFormat, "format", format.Default.String(),
-		"output format: png, jpeg, jxl, or webp")
-	cmd.Flags().StringVar(&out, "out", ".", "directory for generated images")
+	cmd.Flags().StringVar(&outputFormat, "format", "",
+		"output format: png, jpeg, jxl, or webp (default: output.format)")
+	cmd.Flags().StringVar(&out, "out", "", "base directory for generated images (default: output.path)")
 
 	return cmd
 }

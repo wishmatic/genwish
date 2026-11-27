@@ -19,7 +19,7 @@ func TestModelsListNeo(t *testing.T) {
 			t.Fatalf("WriteFile() error: %v", err)
 		}
 
-		out, _, err := runCommand(t, cli.Deps{Config: config.Config{NEOModelsFile: path}},
+		out, _, err := runCommand(t, cli.Deps{Config: config.Config{Neo: config.NeoConfig{ModelsFile: path}}},
 			"models", "list", "neo")
 		if err != nil {
 			t.Fatalf("Execute() error: %v", err)
@@ -37,8 +37,6 @@ func TestModelsListNeo(t *testing.T) {
 	})
 
 	t.Run("defaults to empty when unset", func(t *testing.T) {
-		t.Setenv("NEO_MODELS_FILE", "")
-
 		out, _, err := runCommand(t, cli.Deps{}, "models", "list", "neo")
 		if err != nil {
 			t.Fatalf("Execute() error: %v", err)
@@ -52,9 +50,9 @@ func TestModelsListNeo(t *testing.T) {
 	t.Run("reports a missing configured file", func(t *testing.T) {
 		path := filepath.Join(t.TempDir(), "missing.txt")
 
-		_, _, err := runCommand(t, cli.Deps{Config: config.Config{NEOModelsFile: path}},
+		_, _, err := runCommand(t, cli.Deps{Config: config.Config{Neo: config.NeoConfig{ModelsFile: path}}},
 			"models", "list", "neo")
-		if err == nil || !strings.Contains(err.Error(), "NEO_MODELS_FILE") {
+		if err == nil || !strings.Contains(err.Error(), "neo.models_file") {
 			t.Errorf("Execute() error = %v, want the missing file reported", err)
 		}
 	})

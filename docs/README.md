@@ -34,7 +34,7 @@ Provider names are case-insensitive. `nano` also accepts `nano-gpt`, `nanogpt`, 
 
 ## Where to look
 
-- [configuration.md](configuration.md): every environment variable.
+- [configuration.md](configuration.md): the TOML config file and environment variables.
 - [migration.md](migration.md): old commands and settings mapped to genwish.
 - [nano.md](nano.md): NanoGPT image and video generation.
 - [neo.md](neo.md): Forge Neo generation, editing, and model listing.

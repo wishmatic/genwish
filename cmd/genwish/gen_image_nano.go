@@ -6,17 +6,19 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/wishmatic/genwish/internal/cli"
+	"github.com/wishmatic/genwish/internal/format"
 	"github.com/wishmatic/genwish/internal/nanogpt"
 )
 
 func newGenImageNanoCommand(deps cli.Deps) *cobra.Command {
 	var (
-		model  string
-		size   string
-		image  string
-		images []string
-		mask   string
-		out    string
+		model        string
+		size         string
+		image        string
+		images       []string
+		mask         string
+		outputFormat string
+		out          string
 	)
 
 	cmd := &cobra.Command{
@@ -27,6 +29,16 @@ func newGenImageNanoCommand(deps cli.Deps) *cobra.Command {
 			prompt, err := promptFromArgs(args)
 			if err != nil {
 				return err
+			}
+
+			cfg, err := cli.ResolveConfig(deps)
+			if err != nil {
+				return err
+			}
+
+			target, err := cli.OutputFormat(cfg, outputFormat)
+			if err != nil {
+				return fmt.Errorf("gen image: %w", err)
 			}
 
 			resolver := cli.ImageResolver(deps)
@@ -77,7 +89,7 @@ func newGenImageNanoCommand(deps cli.Deps) *cobra.Command {
 				return fmt.Errorf("gen image: %w", err)
 			}
 
-			paths, err := writeImages(out, assets)
+			paths, err := writeImages(cli.OutputDir(cfg, out), assets, target)
 			if err != nil {
 				return fmt.Errorf("gen image: %w", err)
 			}
@@ -98,7 +110,9 @@ func newGenImageNanoCommand(deps cli.Deps) *cobra.Command {
 	cmd.Flags().StringVar(&image, "image", "", "image to transform")
 	cmd.Flags().StringArrayVar(&images, "images", nil, "additional input image")
 	cmd.Flags().StringVar(&mask, "mask", "", "inpainting mask")
-	cmd.Flags().StringVar(&out, "out", ".", "directory for generated images")
+	cmd.Flags().StringVar(&outputFormat, "format", "",
+		"output format: png, jpeg, jxl, or webp (default: output.format)")
+	cmd.Flags().StringVar(&out, "out", "", "base directory for generated images (default: output.path)")
 	cmd.Flags().Int("seed", 0, "seed for the models that take one")
 	cmd.Flags().Float64("strength", 0, "how far the output may move from the input image")
 	cmd.Flags().Float64("guidance-scale", 0, "how closely the model follows the prompt")
@@ -138,11 +152,22 @@ func readyImages(cmd *cobra.Command, images []nanogpt.GeneratedImage) ([]readyIm
 	return ready, nil
 }
 
-func writeImages(dir string, images []readyImage) ([]string, error) {
+func writeImages(base string, images []readyImage, target format.Format) ([]string, error) {
 	paths := make([]string, 0, len(images))
 
 	for _, image := range images {
-		path, err := cli.WriteAsset(dir, "nano-image", image.data, image.mediaType)
+		data := image.data
+
+		if image.mediaType != target.MediaType() {
+			converted, err := format.Convert(data, target)
+			if err != nil {
+				return nil, err
+			}
+
+			data = converted
+		}
+
+		path, err := cli.WriteImage(base, "images", data, target.MediaType())
 		if err != nil {
 			return nil, err
 		}

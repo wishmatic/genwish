@@ -125,11 +125,9 @@ func TestDanbooruCredentials(t *testing.T) {
 func TestCatalogService(t *testing.T) {
 	t.Run("builds without stored danbooru credentials", func(t *testing.T) {
 		cfg := config.Config{
-			RateLimitRPS:          1,
-			RateLimitBurst:        1,
-			RequestTimeoutSeconds: 20,
-			MaxLimit:              100,
-			MaxOffset:             1000,
+			Booru: config.BooruConfig{
+				RateLimit: config.RateLimitConfig{RPS: 1, Burst: 1, Timeout: 20},
+			},
 		}
 
 		service, err := CatalogService(Deps{Config: cfg, Credentials: &memoryStore{}})

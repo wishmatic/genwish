@@ -1,6 +1,66 @@
 # Configuration
 
-`genwish` reads configuration from the environment, optionally loaded from `.env` in the working directory. Credentials are not read from the environment; use `genwish login`.
+`genwish` reads a TOML config file and three environment variables. Credentials are not configuration; use `genwish login`.
+
+## Config file
+
+The default path is `~/.genwish/config.toml`. Pass `--config-file <path>` to any command to read a different file.
+
+- A missing default file is not an error; the built-in defaults apply.
+- A missing `--config-file` path is an error.
+- Malformed TOML and unknown keys are errors.
+
+Command flags override the file, which overrides the built-in defaults.
+
+```toml
+[output]
+format = "webp"        # png, jpeg, jxl, or webp
+path = "~/.genwish/out"
+
+[neo]
+url = "http://127.0.0.1:7860"
+models_file = ""
+
+[booru.rate_limit]
+rps = 1.0
+burst = 1
+timeout = 20           # seconds
+```
+
+| Key                        | Type    | Default                 | Purpose                                                                                |
+| -------------------------- | ------- | ----------------------- | -------------------------------------------------------------------------------------- |
+| `output.format`            | string  | `webp`                  | Default image format for generated and edited images: `png`, `jpeg`, `jxl`, or `webp`. |
+| `output.path`              | string  | `~/.genwish/out`        | Base directory for generated and edited media. A leading `~` is expanded.              |
+| `neo.url`                  | string  | `http://127.0.0.1:7860` | Forge Neo API base URL.                                                                |
+| `neo.models_file`          | string  | empty                   | Newline-delimited checkpoint names for `models list neo`. A leading `~` is expanded.   |
+| `booru.rate_limit.rps`     | float   | `1`                     | Danbooru requests per second.                                                          |
+| `booru.rate_limit.burst`   | integer | `1`                     | Danbooru burst size.                                                                   |
+| `booru.rate_limit.timeout` | integer | `20`                    | Danbooru request timeout in seconds.                                                   |
+
+Every image is converted to `output.format` when the provider returns a different type.
+
+The tag page limit is fixed at 100 and the largest tag offset at 1000. There is no tag denylist.
+
+## Output layout
+
+Every image and video is written under the configured base directory:
+
+```text
+<output.path>/images/<YYYY-MM-DD>/<uuid>.<ext>
+<output.path>/videos/<YYYY-MM-DD>/<uuid>.<ext>
+```
+
+`--out <path>` replaces `output.path` for that command. The date is UTC and the file name is a UUID. Commands print each written path.
+
+## Environment
+
+| Variable             | Default  | Purpose                                                         |
+| -------------------- | -------- | --------------------------------------------------------------- |
+| `LOG_LEVEL`          | `info`   | Reserved for internal logging.                                  |
+| `ERROR_DETAIL`       | `useful` | Set to `verbose` to include upstream response bodies in errors. |
+| `CREDENTIAL_BACKEND` | `auto`   | `auto`, `keyring`, or `file`.                                   |
+
+No other environment variable is read. A `.env` file in the working directory is loaded when present.
 
 ## Credentials
 
@@ -15,10 +75,6 @@ genwish login danbooru
 - `genwish logout <provider>` deletes the stored credential.
 - Danbooru also works anonymously when no credential is stored.
 
-| Variable                     | Default | Purpose                       |
-| ---------------------------- | ------- | ----------------------------- |
-| `GENWISH_CREDENTIAL_BACKEND` | `auto`  | `auto`, `keyring`, or `file`. |
-
 `auto` prefers the OS keyring and falls back to a user-only file.
 
 - Keyring service: `genwish`.
@@ -27,36 +83,4 @@ genwish login danbooru
 
 The Danbooru entry stores the login and API key together.
 
-## Generation and input
-
-| Variable          | Default                 | Purpose                                                                                                                                   |
-| ----------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `OUTPUT_FORMAT`   | `webp`                  | Default image format for Forge Neo and NovelAI: `png`, `jpeg`, `jxl`, or `webp`.                                                          |
-| `SD_URL`          | `http://127.0.0.1:7860` | Forge Neo API base URL.                                                                                                                   |
-| `NEO_MODELS_FILE` | empty                   | Newline-delimited checkpoint names for `models list neo`. Unset means an empty list. Blank lines and lines starting with `#` are ignored. |
-
-## Booru
-
-| Variable                  | Default  | Purpose                                                         |
-| ------------------------- | -------- | --------------------------------------------------------------- |
-| `ERROR_DETAIL`            | `useful` | Set to `verbose` to include upstream response bodies in errors. |
-| `RATE_LIMIT_RPS`          | `1`      | Danbooru requests per second.                                   |
-| `RATE_LIMIT_BURST`        | `1`      | Danbooru burst size.                                            |
-| `REQUEST_TIMEOUT_SECONDS` | `20`     | Danbooru request timeout.                                       |
-| `MAX_LIMIT`               | `100`    | Largest tag page, at most 100.                                  |
-| `MAX_OFFSET`              | `1000`   | Largest tag offset.                                             |
-| `BLOCKED_TAGS`            | empty    | Comma-separated tag denylist.                                   |
-
 The Danbooru user agent is fixed at `genwish/0.1.0`.
-
-## Logging
-
-| Variable    | Default | Purpose                        |
-| ----------- | ------- | ------------------------------ |
-| `LOG_LEVEL` | `info`  | Reserved for internal logging. |
-
-## Removed settings
-
-The MCP servers used `HOST`, `PORT`, `API_KEY`, `PUBLIC_HOST`, and `FILES_DIR`. `genwish` does not run a server and does not read them.
-
-`genwish` also does not read `NANOGPT_API_KEY`, `NOVELAI_API_KEY`, `DANBOORU_LOGIN`, `DANBOORU_API_KEY`, or `USER_AGENT`. API keys are login-only, and the user agent is hardcoded.

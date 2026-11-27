@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"crypto/rand"
 	"fmt"
 	"io"
 	"os"
@@ -17,26 +18,76 @@ func OutputFormat(cfg config.Config, requested string) (format.Format, error) {
 		return format.Parse(requested)
 	}
 
-	if cfg.DefaultOutput == "" {
+	if cfg.Output.Format == "" {
 		return format.Default, nil
 	}
 
-	return format.Parse(cfg.DefaultOutput)
+	return format.Parse(cfg.Output.Format)
 }
 
-func WriteImage(dir, prefix string, data []byte, mediaType string) (string, error) {
+func OutputDir(cfg config.Config, requested string) string {
+	if strings.TrimSpace(requested) != "" {
+		return requested
+	}
+
+	if cfg.Output.Path != "" {
+		return cfg.Output.Path
+	}
+
+	return "."
+}
+
+func WriteImage(base, kind string, data []byte, mediaType string) (string, error) {
 	ext, err := imageExtension(mediaType)
 	if err != nil {
 		return "", err
 	}
 
+	return writeMediaFile(base, kind, ext, data)
+}
+
+func WriteImages(base, kind string, images [][]byte, target format.Format) ([]string, error) {
+	paths := make([]string, 0, len(images))
+
+	for index, data := range images {
+		converted, err := format.Convert(data, target)
+		if err != nil {
+			return nil, fmt.Errorf("image %d: %w", index+1, err)
+		}
+
+		path, err := WriteImage(base, kind, converted, target.MediaType())
+		if err != nil {
+			return nil, err
+		}
+
+		paths = append(paths, path)
+	}
+
+	return paths, nil
+}
+
+func PrintPaths(w io.Writer, paths []string) error {
+	for _, path := range paths {
+		if _, err := fmt.Fprintln(w, path); err != nil {
+			return fmt.Errorf("write path: %w", err)
+		}
+	}
+
+	return nil
+}
+
+func writeMediaFile(base, kind, ext string, data []byte) (string, error) {
+	id, err := newID()
+	if err != nil {
+		return "", err
+	}
+
+	dir := filepath.Join(base, kind, time.Now().UTC().Format("2006-01-02"))
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return "", fmt.Errorf("create output directory: %w", err)
 	}
 
-	stamp := time.Now().UTC().Format("20060102-150405")
-
-	tmp, err := os.CreateTemp(dir, prefix+"-"+stamp+"-*.tmp")
+	tmp, err := os.CreateTemp(dir, "."+id+"-*.tmp")
 	if err != nil {
 		return "", fmt.Errorf("create output file: %w", err)
 	}
@@ -62,7 +113,7 @@ func WriteImage(dir, prefix string, data []byte, mediaType string) (string, erro
 		return "", fmt.Errorf("close output file: %w", err)
 	}
 
-	final := filepath.Join(dir, strings.TrimSuffix(filepath.Base(name), ".tmp")+"."+ext)
+	final := filepath.Join(dir, id+"."+ext)
 
 	if err := os.Rename(name, final); err != nil {
 		return "", fmt.Errorf("store output file: %w", err)
@@ -73,34 +124,17 @@ func WriteImage(dir, prefix string, data []byte, mediaType string) (string, erro
 	return final, nil
 }
 
-func WriteImages(dir, prefix string, images [][]byte, target format.Format) ([]string, error) {
-	paths := make([]string, 0, len(images))
+func newID() (string, error) {
+	var b [16]byte
 
-	for index, data := range images {
-		converted, err := format.Convert(data, target)
-		if err != nil {
-			return nil, fmt.Errorf("image %d: %w", index+1, err)
-		}
-
-		path, err := WriteImage(dir, prefix, converted, target.MediaType())
-		if err != nil {
-			return nil, err
-		}
-
-		paths = append(paths, path)
+	if _, err := rand.Read(b[:]); err != nil {
+		return "", fmt.Errorf("generate file name: %w", err)
 	}
 
-	return paths, nil
-}
+	b[6] = (b[6] & 0x0f) | 0x40
+	b[8] = (b[8] & 0x3f) | 0x80
 
-func PrintPaths(w io.Writer, paths []string) error {
-	for _, path := range paths {
-		if _, err := fmt.Fprintln(w, path); err != nil {
-			return fmt.Errorf("write path: %w", err)
-		}
-	}
-
-	return nil
+	return fmt.Sprintf("%x-%x-%x-%x-%x", b[0:4], b[4:6], b[6:8], b[8:10], b[10:16]), nil
 }
 
 func imageExtension(mediaType string) (string, error) {

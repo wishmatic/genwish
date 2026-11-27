@@ -22,6 +22,10 @@ import (
 
 const userAgent = "genwish/0.1.0"
 
+type Flags struct {
+	ConfigPath string
+}
+
 type Deps struct {
 	In  io.Reader
 	Out io.Writer
@@ -29,6 +33,7 @@ type Deps struct {
 
 	Config      config.Config
 	Credentials credential.Store
+	Flags       *Flags
 
 	Nano     *nanogpt.Client
 	Novel    *novelai.Client
@@ -55,6 +60,9 @@ func WithDefaults(deps Deps) Deps {
 	if deps.Err == nil {
 		deps.Err = os.Stderr
 	}
+	if deps.Flags == nil {
+		deps.Flags = &Flags{}
+	}
 
 	return deps
 }
@@ -64,7 +72,15 @@ func ResolveConfig(deps Deps) (config.Config, error) {
 		return deps.Config, nil
 	}
 
-	return config.Load()
+	return config.Load(deps.configPath())
+}
+
+func (d Deps) configPath() string {
+	if d.Flags == nil {
+		return ""
+	}
+
+	return d.Flags.ConfigPath
 }
 
 func OpenCredentials(deps Deps, p provider.Name) (credential.Store, error) {
@@ -122,7 +138,7 @@ func ForgeClient(deps Deps, cfg config.Config) *forge.Client {
 		return deps.Forge
 	}
 
-	return forge.New(cfg.SDURL, zap.NewNop())
+	return forge.New(cfg.Neo.URL, zap.NewNop())
 }
 
 func CatalogService(deps Deps) (*catalog.Service, error) {
@@ -145,12 +161,7 @@ func CatalogService(deps Deps) (*catalog.Service, error) {
 		return nil, err
 	}
 
-	return catalog.New(danbooruClient, catalog.Options{
-		BlockedTags: cfg.BlockedTags(),
-		MaxLimit:    cfg.MaxLimit,
-		MaxOffset:   cfg.MaxOffset,
-		Relations:   nil,
-	}), nil
+	return catalog.New(danbooruClient, catalog.Options{}), nil
 }
 
 func danbooruCredentials(deps Deps) (credential.DanbooruCredentials, error) {
@@ -174,8 +185,8 @@ func booruProvider(cfg config.Config, creds credential.DanbooruCredentials) (*bo
 	transport, err := fetch.New(fetch.Config{
 		BaseURL:       booru.DefaultBaseURL,
 		UserAgent:     userAgent,
-		Timeout:       time.Duration(cfg.RequestTimeoutSeconds) * time.Second,
-		Limiter:       fetch.NewLimiter(cfg.RateLimitRPS, cfg.RateLimitBurst),
+		Timeout:       time.Duration(cfg.Booru.RateLimit.Timeout) * time.Second,
+		Limiter:       fetch.NewLimiter(cfg.Booru.RateLimit.RPS, cfg.Booru.RateLimit.Burst),
 		VerboseErrors: cfg.VerboseErrors(),
 	})
 	if err != nil {
@@ -183,11 +194,10 @@ func booruProvider(cfg config.Config, creds credential.DanbooruCredentials) (*bo
 	}
 
 	return booru.New(booru.Config{
-		BaseURL:  booru.DefaultBaseURL,
-		Login:    creds.Login,
-		APIKey:   creds.APIKey,
-		MaxLimit: cfg.MaxLimit,
-		HTTP:     transport,
+		BaseURL: booru.DefaultBaseURL,
+		Login:   creds.Login,
+		APIKey:  creds.APIKey,
+		HTTP:    transport,
 	}), nil
 }
 

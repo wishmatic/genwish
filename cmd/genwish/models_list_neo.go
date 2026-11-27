@@ -22,7 +22,7 @@ func runModelsListNeo(deps cli.Deps, args []string, query string, limit int) err
 		return err
 	}
 
-	models, err := readNEOModels(cfg.NEOModelsFile)
+	models, err := readNEOModels(cfg.Neo.ModelsFile)
 	if err != nil {
 		return err
 	}
@@ -75,7 +75,7 @@ func readNEOModels(path string) ([]string, error) {
 
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return nil, fmt.Errorf("NEO_MODELS_FILE %s: %w", path, err)
+		return nil, fmt.Errorf("neo.models_file %s: %w", path, err)
 	}
 
 	models := make([]string, 0)

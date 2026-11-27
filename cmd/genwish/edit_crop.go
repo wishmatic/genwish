@@ -37,7 +37,8 @@ func newEditCropCommand(deps cli.Deps, spec cropCommand) *cobra.Command {
 		"transparent padding in pixels around the trimmed content")
 	cmd.Flags().StringVar(&outputFormat, "format", "",
 		"output image format: png, jpeg, jxl, or webp")
-	cmd.Flags().StringVar(&out, "out", ".", "directory for the edited image")
+	cmd.Flags().StringVar(&out, "out", "",
+		"base directory for the edited image (default: output.path)")
 
 	return cmd
 }
@@ -67,7 +68,7 @@ func editCropRun(
 		return fmt.Errorf("edit: %w", err)
 	}
 
-	path, err := cli.WriteImage(out, "neo-image", edited, target.MediaType())
+	path, err := cli.WriteImage(cli.OutputDir(cfg, out), "images", edited, target.MediaType())
 	if err != nil {
 		return fmt.Errorf("edit: %w", err)
 	}

@@ -23,48 +23,34 @@ Removed commands and flags:
 - `nano-cli web search`, `web scrape`, `web map`, `web crawl`, and `web youtube`.
 - MCP tool names and schemas.
 
-## Environment mapping
+## Configuration mapping
 
-Unchanged:
+Environment variables that remain:
 
-- `OUTPUT_FORMAT`
-- `SD_URL`
-- `ERROR_DETAIL`
-- `RATE_LIMIT_RPS`
-- `RATE_LIMIT_BURST`
-- `REQUEST_TIMEOUT_SECONDS`
-- `MAX_LIMIT`
-- `MAX_OFFSET`
-- `BLOCKED_TAGS`
 - `LOG_LEVEL`
+- `ERROR_DETAIL`
+- `CREDENTIAL_BACKEND` (renamed from `GENWISH_CREDENTIAL_BACKEND`)
 
-Added:
+Moved to `~/.genwish/config.toml`, or the file named by `--config-file`:
 
-- `GENWISH_CREDENTIAL_BACKEND`
-- `NEO_MODELS_FILE`
+| Old environment variable  | Config key                 |
+| ------------------------- | -------------------------- |
+| `OUTPUT_FORMAT`           | `output.format`            |
+| `SD_URL`                  | `neo.url`                  |
+| `NEO_MODELS_FILE`         | `neo.models_file`          |
+| `RATE_LIMIT_RPS`          | `booru.rate_limit.rps`     |
+| `RATE_LIMIT_BURST`        | `booru.rate_limit.burst`   |
+| `REQUEST_TIMEOUT_SECONDS` | `booru.rate_limit.timeout` |
 
-Removed, because credentials are login-only:
+Removed:
 
-- `NANOGPT_API_KEY`
-- `NOVELAI_API_KEY`
-- `DANBOORU_LOGIN`
-- `DANBOORU_API_KEY`
-
-Removed, because input addresses are no longer rewritten:
-
-- `IMAGE_URL_MAP`
-
-Removed, because the user agent is hardcoded:
-
-- `USER_AGENT`
-
-Removed, server-only:
-
-- `HOST`
-- `PORT`
-- `API_KEY`
-- `PUBLIC_HOST`
-- `FILES_DIR`
+- `MAX_LIMIT`: the tag page limit is fixed at 100.
+- `MAX_OFFSET`: the largest offset is fixed at 1000.
+- `BLOCKED_TAGS`: there is no tag denylist.
+- `IMAGE_URL_MAP`: input addresses are no longer rewritten.
+- `NANOGPT_API_KEY`, `NOVELAI_API_KEY`, `DANBOORU_LOGIN`, `DANBOORU_API_KEY`: credentials are login-only.
+- `USER_AGENT`: the user agent is hardcoded.
+- `HOST`, `PORT`, `API_KEY`, `PUBLIC_HOST`, `FILES_DIR`: server-only.
 
 ## Credential migration
 
@@ -92,7 +78,7 @@ New locations:
 | novel    | `genwish`       | `novelai-api-key` | `os.UserConfigDir()/genwish/novelai_api_key` |
 | danbooru | `genwish`       | `danbooru`        | `os.UserConfigDir()/genwish/danbooru`        |
 
-Backend variable: `GENWISH_CREDENTIAL_BACKEND`.
+Backend variable: `CREDENTIAL_BACKEND`.
 
 The Danbooru entry stores the login and API key together. `genwish login danbooru` prompts for the login first, then the API key. Danbooru still works anonymously without a stored credential.
 
@@ -103,6 +89,7 @@ The Danbooru entry stores the login and API key together. `genwish login danboor
 - `login` and `logout` take the provider.
 - API keys are login-only; no key environment variable is read.
 - The Danbooru user agent is hardcoded at `genwish/0.1.0`.
+- Generated and edited media is written under `<output.path>/<images|videos>/<date>/<uuid>.<ext>`; `--out` replaces the base directory.
 - `gen image` and `gen video` take the provider as a subcommand.
 - `gen video neo` and `gen video novel` fail with an unsupported-provider error.
-- `models list neo` reads `NEO_MODELS_FILE` instead of querying Forge.
+- `models list neo` reads `neo.models_file` instead of querying Forge.

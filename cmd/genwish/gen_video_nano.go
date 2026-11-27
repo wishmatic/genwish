@@ -32,6 +32,11 @@ func newGenVideoNanoCommand(deps cli.Deps) *cobra.Command {
 				return err
 			}
 
+			cfg, err := cli.ResolveConfig(deps)
+			if err != nil {
+				return err
+			}
+
 			req := nanogpt.VideoRequest{
 				Model:          model,
 				Prompt:         prompt,
@@ -75,7 +80,7 @@ func newGenVideoNanoCommand(deps cli.Deps) *cobra.Command {
 				return fmt.Errorf("gen video: %w", err)
 			}
 
-			path, err := cli.WriteAsset(out, "nano-video", data, mediaType)
+			path, err := cli.WriteAsset(cli.OutputDir(cfg, out), "videos", data, mediaType)
 			if err != nil {
 				return fmt.Errorf("gen video: %w", err)
 			}
@@ -99,7 +104,7 @@ func newGenVideoNanoCommand(deps cli.Deps) *cobra.Command {
 	cmd.Flags().Int("seed", 0, "seed for the providers that honour one")
 	cmd.Flags().Bool("generate-audio", false, "add AI audio on the models that support it")
 	cmd.Flags().StringVar(&videoURL, "video-url", "", "source video to extend, edit, or upscale")
-	cmd.Flags().StringVar(&out, "out", ".", "directory for the generated video")
+	cmd.Flags().StringVar(&out, "out", "", "base directory for the generated video (default: output.path)")
 
 	_ = cmd.MarkFlagRequired("model")
 
