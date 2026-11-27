@@ -114,6 +114,19 @@ format = "jpeg"
 		}
 	})
 
+	t.Run("reads the shipped example", func(t *testing.T) {
+		setHome(t)
+
+		cfg, err := Load(filepath.Join("..", "..", "example", "config.toml"))
+		if err != nil {
+			t.Fatalf("Load(example) error: %v", err)
+		}
+
+		if cfg.Output.Format != "webp" || cfg.Neo.URL != defaultNeoURL {
+			t.Errorf("Load(example) = %+v, want the documented defaults", cfg)
+		}
+	})
+
 	t.Run("rejects a missing explicit file", func(t *testing.T) {
 		setHome(t)
 		path := filepath.Join(t.TempDir(), "missing.toml")

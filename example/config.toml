@@ -1,0 +1,26 @@
+# Example genwish configuration.
+#
+# Copy to ~/.genwish/config.toml, or pass any file with --config-file.
+# Every value below is the built-in default.
+
+[output]
+# png, jpeg, jxl, or webp.
+format = "webp"
+# Base directory for generated and edited media. Images are written under
+# <path>/images/<date>/<uuid>.<ext>; videos under <path>/videos/<date>/<uuid>.<ext>.
+path = "~/.genwish/out"
+
+[neo]
+# Forge Neo API base URL.
+url = "http://127.0.0.1:7860"
+# Newline-delimited checkpoint names for `genwish models list neo`.
+# Blank lines and lines starting with # are ignored.
+models_file = ""
+
+[booru.rate_limit]
+# Danbooru requests per second.
+rps = 1.0
+# Danbooru burst size.
+burst = 1
+# Danbooru request timeout in seconds.
+timeout = 20

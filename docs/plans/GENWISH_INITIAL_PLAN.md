@@ -16,7 +16,7 @@ Implemented natively. Automated verification passes: `go build ./...`, `go vet .
 
 The image URL map was removed after implementation: `internal/sourcemap` and `IMAGE_URL_MAP` no longer exist, and `internal/resolve` fetches URLs unchanged. References to it below record the original build.
 
-Configuration moved after implementation: settings come from `~/.genwish/config.toml` or `--config-file`, no environment variables are read, logging and `ERROR_DETAIL` were removed, credentials always use the OS keyring with a user-only file fallback, the tag limits are fixed at 100 and 1000, and blocked tags were removed entirely. Environment variable and config names below record the original build.
+    Configuration moved after implementation: settings come from `~/.genwish/config.toml` or `--config-file`, no environment variables are read, logging and `ERROR_DETAIL` were removed, credentials always use the OS keyring with a user-only file fallback, the tag limits are fixed at 100 and 1000, and blocked tags were removed entirely. The verbatim source docs under `docs/reference` were later removed. Environment variable and config names below record the original build.
 
 ## Requirements
 

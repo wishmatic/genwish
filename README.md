@@ -44,7 +44,6 @@ genwish util booru blue_hair --limit 5
 - [Forge Neo](docs/neo.md)
 - [NovelAI](docs/novel.md)
 - [Booru](docs/booru.md)
-- [Source documentation](docs/reference), preserved verbatim
 
 ## License
 

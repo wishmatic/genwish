@@ -41,4 +41,3 @@ Provider names are case-insensitive. `nano` also accepts `nano-gpt`, `nanogpt`, 
 - [novel.md](novel.md): NovelAI generation, balance, and Anlas.
 - [booru.md](booru.md): tag search semantics.
 - [prompts/](prompts): agent prompts for Forge Neo and NovelAI model knowledge.
-- [reference/](reference): the original READMEs and `.env.example` files, copied verbatim.
