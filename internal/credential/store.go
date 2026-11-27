@@ -33,7 +33,13 @@ func Open(p provider.Name) (Store, error) {
 		return nil, err
 	}
 
-	return newAutoStore(KeyringStore{provider: p}, file), nil
+	stores := []Store{KeyringStore{provider: p}}
+
+	if pass, ok := newPassStore(p); ok {
+		stores = append(stores, pass)
+	}
+
+	return newAutoStore(append(stores, file)...), nil
 }
 
 func StorageWarning(p provider.Name) string {
@@ -43,6 +49,13 @@ func StorageWarning(p provider.Name) string {
 	}
 
 	_, keyringErr := keyring.Get(keyringService, user)
+	if keyringErr == nil || errors.Is(keyringErr, keyring.ErrNotFound) {
+		return ""
+	}
+
+	if _, ok := newPassStore(p); ok {
+		return ""
+	}
 
 	path, err := configFilePath(p)
 	if err != nil {
@@ -200,63 +213,71 @@ func keyringUser(p provider.Name) (string, error) {
 }
 
 type autoStore struct {
-	keyring Store
-	file    Store
+	stores []Store
 }
 
-func newAutoStore(keyring, file Store) *autoStore {
-	return &autoStore{keyring: keyring, file: file}
+func newAutoStore(stores ...Store) *autoStore {
+	return &autoStore{stores: stores}
 }
 
 func (s *autoStore) Load() (string, error) {
-	key, keyringErr := s.keyring.Load()
-	if keyringErr == nil {
-		return key, nil
+	var firstErr error
+
+	for _, store := range s.stores {
+		key, err := store.Load()
+		if err == nil {
+			return key, nil
+		}
+
+		if !errors.Is(err, ErrNotFound) && firstErr == nil {
+			firstErr = err
+		}
 	}
 
-	fileKey, fileErr := s.file.Load()
-	if fileErr == nil {
-		return fileKey, nil
+	if firstErr != nil {
+		return "", fmt.Errorf("%w (%v)", ErrNotFound, firstErr)
 	}
 
-	if errors.Is(keyringErr, ErrNotFound) && errors.Is(fileErr, ErrNotFound) {
-		return "", ErrNotFound
-	}
-
-	if !errors.Is(fileErr, ErrNotFound) {
-		return "", fileErr
-	}
-
-	return "", fmt.Errorf("%w; keyring unavailable: %v", ErrNotFound, keyringErr)
+	return "", ErrNotFound
 }
 
 func (s *autoStore) Save(key string) error {
-	if err := s.keyring.Save(key); err == nil {
-		if err := s.file.Delete(); err != nil {
-			return fmt.Errorf("remove file fallback after keyring save: %w", err)
+	var lastErr error
+
+	for index, store := range s.stores {
+		if err := store.Save(key); err != nil {
+			lastErr = err
+
+			continue
+		}
+
+		for _, stale := range s.stores[index+1:] {
+			if err := stale.Delete(); err != nil {
+				return fmt.Errorf("remove stale credential: %w", err)
+			}
 		}
 
 		return nil
 	}
 
-	return s.file.Save(key)
+	return lastErr
 }
 
 func (s *autoStore) Delete() error {
-	fileErr := s.file.Delete()
-	keyringErr := s.keyring.Delete()
+	var firstErr error
 
-	if fileErr != nil {
-		return fileErr
+	for _, store := range s.stores {
+		err := store.Delete()
+		if err == nil || errors.Is(err, ErrNotFound) {
+			continue
+		}
+
+		if key, loadErr := store.Load(); loadErr == nil && key != "" {
+			if firstErr == nil {
+				firstErr = err
+			}
+		}
 	}
 
-	if keyringErr == nil || errors.Is(keyringErr, ErrNotFound) {
-		return nil
-	}
-
-	if key, err := s.keyring.Load(); err == nil && key != "" {
-		return keyringErr
-	}
-
-	return nil
+	return firstErr
 }

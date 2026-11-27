@@ -21,9 +21,8 @@ func NewLoginCommand(deps cli.Deps) *cobra.Command {
 	return &cobra.Command{
 		Use:   "login <provider>",
 		Short: "Store a NanoGPT, NovelAI, or Danbooru credential",
-		Long: "Reads credentials from STDIN and stores them in the OS keyring, with a " +
-			"user-only file fallback when no keyring is available. Danbooru reads a login " +
-			"line followed by an API key line.",
+		Long: "Reads credentials from STDIN and stores them in the OS keyring, then pass, then a " +
+			"user-only file. Danbooru reads a login line followed by an API key line.",
 		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 0 {

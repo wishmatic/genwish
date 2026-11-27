@@ -72,14 +72,18 @@ genwish login danbooru
 - Logging in when a credential is already stored warns first, then replaces it.
 - Danbooru also answers anonymous requests.
 
-Credentials use the OS keyring, falling back to a user-only file when the keyring is unavailable.
-`genwish login` warns before prompting when that fallback will be used.
+Credentials are stored in the OS keyring when it is available, otherwise in `pass` when it is
+installed and its store exists, and otherwise in a user-only file. `genwish login` warns before
+prompting when the file fallback will be used.
 
 - Keyring service: `genwish`.
 - Keyring users: `nanogpt-api-key`, `novelai-api-key`, `danbooru`.
+- `pass` entries: `genwish/nanogpt-api-key`, `genwish/novelai-api-key`, and `genwish/danbooru`,
+  under `PASSWORD_STORE_DIR` or `~/.password-store`.
 - File fallback, under `os.UserConfigDir()/genwish/`:
   `nanogpt_api_key`, `novelai_api_key`, `danbooru`.
 
-The Danbooru entry stores the login and API key together.
+The Danbooru entry stores the login and API key together. Login writes to the first backend that
+accepts the credential and removes lower-priority copies; logout clears every backend.
 
 The Danbooru user agent is fixed at `genwish/0.1.0`.
