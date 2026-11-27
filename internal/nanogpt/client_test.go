@@ -1,0 +1,127 @@
+package nanogpt
+
+import (
+	"encoding/json"
+	"errors"
+	"io"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
+	"testing"
+)
+
+const testKey = "nano-key-123"
+
+func TestNewRejectsAMissingKey(t *testing.T) {
+	if _, err := New(Config{BaseURL: "http://127.0.0.1:1"}); !errors.Is(err, ErrNoAPIKey) {
+		t.Errorf("New() error = %v, want ErrNoAPIKey", err)
+	}
+}
+
+func TestNewAppliesTheDefaultBaseURL(t *testing.T) {
+	c, err := New(Config{APIKey: testKey})
+	if err != nil {
+		t.Fatalf("New() error: %v", err)
+	}
+
+	if c.baseURL != DefaultBaseURL {
+		t.Errorf("baseURL = %q, want %q", c.baseURL, DefaultBaseURL)
+	}
+}
+
+func TestNewTrimsATrailingSlash(t *testing.T) {
+	c, err := New(Config{APIKey: testKey, BaseURL: "http://198.51.100.7:8080/"})
+	if err != nil {
+		t.Fatalf("New() error: %v", err)
+	}
+
+	if c.baseURL != "http://198.51.100.7:8080" {
+		t.Errorf("baseURL = %q, want the trailing slash dropped", c.baseURL)
+	}
+}
+
+func newTestClient(t *testing.T, baseURL string) *Client {
+	t.Helper()
+
+	c, err := New(Config{APIKey: testKey, BaseURL: baseURL})
+	if err != nil {
+		t.Fatalf("New() error: %v", err)
+	}
+
+	return c
+}
+
+type recordedRequest struct {
+	method  string
+	path    string
+	query   url.Values
+	headers http.Header
+	body    map[string]any
+}
+
+func recordingServer(t *testing.T, response string, status int) (*httptest.Server, *recordedRequest) {
+	t.Helper()
+
+	rec := &recordedRequest{}
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		rec.method = r.Method
+		rec.path = r.URL.Path
+		rec.query = r.URL.Query()
+		rec.headers = r.Header.Clone()
+
+		// A request that carries no body, as the GET endpoints send, is not a failure to decode.
+		if err := json.NewDecoder(r.Body).Decode(&rec.body); err != nil && !errors.Is(err, io.EOF) {
+			t.Errorf("decode request body: %v", err)
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(status)
+
+		_, _ = w.Write([]byte(response))
+	}))
+	t.Cleanup(srv.Close)
+
+	return srv, rec
+}
+
+func (r *recordedRequest) assertHeader(t *testing.T, name, want string) {
+	t.Helper()
+
+	if got := r.headers.Get(name); got != want {
+		t.Errorf("%s = %q, want %q", name, got, want)
+	}
+}
+
+func (r *recordedRequest) assertBody(t *testing.T, key string, want any) {
+	t.Helper()
+
+	got, ok := r.body[key]
+	if !ok {
+		t.Fatalf("body has no %q: %v", key, r.body)
+	}
+
+	if got != want {
+		t.Errorf("body[%q] = %v, want %v", key, got, want)
+	}
+}
+
+func (r *recordedRequest) assertBodyNumber(t *testing.T, key string, want float64) {
+	t.Helper()
+
+	got, ok := r.body[key]
+	if !ok {
+		t.Fatalf("body has no %q: %v", key, r.body)
+	}
+
+	if number, ok := got.(float64); !ok || number != want {
+		t.Errorf("body[%q] = %v, want %v", key, got, want)
+	}
+}
+
+func (r *recordedRequest) assertBodyOmits(t *testing.T, key string) {
+	t.Helper()
+
+	if got, ok := r.body[key]; ok && got != nil {
+		t.Errorf("body[%q] = %v, want it omitted", key, got)
+	}
+}

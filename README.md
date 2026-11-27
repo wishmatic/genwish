@@ -1,2 +1,53 @@
 # genwish
-Bespoke personal CLI tool for image and video generation
+
+Bespoke personal CLI for image and video generation, plus Danbooru tag lookup.
+
+It folds the generation parts of `nano-cli`, `neo-cli`, `novel-cli`, and `booru-cli` into one binary. There is no MCP server.
+
+## Install
+
+```sh
+go install github.com/wishmatic/genwish/cmd/genwish@latest
+```
+
+## Providers
+
+| Provider | Generation                   | Balance      | API key                                    |
+| -------- | ---------------------------- | ------------ | ------------------------------------------ |
+| `nano`   | image, video                 | USD and Nano | `NANOGPT_API_KEY` or `genwish login nano`  |
+| `neo`    | image, edit, convert, bgkill | none         | none, uses local Forge                     |
+| `novel`  | image                        | Anlas        | `NOVELAI_API_KEY` or `genwish login novel` |
+
+## Quick start
+
+```sh
+genwish login nano
+genwish gen image nano "a red fox in snow" --out ./images
+genwish gen video nano "waves at sunset" --model veo2-video --out ./videos
+
+genwish gen image neo "a red fox" --model sd.safetensors --forge-preset default --out ./images
+genwish edit square ./logo.png --out ./images
+
+genwish login novel
+genwish gen image novel "a cat" --out ./images
+genwish balance novel
+
+genwish util booru blue_hair --limit 5
+```
+
+## Documentation
+
+- [Command and provider reference](docs/README.md)
+- [Configuration](docs/configuration.md)
+- [Migration from the old CLIs](docs/migration.md)
+- [NanoGPT](docs/nano.md)
+- [Forge Neo](docs/neo.md)
+- [NovelAI](docs/novel.md)
+- [Booru](docs/booru.md)
+- [Source documentation](docs/reference), preserved verbatim
+
+## License
+
+Apache-2.0. See [LICENSE](LICENSE).
+
+This project is not affiliated with or endorsed by NanoGPT, NovelAI, Danbooru, AUTOMATIC1111, Illyasviel, Haoming02, or any other third party.

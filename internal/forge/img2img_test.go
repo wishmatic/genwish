@@ -1,0 +1,64 @@
+package forge
+
+import (
+	"context"
+	"encoding/json"
+	"io"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
+	"go.uber.org/zap"
+)
+
+func TestImg2ImgPayload(t *testing.T) {
+	var (
+		gotPath string
+		gotBody []byte
+	)
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotPath = r.URL.Path
+		gotBody, _ = io.ReadAll(r.Body)
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"images": ["cG5n"]}`))
+	}))
+	defer server.Close()
+
+	c := New(server.URL, zap.NewNop())
+
+	_, err := c.img2img(context.Background(), img2imgRequest{
+		Checkpoint:        "model",
+		InitImageData:     []byte("png"),
+		Prompt:            "test",
+		DenoisingStrength: 0.6,
+	})
+	if err != nil {
+		t.Fatalf("img2img() error: %v", err)
+	}
+
+	if gotPath != "/sdapi/v1/img2img" {
+		t.Errorf("path = %q, want /sdapi/v1/img2img", gotPath)
+	}
+
+	var payload struct {
+		InitImages        []string `json:"init_images"`
+		DenoisingStrength float64  `json:"denoising_strength"`
+		OverrideSettings  struct {
+			Checkpoint string `json:"sd_model_checkpoint"`
+		} `json:"override_settings"`
+	}
+	if err := json.Unmarshal(gotBody, &payload); err != nil {
+		t.Fatalf("decode payload: %v", err)
+	}
+
+	if len(payload.InitImages) != 1 || payload.InitImages[0] != "cG5n" {
+		t.Errorf("init_images = %v, want the init image base64 encoded as-is", payload.InitImages)
+	}
+	if payload.DenoisingStrength != 0.6 {
+		t.Errorf("denoising_strength = %v, want 0.6", payload.DenoisingStrength)
+	}
+	if payload.OverrideSettings.Checkpoint != "model.safetensors" {
+		t.Errorf("sd_model_checkpoint = %q, want model.safetensors", payload.OverrideSettings.Checkpoint)
+	}
+}
