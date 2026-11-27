@@ -5,6 +5,13 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+
+	"github.com/wishmatic/genwish/cmd/genwish/balance"
+	"github.com/wishmatic/genwish/cmd/genwish/config"
+	"github.com/wishmatic/genwish/cmd/genwish/edit"
+	"github.com/wishmatic/genwish/cmd/genwish/gen"
+	"github.com/wishmatic/genwish/cmd/genwish/models"
+	"github.com/wishmatic/genwish/cmd/genwish/util"
 	"github.com/wishmatic/genwish/internal/cli"
 )
 
@@ -30,17 +37,16 @@ func newRoot(deps cli.Deps) *cobra.Command {
 	root.SetOut(deps.Out)
 	root.SetErr(deps.Err)
 
-	root.PersistentFlags().StringVar(&deps.Flags.ConfigPath, "config-file", "",
-		"path to config.toml (default ~/.genwish/config.toml)")
+	config.AddConfigFlag(root, deps)
 
 	root.AddCommand(
-		newLoginCommand(deps),
-		newLogoutCommand(deps),
-		newModelsCommand(deps),
-		newBalanceCommand(deps),
-		newGenCommand(deps),
-		newEditCommand(deps),
-		newUtilCommand(deps),
+		balance.NewCommand(deps),
+		config.NewLoginCommand(deps),
+		config.NewLogoutCommand(deps),
+		edit.NewCommand(deps),
+		gen.NewCommand(deps),
+		models.NewCommand(deps),
+		util.NewCommand(deps),
 	)
 
 	return root

@@ -1,15 +1,36 @@
 package main
 
 import (
+	"bytes"
 	"strings"
 	"testing"
 
 	"github.com/wishmatic/genwish/internal/cli"
 )
 
+func runRoot(t *testing.T, deps cli.Deps, args ...string) (string, string, error) {
+	t.Helper()
+
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
+
+	out := &bytes.Buffer{}
+	errOut := &bytes.Buffer{}
+	deps.Out = out
+	deps.Err = errOut
+
+	root := newRoot(deps)
+	root.SetArgs(args)
+
+	err := root.Execute()
+
+	return out.String(), errOut.String(), err
+}
+
 func TestNewRoot(t *testing.T) {
 	t.Run("lists the surviving commands", func(t *testing.T) {
-		out, _, err := runCommand(t, cli.Deps{}, "help")
+		out, _, err := runRoot(t, cli.Deps{}, "help")
 		if err != nil {
 			t.Fatalf("Execute() error: %v", err)
 		}
@@ -28,7 +49,7 @@ func TestNewRoot(t *testing.T) {
 	})
 
 	t.Run("shows a subcommand usage", func(t *testing.T) {
-		out, _, err := runCommand(t, cli.Deps{}, "help", "login")
+		out, _, err := runRoot(t, cli.Deps{}, "help", "login")
 		if err != nil {
 			t.Fatalf("Execute() error: %v", err)
 		}
