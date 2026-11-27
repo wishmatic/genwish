@@ -43,14 +43,15 @@ command prints each path and `Cost: $...`.
 ## Generate a video
 
 ```sh
+genwish gen video nano "waves at sunset" --out ./media
 genwish gen video nano "waves at sunset" --model veo2-video --out ./media
 ```
 
-`--model` is required.
+`--model` defaults to `alibaba/wan-3.0/text-to-video`.
 
 Flags:
 
-- `--model` (required): video model id.
+- `--model` (`alibaba/wan-3.0/text-to-video`): video model id.
 - `--image` (empty): image to animate; sets `--mode image-to-video` when no mode is given.
 - `--negative-prompt` (empty): content to suppress.
 - `--duration` (provider default): length in seconds.

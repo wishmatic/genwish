@@ -10,6 +10,8 @@ import (
 	"github.com/wishmatic/genwish/internal/nanogpt"
 )
 
+const defaultVideoModel = "alibaba/wan-3.0/text-to-video"
+
 func NewNanoCommand(deps cli.Deps) *cobra.Command {
 	var (
 		model          string
@@ -38,7 +40,7 @@ func NewNanoCommand(deps cli.Deps) *cobra.Command {
 			}
 
 			if strings.TrimSpace(model) == "" {
-				return cmd.Help()
+				model = defaultVideoModel
 			}
 
 			cfg, err := cli.ResolveConfig(deps)
@@ -101,7 +103,7 @@ func NewNanoCommand(deps cli.Deps) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&model, "model", "", "video model id (required)")
+	cmd.Flags().StringVar(&model, "model", defaultVideoModel, "video model id")
 	cmd.Flags().StringVar(&image, "image", "", "image to animate")
 	cmd.Flags().StringVar(&negativePrompt, "negative-prompt", "", "content to suppress")
 	cmd.Flags().StringVar(&duration, "duration", "", "length in seconds")

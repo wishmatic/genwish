@@ -144,13 +144,38 @@ func TestGenerateVideoLeavesNoFileWhenTheDownloadFails(t *testing.T) {
 	}
 }
 
-func TestGenerateVideoWithoutAModelShowsHelp(t *testing.T) {
-	out, _, err := runNano(t, cli.Deps{}, "a wave")
+func TestGenerateVideoDefaultsTheModel(t *testing.T) {
+	var serverURL string
+	server, requests := testutil.CaptureServerFunc(t, func(r *http.Request) (int, string) {
+		switch r.URL.Path {
+		case "/api/generate-video":
+			return http.StatusOK, `{"runId":"run-1","status":"queued"}`
+		case "/api/video/status":
+			return http.StatusOK, fmt.Sprintf(
+				`{"status":"completed","videoUrl":%q,"data":{"cost":0}}`,
+				serverURL+"/video.mp4",
+			)
+		case "/video.mp4":
+			return http.StatusOK, string(testVideo)
+		default:
+			return http.StatusNotFound, ""
+		}
+	})
+	serverURL = server.URL
+
+	_, _, err := runNano(
+		t,
+		cli.Deps{Nano: testutil.NewNanoClient(t, server.URL)},
+		"a wave",
+		"--out", t.TempDir(),
+	)
 	if err != nil {
 		t.Fatalf("Execute() error: %v", err)
 	}
 
-	if !strings.Contains(out, "Usage:") || !strings.Contains(out, "--model") {
-		t.Errorf("stdout = %q, want the video usage", out)
+	submit := testutil.NextRequestPath(t, requests, "/api/generate-video")
+
+	if got := submit.JSONBody(t)["model"]; got != defaultVideoModel {
+		t.Errorf("model = %v, want %v", got, defaultVideoModel)
 	}
 }
