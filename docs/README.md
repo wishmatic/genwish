@@ -1,6 +1,6 @@
 # Documentation
 
-`genwish` is a CLI-only generation tool with three providers and one utility.
+`genwish` is a CLI for image and video generation with three providers and a Danbooru tag utility.
 
 ## Command tree
 
@@ -13,8 +13,6 @@ genwish
       novel <prompt...>
     video
       nano <prompt...>
-      neo <prompt...>      unsupported for now
-      novel <prompt...>    unsupported for now
   edit
     trim <image>
     square <image>
@@ -36,9 +34,7 @@ Provider names are case-insensitive. `nano` also accepts `nano-gpt`, `nanogpt`, 
 ## Where to look
 
 - [configuration.md](configuration.md): the TOML config file.
-- [migration.md](migration.md): old commands and settings mapped to genwish.
 - [nano.md](nano.md): NanoGPT image and video generation.
 - [neo.md](neo.md): Forge Neo generation, editing, and model listing.
 - [novel.md](novel.md): NovelAI generation, balance, and Anlas.
 - [booru.md](booru.md): tag search semantics.
-- [prompts/](prompts): agent prompts for Forge Neo and NovelAI model knowledge.

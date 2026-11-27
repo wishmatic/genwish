@@ -1,7 +1,6 @@
 # Booru
 
-`genwish util booru` searches Danbooru tag names and prints the same text or JSON that the old
-MCP `tags` tool returned.
+`genwish util booru` searches Danbooru tag names and prints text or JSON.
 
 ```sh
 genwish util booru blue_hair
@@ -31,6 +30,7 @@ Walk the list with `--offset` and stop when `more` is false.
 Substring results exclude tags below `--min-count` works by default because Danbooru's tag table
 also holds concatenated and punctuation-mangled zero-work names. `withheld` and
 `withheld_best_count` report what the floor removed. `--min-count 0` returns them.
+Counts are read live, and `snapshot_date` records the date they were read.
 
 An empty page reports a status:
 
@@ -40,19 +40,11 @@ An empty page reports a status:
 - `offset_past_end`: the offset ran past the last match.
 - `unknown`: an unanswerable case was reached.
 
-An offset past the end is never reported as "no such tag". Use `--exact` to ask whether a tag
-exists; a substring miss proves nothing.
-
-## Synonyms and implications
-
-The MCP server built an alias and implication graph in the background. The CLI does not build that
-index, so `synonyms` and per-tag `implications` are empty. Counts are read live, and
-`snapshot_date` records the date they were read.
+Use `--exact` to ask whether a tag exists; a substring result describes matches only.
 
 ## Authentication
 
-Danbooru answers anonymously, so `genwish util booru` works with nothing configured. To raise the
-anonymous rate limit, log in once:
+Danbooru answers anonymous requests. Logging in raises the rate limit:
 
 ```sh
 genwish login danbooru

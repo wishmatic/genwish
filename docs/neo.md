@@ -7,8 +7,6 @@ Only [Haoming02's Neo fork](https://github.com/Haoming02/sd-webui-forge-classic)
 branch) is supported. Launch Forge with `--api`, then set `neo.url` in the config file to its API.
 The default is `http://127.0.0.1:7860`.
 
-No Forge installation or API support is provided here.
-
 ## Generate an image
 
 ```sh
@@ -74,21 +72,11 @@ Flags: `--model` (default `General`), `--full-mode` (fp32 instead of fp16), `--f
 
 ## Models
 
-`genwish` does not query the Forge API for models. It reads a local file:
-
-Set `neo.models_file` in the config file, then run:
+Model names come from a local file. Set `neo.models_file` in the config file, then run:
 
 ```sh
 genwish models list neo
 ```
 
-The file is newline-delimited. Blank lines and lines starting with `#` are ignored. When
-`neo.models_file` is empty, the list is empty. `--query` filters names and `--limit` caps the
-output.
-
-`genwish models list neo video` is rejected because Neo serves only image models.
-
-## Agent model knowledge
-
-The agent needs to know checkpoint, VAE, text encoder, and upscaler names. No list ships here.
-[prompts/neo.md](prompts/neo.md) is the source prompt template.
+The file is newline-delimited. Blank lines and lines starting with `#` are ignored. `--query`
+filters names and `--limit` caps the output.

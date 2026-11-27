@@ -1,13 +1,13 @@
 # Configuration
 
-`genwish` reads a TOML config file. Credentials are not configuration; use `genwish login`.
+`genwish` reads a TOML config file. Credentials come from `genwish login`.
 
 ## Config file
 
 The default path is `~/.genwish/config.toml`. Pass `--config-file <path>` to any command to read a
 different file. A complete example lives in [example/config.toml](../example/config.toml).
 
-- A missing default file is not an error; the built-in defaults apply.
+- When the default file is missing, the built-in defaults apply.
 - A missing `--config-file` path is an error.
 - Malformed TOML and unknown keys are errors.
 
@@ -41,7 +41,7 @@ A leading `~` in `output.path` or `neo.models_file` is expanded.
 
 Every image is converted to `output.format` when the provider returns a different type.
 
-The tag page limit is fixed at 100 and the largest tag offset at 1000. There is no tag denylist.
+The tag page limit is fixed at 100 and the largest tag offset at 1000.
 
 ## Output layout
 
@@ -55,10 +55,6 @@ Every image and video is written under the configured base directory:
 `--out <path>` replaces `output.path` for that command. The date is UTC and the file name is a
 UUID. Commands print each written path.
 
-## Environment
-
-`genwish` reads no environment variables and does not load a `.env` file.
-
 ## Credentials
 
 ```sh
@@ -70,7 +66,7 @@ genwish login danbooru
 - `nano` and `novel` prompt for one API key.
 - `danbooru` prompts for the login first, then the API key.
 - `genwish logout <provider>` deletes the stored credential.
-- Danbooru also works anonymously when no credential is stored.
+- Danbooru also answers anonymous requests.
 
 Credentials use the OS keyring, falling back to a user-only file when the keyring is unavailable.
 `genwish login` warns before prompting when that fallback will be used.

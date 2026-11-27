@@ -2,9 +2,6 @@
 
 Bespoke personal CLI for image and video generation, plus Danbooru tag lookup.
 
-It folds the generation parts of `nano-cli`, `neo-cli`, `novel-cli`, and `booru-cli` into one
-binary. There is no MCP server.
-
 ## Install
 
 ```sh
@@ -40,7 +37,6 @@ genwish util booru blue_hair --limit 5
 
 - [Command and provider reference](docs/README.md)
 - [Configuration](docs/configuration.md)
-- [Migration from the old CLIs](docs/migration.md)
 - [NanoGPT](docs/nano.md)
 - [Forge Neo](docs/neo.md)
 - [NovelAI](docs/novel.md)

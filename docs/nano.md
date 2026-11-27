@@ -10,7 +10,7 @@ Store a key once:
 genwish login nano
 ```
 
-`genwish logout nano` deletes the stored key. API keys are login-only; the environment is not read.
+`genwish logout nano` deletes the stored key.
 
 ## Generate an image
 

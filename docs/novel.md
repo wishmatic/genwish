@@ -10,7 +10,7 @@ Store a key once:
 genwish login novel
 ```
 
-`genwish logout novel` deletes the stored key. API keys are login-only; the environment is not read.
+`genwish logout novel` deletes the stored key.
 
 Calls spend Anlas on the account the key belongs to.
 
@@ -51,7 +51,7 @@ Images are written under `<out>/images/<date>/<uuid>.<ext>`.
 
 ## Models
 
-NovelAI publishes no model-list endpoint, so genwish ships a fixed list:
+The model list is fixed:
 
 ```sh
 genwish models list novel
@@ -59,8 +59,7 @@ genwish models list novel --query 4-5 --limit 5
 ```
 
 The list covers the V5, V4.5, V4, V3, and Furry V3 image families. `--query` filters ids and
-`--limit` caps the output. `genwish models list novel video` is rejected because NovelAI serves
-only image models.
+`--limit` caps the output.
 
 ## Balance and Anlas
 
@@ -73,7 +72,3 @@ Prints `Anlas: N`, and `Tier: ...` when NovelAI reports one.
 The balance comes from `GET https://image.novelai.net/user/data` with the API key as a Bearer
 token. The Anlas total is read from `subscription.trainingStepsLeft`, either as an object with
 `fixedTrainingStepsLeft` plus `purchasedTrainingSteps`, or as a plain integer on older responses.
-
-## Agent model knowledge
-
-[prompts/novel.md](prompts/novel.md) is the source prompt template for model and sampler knowledge.

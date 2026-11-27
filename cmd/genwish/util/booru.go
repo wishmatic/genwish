@@ -54,7 +54,7 @@ func NewBooruCommand(deps cli.Deps) *cobra.Command {
 	)
 	flags.StringArrayVar(&opts.category, "category", nil,
 		"keep only this category; repeatable ("+booru.CategoryList()+")")
-	flags.BoolVar(&opts.json, "json", false, "print the tool's JSON instead of text")
+	flags.BoolVar(&opts.json, "json", false, "print JSON instead of text")
 
 	return cmd
 }
