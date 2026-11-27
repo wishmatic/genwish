@@ -1,4 +1,4 @@
-package view
+package util
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"github.com/wishmatic/genwish/internal/catalog"
 )
 
-type TagsOutput struct {
+type tagsOutput struct {
 	Search       string      `json:"search"`
 	Exact        bool        `json:"exact"`
 	Status       string      `json:"status"`
@@ -21,10 +21,10 @@ type TagsOutput struct {
 	Withheld     int         `json:"withheld"`
 	WithheldBest int         `json:"withheld_best_count"`
 	Synonyms     []string    `json:"synonyms"`
-	Tags         []TagOutput `json:"tags"`
+	Tags         []tagOutput `json:"tags"`
 }
 
-type TagOutput struct {
+type tagOutput struct {
 	Name          string   `json:"name"`
 	Category      string   `json:"category"`
 	Count         int      `json:"count"`
@@ -33,8 +33,8 @@ type TagOutput struct {
 	Implications  []string `json:"implications"`
 }
 
-func Tags(result catalog.TagsResult, request catalog.TagsInput) TagsOutput {
-	return TagsOutput{
+func newTagsOutput(result catalog.TagsResult, request catalog.TagsInput) tagsOutput {
+	return tagsOutput{
 		Search:       result.Search,
 		Exact:        request.Exact,
 		Status:       string(result.Status),
@@ -51,7 +51,7 @@ func Tags(result catalog.TagsResult, request catalog.TagsInput) TagsOutput {
 	}
 }
 
-func Render(out TagsOutput) string {
+func renderTags(out tagsOutput) string {
 	if len(out.Tags) == 0 {
 		return renderEmpty(out)
 	}
@@ -91,11 +91,11 @@ func nonNilStrings(values []string) []string {
 	return values
 }
 
-func toTagOutputs(tags []booru.Tag) []TagOutput {
-	out := make([]TagOutput, 0, len(tags))
+func toTagOutputs(tags []booru.Tag) []tagOutput {
+	out := make([]tagOutput, 0, len(tags))
 
 	for _, tag := range tags {
-		out = append(out, TagOutput{
+		out = append(out, tagOutput{
 			Name:          tag.Name,
 			Category:      tag.Category.String(),
 			Count:         tag.Count,
@@ -108,7 +108,7 @@ func toTagOutputs(tags []booru.Tag) []TagOutput {
 	return out
 }
 
-func renderTag(tag TagOutput) string {
+func renderTag(tag tagOutput) string {
 	if tag.AliasOf == "" {
 		return fmt.Sprintf("- %s (%s): %d works", tag.Name, tag.Category, tag.Count)
 	}
@@ -126,7 +126,7 @@ func renderTag(tag TagOutput) string {
 	return fmt.Sprintf("- %s (%s): alias of %s", tag.Name, tag.Category, tag.AliasOf)
 }
 
-func renderEmpty(out TagsOutput) string {
+func renderEmpty(out tagsOutput) string {
 	switch out.Status {
 	case string(catalog.StatusNoSubstringMatch):
 		return renderNoSubstringMatch(out)
@@ -151,7 +151,7 @@ func renderEmpty(out TagsOutput) string {
 	return "No tags matched."
 }
 
-func renderSynonyms(out TagsOutput) string {
+func renderSynonyms(out tagsOutput) string {
 	if len(out.Synonyms) == 0 {
 		return ""
 	}
@@ -161,7 +161,7 @@ func renderSynonyms(out TagsOutput) string {
 
 // renderNoSubstringMatch names the filter that emptied the page. A withheld canonical tag exists;
 // saying only that the substring matched nothing would assert that it does not.
-func renderNoSubstringMatch(out TagsOutput) string {
+func renderNoSubstringMatch(out tagsOutput) string {
 	if out.Withheld == 0 {
 		return fmt.Sprintf("No tag name contains %q.", out.Search) + renderSynonyms(out)
 	}

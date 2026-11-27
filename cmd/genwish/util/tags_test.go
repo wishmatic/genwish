@@ -1,4 +1,4 @@
-package view
+package util
 
 import (
 	"encoding/json"
@@ -29,7 +29,7 @@ func TestTagsEchoesTheRequest(t *testing.T) {
 		}},
 	}
 
-	out := Tags(
+	out := newTagsOutput(
 		result,
 		catalog.TagsInput{Search: "blue hair", Offset: 5, Limit: 10, MinCount: 2, Exact: true},
 	)
@@ -65,7 +65,7 @@ func TestTagsEchoesTheRequest(t *testing.T) {
 }
 
 func TestTagsKeepsNilSlicesEmpty(t *testing.T) {
-	out := Tags(catalog.TagsResult{}, catalog.TagsInput{})
+	out := newTagsOutput(catalog.TagsResult{}, catalog.TagsInput{})
 
 	if out.Synonyms == nil {
 		t.Error("synonyms = nil, want an empty slice")
@@ -79,7 +79,7 @@ func TestTagsKeepsNilSlicesEmpty(t *testing.T) {
 func TestTagsEmptyImplicationsAreAnEmptySlice(t *testing.T) {
 	result := catalog.TagsResult{Tags: []booru.Tag{{Name: "blue_hair"}}}
 
-	out := Tags(result, catalog.TagsInput{})
+	out := newTagsOutput(result, catalog.TagsInput{})
 
 	if out.Tags[0].Implications == nil {
 		t.Error("implications = nil, want an empty slice")
@@ -87,11 +87,11 @@ func TestTagsEmptyImplicationsAreAnEmptySlice(t *testing.T) {
 }
 
 func TestRenderPage(t *testing.T) {
-	out := TagsOutput{
+	out := tagsOutput{
 		Offset:   0,
 		Synonyms: []string{"pee", "urine"},
 		More:     true,
-		Tags: []TagOutput{
+		Tags: []tagOutput{
 			{
 				Name:         "blue_hair",
 				Category:     "general",
@@ -108,7 +108,7 @@ func TestRenderPage(t *testing.T) {
 		},
 	}
 
-	got := Render(out)
+	got := renderTags(out)
 	want := "- blue_hair (general): 482913 works [implies aqua_hair]\n" +
 		"- dickgirl (general): alias of futanari (52264 works there)\n" +
 		"\nAlso known as: pee, urine.\n" +
@@ -120,26 +120,26 @@ func TestRenderPage(t *testing.T) {
 }
 
 func TestRenderAliasWithoutTheTargetCount(t *testing.T) {
-	out := TagsOutput{
-		Tags: []TagOutput{{Name: "dickgirl", Category: "general", AliasOf: "futanari"}},
+	out := tagsOutput{
+		Tags: []tagOutput{{Name: "dickgirl", Category: "general", AliasOf: "futanari"}},
 	}
 
-	if got, want := Render(out), "- dickgirl (general): alias of futanari"; got != want {
+	if got, want := renderTags(out), "- dickgirl (general): alias of futanari"; got != want {
 		t.Errorf("Render() = %q, want %q", got, want)
 	}
 }
 
 func TestRenderHonestEmpties(t *testing.T) {
 	tests := map[string]struct {
-		out  TagsOutput
+		out  tagsOutput
 		want string
 	}{
 		"substring miss": {
-			out:  TagsOutput{Search: "qzx", Status: string(catalog.StatusNoSubstringMatch)},
+			out:  tagsOutput{Search: "qzx", Status: string(catalog.StatusNoSubstringMatch)},
 			want: `No tag name contains "qzx".`,
 		},
 		"one withheld": {
-			out: TagsOutput{
+			out: tagsOutput{
 				Search:       "ass_grabeye_contact",
 				Status:       string(catalog.StatusNoSubstringMatch),
 				MinCount:     1,
@@ -151,7 +151,7 @@ func TestRenderHonestEmpties(t *testing.T) {
 				`Set min_count=0 to include it.`,
 		},
 		"many withheld": {
-			out: TagsOutput{
+			out: tagsOutput{
 				Search:       "blue",
 				Status:       string(catalog.StatusNoSubstringMatch),
 				MinCount:     2,
@@ -163,7 +163,7 @@ func TestRenderHonestEmpties(t *testing.T) {
 				`Set min_count=0 to include them.`,
 		},
 		"offset past end": {
-			out: TagsOutput{
+			out: tagsOutput{
 				Search:   "blue",
 				Status:   string(catalog.StatusOffsetPastEnd),
 				Offset:   50,
@@ -173,23 +173,23 @@ func TestRenderHonestEmpties(t *testing.T) {
 				`Try a smaller offset. Known aliases: pee.`,
 		},
 		"exact miss": {
-			out:  TagsOutput{Search: "no_such_tag", Status: string(catalog.StatusExactNotFound)},
+			out:  tagsOutput{Search: "no_such_tag", Status: string(catalog.StatusExactNotFound)},
 			want: `No tag named "no_such_tag" exists.`,
 		},
 		"unknown": {
-			out: TagsOutput{Search: "maybe_tag", Status: string(catalog.StatusUnknown)},
+			out: tagsOutput{Search: "maybe_tag", Status: string(catalog.StatusUnknown)},
 			want: `Could not confirm whether "maybe_tag" exists because the tag index was ` +
 				`unavailable; try again.`,
 		},
 		"unset status": {
-			out:  TagsOutput{},
+			out:  tagsOutput{},
 			want: "No tags matched.",
 		},
 	}
 
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			if got := Render(tt.out); got != tt.want {
+			if got := renderTags(tt.out); got != tt.want {
 				t.Errorf("Render() = %q, want %q", got, tt.want)
 			}
 		})
@@ -197,7 +197,7 @@ func TestRenderHonestEmpties(t *testing.T) {
 }
 
 func TestTagsJSONShape(t *testing.T) {
-	out := Tags(catalog.TagsResult{
+	out := newTagsOutput(catalog.TagsResult{
 		Search: "blue_hair",
 		Status: catalog.StatusOK,
 		Tags:   []booru.Tag{{Name: "blue_hair", Category: booru.CategoryGeneral, Count: 1}},

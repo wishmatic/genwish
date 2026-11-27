@@ -12,7 +12,6 @@ import (
 	"github.com/wishmatic/genwish/internal/catalog"
 	"github.com/wishmatic/genwish/internal/cli"
 	"github.com/wishmatic/genwish/internal/testutil"
-	"github.com/wishmatic/genwish/internal/view"
 )
 
 type stubSource struct {
@@ -167,7 +166,7 @@ func TestUtilBooru(t *testing.T) {
 			t.Fatalf("Execute() error: %v", err)
 		}
 
-		var decoded view.TagsOutput
+		var decoded tagsOutput
 		if err := json.Unmarshal([]byte(out), &decoded); err != nil {
 			t.Fatalf("decode stdout: %v\n%s", err, out)
 		}

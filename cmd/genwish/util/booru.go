@@ -11,7 +11,6 @@ import (
 	"github.com/wishmatic/genwish/internal/booru"
 	"github.com/wishmatic/genwish/internal/catalog"
 	"github.com/wishmatic/genwish/internal/cli"
-	"github.com/wishmatic/genwish/internal/view"
 )
 
 const defaultMinCount = 1
@@ -89,13 +88,13 @@ func runBooruSearch(ctx context.Context, deps cli.Deps, opts booruOptions, args 
 		return fmt.Errorf("tags: %w", err)
 	}
 
-	out := view.Tags(result, request)
+	out := newTagsOutput(result, request)
 
 	if opts.json {
 		return cli.WriteJSON(deps.Out, out)
 	}
 
-	_, err = fmt.Fprintln(deps.Out, view.Render(out))
+	_, err = fmt.Fprintln(deps.Out, renderTags(out))
 
 	return err
 }
