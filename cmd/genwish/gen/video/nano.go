@@ -2,6 +2,7 @@ package genvideo
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -25,11 +26,19 @@ func NewNanoCommand(deps cli.Deps) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "nano <prompt...>",
 		Short: "Generate a video through NanoGPT",
-		Args:  cobra.MinimumNArgs(1),
+		Args:  cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 0 {
+				return cmd.Help()
+			}
+
 			prompt, err := cli.PromptFromArgs(args)
 			if err != nil {
 				return err
+			}
+
+			if strings.TrimSpace(model) == "" {
+				return cmd.Help()
 			}
 
 			cfg, err := cli.ResolveConfig(deps)
@@ -92,7 +101,7 @@ func NewNanoCommand(deps cli.Deps) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&model, "model", "", "video model id")
+	cmd.Flags().StringVar(&model, "model", "", "video model id (required)")
 	cmd.Flags().StringVar(&image, "image", "", "image to animate")
 	cmd.Flags().StringVar(&negativePrompt, "negative-prompt", "", "content to suppress")
 	cmd.Flags().StringVar(&duration, "duration", "", "length in seconds")
@@ -106,8 +115,6 @@ func NewNanoCommand(deps cli.Deps) *cobra.Command {
 	cmd.Flags().StringVar(&videoURL, "video-url", "", "source video to extend, edit, or upscale")
 	cmd.Flags().
 		StringVar(&out, "out", "", "base directory for the generated video (default: output.path)")
-
-	_ = cmd.MarkFlagRequired("model")
 
 	return cmd
 }

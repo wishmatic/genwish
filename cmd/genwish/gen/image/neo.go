@@ -48,8 +48,12 @@ func NewNeoCommand(deps cli.Deps) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "neo <prompt...>",
 		Short: "Generate an image with the local Forge Neo instance",
-		Args:  cobra.MinimumNArgs(1),
+		Args:  cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 0 {
+				return cmd.Help()
+			}
+
 			return forgeRun(cmd.Context(), deps, flags, args)
 		},
 	}

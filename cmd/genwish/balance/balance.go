@@ -13,8 +13,14 @@ func NewCommand(deps cli.Deps) *cobra.Command {
 	return &cobra.Command{
 		Use:   "balance <provider>",
 		Short: "Read the account balance for a provider",
-		Args:  cobra.ExactArgs(1),
+		Long: "Read the account balance for a provider.\n\n" +
+			"Providers: nano, novel.",
+		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 0 {
+				return cmd.Help()
+			}
+
 			name, err := provider.ParseBalance(args[0])
 			if err != nil {
 				return err

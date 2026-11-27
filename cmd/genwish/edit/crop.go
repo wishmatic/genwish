@@ -52,8 +52,12 @@ func newCropCommand(deps cli.Deps, spec cropCommand) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   spec.name + " <image>",
 		Short: spec.short,
-		Args:  cobra.ExactArgs(1),
+		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 0 {
+				return cmd.Help()
+			}
+
 			opts, _ := imageedit.OptionsFor(imageedit.Request{
 				IsCrop:   true,
 				IsSquare: spec.isSquare,

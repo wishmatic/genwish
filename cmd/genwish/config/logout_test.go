@@ -1,12 +1,29 @@
 package config
 
 import (
+	"bytes"
 	"errors"
 	"strings"
 	"testing"
 
 	"github.com/wishmatic/genwish/internal/cli"
+	"github.com/wishmatic/genwish/internal/testutil"
 )
+
+func TestLogoutWithoutAProviderShowsHelp(t *testing.T) {
+	out := &bytes.Buffer{}
+	cmd := NewLogoutCommand(cli.Deps{})
+	cmd.SetOut(out)
+	cmd.SetErr(&bytes.Buffer{})
+
+	if err := testutil.Run(t, cmd); err != nil {
+		t.Fatalf("Execute() error: %v", err)
+	}
+
+	if !strings.Contains(out.String(), "logout <provider>") {
+		t.Errorf("stdout = %q, want the logout usage", out)
+	}
+}
 
 func TestLogoutRejectsNeo(t *testing.T) {
 	t.Run("reports the provider does not use a key", func(t *testing.T) {

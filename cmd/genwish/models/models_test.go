@@ -1,6 +1,7 @@
 package models
 
 import (
+	"bytes"
 	"strings"
 	"testing"
 
@@ -9,10 +10,18 @@ import (
 )
 
 func TestNewCommand(t *testing.T) {
-	t.Run("list requires a provider", func(t *testing.T) {
-		err := testutil.Run(t, NewCommand(cli.Deps{}), "list")
-		if err == nil || !strings.Contains(err.Error(), "between 1 and 2") {
-			t.Errorf("Execute() error = %v, want the missing provider reported", err)
+	t.Run("list shows help without a provider", func(t *testing.T) {
+		out := &bytes.Buffer{}
+		cmd := NewCommand(cli.Deps{Out: out})
+		cmd.SetOut(out)
+		cmd.SetErr(&bytes.Buffer{})
+
+		if err := testutil.Run(t, cmd, "list"); err != nil {
+			t.Fatalf("Execute() error: %v", err)
+		}
+
+		if !strings.Contains(out.String(), "Providers: nano, neo, novel") {
+			t.Errorf("stdout = %q, want the provider options", out)
 		}
 	})
 
@@ -23,10 +32,18 @@ func TestNewCommand(t *testing.T) {
 		}
 	})
 
-	t.Run("get requires a provider and an id", func(t *testing.T) {
-		err := testutil.Run(t, NewCommand(cli.Deps{}), "get")
-		if err == nil || !strings.Contains(err.Error(), "between 2 and 3") {
-			t.Errorf("Execute() error = %v, want the missing arguments reported", err)
+	t.Run("get shows help without an id", func(t *testing.T) {
+		out := &bytes.Buffer{}
+		cmd := NewCommand(cli.Deps{Out: out})
+		cmd.SetOut(out)
+		cmd.SetErr(&bytes.Buffer{})
+
+		if err := testutil.Run(t, cmd, "get", "nano"); err != nil {
+			t.Fatalf("Execute() error: %v", err)
+		}
+
+		if !strings.Contains(out.String(), "Providers: nano, neo, novel") {
+			t.Errorf("stdout = %q, want the provider options", out)
 		}
 	})
 

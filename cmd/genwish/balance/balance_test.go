@@ -13,6 +13,21 @@ import (
 )
 
 func TestNewCommand(t *testing.T) {
+	t.Run("shows help without a provider", func(t *testing.T) {
+		out := &bytes.Buffer{}
+		cmd := NewCommand(cli.Deps{Out: out})
+		cmd.SetOut(out)
+		cmd.SetErr(&bytes.Buffer{})
+
+		if err := testutil.Run(t, cmd); err != nil {
+			t.Fatalf("Execute() error: %v", err)
+		}
+
+		if !strings.Contains(out.String(), "Providers: nano, novel") {
+			t.Errorf("stdout = %q, want the provider options", out)
+		}
+	})
+
 	t.Run("accepts the nano aliases", func(t *testing.T) {
 		for _, alias := range []string{"nano-gpt", "nanogpt", "nano gpt"} {
 			server := httptest.NewServer(

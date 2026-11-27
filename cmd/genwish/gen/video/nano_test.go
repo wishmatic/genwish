@@ -144,9 +144,13 @@ func TestGenerateVideoLeavesNoFileWhenTheDownloadFails(t *testing.T) {
 	}
 }
 
-func TestGenerateVideoRequiresAModel(t *testing.T) {
-	_, _, err := runNano(t, cli.Deps{}, "a wave")
-	if err == nil || !strings.Contains(err.Error(), "model") {
-		t.Errorf("Execute() error = %v, want the missing-model rejection", err)
+func TestGenerateVideoWithoutAModelShowsHelp(t *testing.T) {
+	out, _, err := runNano(t, cli.Deps{}, "a wave")
+	if err != nil {
+		t.Fatalf("Execute() error: %v", err)
+	}
+
+	if !strings.Contains(out, "Usage:") || !strings.Contains(out, "--model") {
+		t.Errorf("stdout = %q, want the video usage", out)
 	}
 }

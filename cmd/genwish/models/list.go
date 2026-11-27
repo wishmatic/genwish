@@ -18,8 +18,14 @@ func NewListCommand(deps cli.Deps) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list <provider> [image|video]",
 		Short: "List the models a provider serves",
-		Args:  cobra.RangeArgs(1, 2),
+		Long: "List the models a provider serves.\n\n" +
+			"Providers: nano, neo, novel.",
+		Args: cobra.MaximumNArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 0 {
+				return cmd.Help()
+			}
+
 			name, err := provider.Parse(args[0])
 			if err != nil {
 				return err

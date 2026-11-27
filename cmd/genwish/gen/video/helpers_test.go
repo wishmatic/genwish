@@ -18,7 +18,11 @@ func runNano(t *testing.T, deps cli.Deps, args ...string) (string, string, error
 	deps.Out = out
 	deps.Err = errOut
 
-	err := testutil.Run(t, NewNanoCommand(deps), args...)
+	cmd := NewNanoCommand(deps)
+	cmd.SetOut(out)
+	cmd.SetErr(errOut)
+
+	err := testutil.Run(t, cmd, args...)
 
 	return out.String(), errOut.String(), err
 }

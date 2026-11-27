@@ -13,8 +13,12 @@ func NewLogoutCommand(deps cli.Deps) *cobra.Command {
 	return &cobra.Command{
 		Use:   "logout <provider>",
 		Short: "Delete a stored NanoGPT, NovelAI, or Danbooru credential",
-		Args:  cobra.ExactArgs(1),
-		RunE: func(_ *cobra.Command, args []string) error {
+		Args:  cobra.MaximumNArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 0 {
+				return cmd.Help()
+			}
+
 			name, err := provider.ParseCredential(args[0])
 			if err != nil {
 				return err

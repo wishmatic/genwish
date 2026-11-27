@@ -22,8 +22,12 @@ func NewBgkillCommand(deps cli.Deps) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "bgkill <image>",
 		Short: "Remove the background from an image",
-		Args:  cobra.ExactArgs(1),
+		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 0 {
+				return cmd.Help()
+			}
+
 			return bgkillRun(cmd, deps, flags, args[0])
 		},
 	}

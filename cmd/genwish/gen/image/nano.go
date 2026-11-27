@@ -24,8 +24,12 @@ func NewNanoCommand(deps cli.Deps) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "nano <prompt...>",
 		Short: "Generate images through NanoGPT",
-		Args:  cobra.MinimumNArgs(1),
+		Args:  cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 0 {
+				return cmd.Help()
+			}
+
 			prompt, err := cli.PromptFromArgs(args)
 			if err != nil {
 				return err

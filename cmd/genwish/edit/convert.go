@@ -20,8 +20,12 @@ func NewConvertCommand(deps cli.Deps) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "convert <image>",
 		Short: "Re-encode an image as png, jpeg, jxl, or webp",
-		Args:  cobra.ExactArgs(1),
+		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 0 {
+				return cmd.Help()
+			}
+
 			return convertRun(cmd, deps, flags, args[0])
 		},
 	}

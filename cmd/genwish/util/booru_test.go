@@ -233,3 +233,18 @@ func TestUtilBooru(t *testing.T) {
 		}
 	})
 }
+
+func TestBooruShowsHelpWithoutASearch(t *testing.T) {
+	out := &bytes.Buffer{}
+	cmd := NewBooruCommand(cli.Deps{})
+	cmd.SetOut(out)
+	cmd.SetErr(&bytes.Buffer{})
+
+	if err := testutil.Run(t, cmd); err != nil {
+		t.Fatalf("Execute() error: %v", err)
+	}
+
+	if !strings.Contains(out.String(), "booru <search...>") {
+		t.Errorf("stdout = %q, want the search usage", out)
+	}
+}
