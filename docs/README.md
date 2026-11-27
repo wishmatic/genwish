@@ -1,6 +1,7 @@
 # Documentation
 
-`genwish` is a CLI for image and video generation with three providers and a Danbooru tag utility.
+`genwish` is a CLI for image, video, and name generation, with three providers and a Danbooru
+tag utility.
 
 ## Command tree
 
@@ -11,6 +12,7 @@ genwish
       nano <prompt...>
       neo <prompt...>
       novel <prompt...>
+    name
     video
       nano <prompt...>
   edit
@@ -40,3 +42,4 @@ Provider names are case-insensitive. `nano` also accepts `nano-gpt`, `nanogpt`, 
 - [neo.md](neo.md): Forge Neo generation, editing, and model listing.
 - [novel.md](novel.md): NovelAI generation, balance, and Anlas.
 - [booru.md](booru.md): tag search semantics.
+- [name.md](name.md): local name generation.

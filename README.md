@@ -1,6 +1,6 @@
 # genwish
 
-Bespoke personal CLI for image and video generation, plus Danbooru tag lookup.
+Bespoke personal CLI for image, video, and name generation, plus Danbooru tag lookup.
 
 ## Install
 
@@ -31,6 +31,8 @@ genwish gen image novel "a cat" --out ./media
 genwish balance novel
 
 genwish util booru blue_hair --limit 5
+
+genwish gen name --count 3
 ```
 
 ## Documentation
@@ -41,6 +43,7 @@ genwish util booru blue_hair --limit 5
 - [Forge Neo](docs/neo.md)
 - [NovelAI](docs/novel.md)
 - [Booru](docs/booru.md)
+- [Names](docs/name.md)
 
 ## License
 

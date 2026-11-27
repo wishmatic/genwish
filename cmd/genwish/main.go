@@ -27,7 +27,7 @@ func newRoot(deps cli.Deps) *cobra.Command {
 
 	root := &cobra.Command{
 		Use:           "genwish",
-		Short:         "Generate images and video from the command line",
+		Short:         "Generate images, video, and names from the command line",
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}

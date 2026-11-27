@@ -10,7 +10,7 @@ import (
 )
 
 func TestNewCommand(t *testing.T) {
-	t.Run("lists image and video", func(t *testing.T) {
+	t.Run("lists image, name, and video", func(t *testing.T) {
 		out := &bytes.Buffer{}
 		cmd := NewCommand(cli.Deps{})
 		cmd.SetOut(out)
@@ -20,7 +20,7 @@ func TestNewCommand(t *testing.T) {
 			t.Fatalf("Execute() error: %v", err)
 		}
 
-		for _, want := range []string{"image", "video"} {
+		for _, want := range []string{"image", "name", "video"} {
 			if !strings.Contains(out.String(), want) {
 				t.Errorf("stdout does not mention %q:\n%s", want, out)
 			}

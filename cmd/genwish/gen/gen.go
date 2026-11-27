@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 
 	genimage "github.com/wishmatic/genwish/cmd/genwish/gen/image"
+	genname "github.com/wishmatic/genwish/cmd/genwish/gen/name"
 	genvideo "github.com/wishmatic/genwish/cmd/genwish/gen/video"
 	"github.com/wishmatic/genwish/internal/cli"
 )
@@ -12,7 +13,7 @@ func NewCommand(deps cli.Deps) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "gen",
 		Aliases: []string{"generate"},
-		Short:   "Generate images and video",
+		Short:   "Generate images, video, and names",
 		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			return cmd.Help()
@@ -21,6 +22,7 @@ func NewCommand(deps cli.Deps) *cobra.Command {
 
 	cmd.AddCommand(
 		genimage.NewCommand(deps),
+		genname.NewCommand(deps),
 		genvideo.NewCommand(deps),
 	)
 
