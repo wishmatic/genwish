@@ -2,6 +2,7 @@ package novelai
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -48,6 +49,55 @@ func TestCheckBalance(t *testing.T) {
 
 		if balance.Anlas != 1200 {
 			t.Errorf("Anlas = %d, want 1200", balance.Anlas)
+		}
+
+		if balance.Tier != "" {
+			t.Errorf("Tier = %q, want it unset", balance.Tier)
+		}
+	})
+
+	t.Run("maps the numeric tier", func(t *testing.T) {
+		tests := map[int]string{
+			0: "paper",
+			1: "tablet",
+			2: "scroll",
+			3: "opus",
+			7: "7",
+		}
+
+		for level, want := range tests {
+			body := fmt.Sprintf(
+				`{"subscription":{"tier":%d,"trainingStepsLeft":1200}}`, level,
+			)
+
+			server := httptest.NewServer(
+				http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+					_, _ = w.Write([]byte(body))
+				}),
+			)
+
+			balance, err := New(server.URL, "key").CheckBalance(context.Background())
+			server.Close()
+
+			if err != nil {
+				t.Fatalf("tier %d: CheckBalance() error: %v", level, err)
+			}
+
+			if balance.Tier != want {
+				t.Errorf("tier %d = %q, want %q", level, balance.Tier, want)
+			}
+		}
+	})
+
+	t.Run("reports an invalid tier", func(t *testing.T) {
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+			_, _ = w.Write([]byte(`{"subscription":{"tier":{},"trainingStepsLeft":1200}}`))
+		}))
+		t.Cleanup(server.Close)
+
+		_, err := New(server.URL, "key").CheckBalance(context.Background())
+		if err == nil || !strings.Contains(err.Error(), "subscription.tier") {
+			t.Errorf("CheckBalance() error = %v, want the invalid tier named", err)
 		}
 	})
 

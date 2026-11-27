@@ -68,8 +68,9 @@ The list covers the V5, V4.5, V4, V3, and Furry V3 image families. `--query` fil
 genwish balance novel
 ```
 
-Prints `Anlas: N`, and `Tier: ...` when NovelAI reports one.
+Prints `Anlas: N`, and the tier (`paper`, `tablet`, `scroll`, or `opus`) when NovelAI reports one.
 
 The balance comes from `GET https://image.novelai.net/user/data` with the API key as a Bearer
 token. The Anlas total is read from `subscription.trainingStepsLeft`, either as an object with
 `fixedTrainingStepsLeft` plus `purchasedTrainingSteps`, or as a plain integer on older responses.
+The tier is NovelAI's numeric level: 0 Paper, 1 Tablet, 2 Scroll, 3 Opus.
