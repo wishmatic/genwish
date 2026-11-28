@@ -281,10 +281,8 @@ func TestAliasTargetFollowsAndTerminates(t *testing.T) {
 			return
 		}
 
-		_, _ = w.Write(
-			[]byte(
-				fmt.Sprintf(`[{"antecedent_name":"%s","consequent_name":"%s"}]`, antecedent, consequent),
-			),
+		_, _ = fmt.Fprintf(
+			w, `[{"antecedent_name":"%s","consequent_name":"%s"}]`, antecedent, consequent,
 		)
 	})
 
