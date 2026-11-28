@@ -107,7 +107,12 @@ func (c *Client) do(
 		body = bytes.NewReader(encoded)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, method, c.baseURL+path, body)
+	req, err := http.NewRequestWithContext(
+		ctx,
+		method,
+		fmt.Sprintf("%s%s", c.baseURL, path),
+		body,
+	)
 	if err != nil {
 		return fmt.Errorf("build %s request: %w", path, err)
 	}

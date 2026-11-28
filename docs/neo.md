@@ -10,27 +10,28 @@ The default is `http://127.0.0.1:7860`.
 ## Generate an image
 
 ```sh
-genwish gen image neo "a red fox in snow" --model sd.safetensors \
-  --forge-preset default --out ./media
+genwish gen image neo "a red fox in snow" --model krea --out ./media
 ```
 
-`--model` and `--forge-preset` are required.
+`--model` names a model in the registry. Its checkpoint, encoders, preset, sampler, scheduler,
+steps, cfg, and hi-res setting are used unless a flag overrides them. A name that is not configured
+is used as the checkpoint filename as given.
 
 Flags:
 
-- `--model` (required): checkpoint filename to load.
-- `--forge-preset` (required): Forge UI preset to apply.
-- `--vae-and-text-model` (empty): VAE or text encoder filename, repeatable.
+- `--model` (required): model id from the registry, or a checkpoint filename.
+- `--forge-preset` (empty unless the model sets one): Forge UI preset to apply.
+- `--vae-and-text-model` (the model's encoders): VAE or text encoder filename, repeatable.
 - `--negative-prompt` (empty): things to avoid.
-- `--sampler-name` (`DPM++ 2M`): sampler.
-- `--scheduler` (`Automatic`): scheduler.
-- `--steps` (`20`): sampling steps.
+- `--sampler-name` (the model's sampler, else `DPM++ 2M`): sampler.
+- `--scheduler` (the model's scheduler, else `Automatic`): scheduler.
+- `--steps` (the model's steps, else `20`): sampling steps.
 - `--width` / `--height` (`0`): output size; 0 uses the init image or the model default.
-- `--cfg-scale` (`7`): classifier-free guidance scale.
+- `--cfg-scale` (the model's cfg, else `7`): classifier-free guidance scale.
 - `--seed` (`-1`): random seed; -1 is random.
 - `--init-image` (empty): image to transform; a local path, an http(s) URL, or a data URI.
 - `--denoising-strength` (`0`): how much of the init image to change.
-- `--enable-hr` (false): enable hi-res second-pass upscaling.
+- `--enable-hr` (the model's hi-res setting, else false): enable hi-res second-pass upscaling.
 - `--hr-scale` (`0`): hi-res upscaling factor.
 - `--hr-upscaler` (empty): hi-res upscaler.
 - `--hr-second-pass-steps` (`0`): steps for the hi-res pass.

@@ -51,17 +51,27 @@ func NewNeoCommand(deps cli.Deps) *cobra.Command {
 				return cmd.Help()
 			}
 
-			return forgeRun(cmd.Context(), deps, flags, args)
+			return forgeRun(cmd, deps, flags, args)
 		},
 	}
 
-	cmd.Flags().StringVar(&flags.model, "model", "", "checkpoint (model) filename to load")
-	cmd.Flags().StringVar(&flags.preset, "forge-preset", "", "Forge UI preset to apply")
+	cmd.Flags().StringVar(
+		&flags.model,
+		"model",
+		"",
+		"model id from models.toml, or a checkpoint filename to load",
+	)
+	cmd.Flags().StringVar(
+		&flags.preset,
+		"forge-preset",
+		"",
+		"Forge UI preset; defaults to the model's configured preset",
+	)
 	cmd.Flags().StringArrayVar(
 		&flags.vaeAndTextModels,
 		"vae-and-text-model",
 		nil,
-		"VAE or text encoder filename to load; repeat for more",
+		"VAE or text encoder filename to load; repeat for more; defaults to the model's encoders",
 	)
 	cmd.Flags().StringVar(
 		&flags.negativePrompt,
@@ -69,12 +79,32 @@ func NewNeoCommand(deps cli.Deps) *cobra.Command {
 		"",
 		"things to avoid in the generated image",
 	)
-	cmd.Flags().StringVar(&flags.sampler, "sampler-name", forgeDefaultSampler, "sampler to use")
-	cmd.Flags().StringVar(&flags.scheduler, "scheduler", forgeDefaultScheduler, "scheduler to use")
-	cmd.Flags().IntVar(&flags.steps, "steps", 20, "number of sampling steps")
+	cmd.Flags().StringVar(
+		&flags.sampler,
+		"sampler-name",
+		forgeDefaultSampler,
+		"sampler to use; defaults to the model's configured sampler",
+	)
+	cmd.Flags().StringVar(
+		&flags.scheduler,
+		"scheduler",
+		forgeDefaultScheduler,
+		"scheduler to use; defaults to the model's configured scheduler",
+	)
+	cmd.Flags().IntVar(
+		&flags.steps,
+		"steps",
+		20,
+		"number of sampling steps; defaults to the model's configured steps",
+	)
 	cmd.Flags().IntVar(&flags.width, "width", 0, "output width in pixels")
 	cmd.Flags().IntVar(&flags.height, "height", 0, "output height in pixels")
-	cmd.Flags().Float64Var(&flags.cfgScale, "cfg-scale", 7, "classifier-free guidance scale")
+	cmd.Flags().Float64Var(
+		&flags.cfgScale,
+		"cfg-scale",
+		7,
+		"classifier-free guidance scale; defaults to the model's configured value",
+	)
 	cmd.Flags().IntVar(&flags.seed, "seed", -1, "random seed")
 	cmd.Flags().StringVar(
 		&flags.initImage,
@@ -88,7 +118,12 @@ func NewNeoCommand(deps cli.Deps) *cobra.Command {
 		0,
 		"how much of the init image to change",
 	)
-	cmd.Flags().BoolVar(&flags.enableHR, "enable-hr", false, "enable hi-res second-pass upscaling")
+	cmd.Flags().BoolVar(
+		&flags.enableHR,
+		"enable-hr",
+		false,
+		"enable hi-res second-pass upscaling; defaults to the model's configured setting",
+	)
 	cmd.Flags().Float64Var(&flags.hrScale, "hr-scale", 0, "hi-res upscaling factor")
 	cmd.Flags().StringVar(&flags.hrUpscaler, "hr-upscaler", "", "hi-res upscaler to use")
 	cmd.Flags().IntVar(
@@ -116,7 +151,7 @@ func NewNeoCommand(deps cli.Deps) *cobra.Command {
 	return cmd
 }
 
-func forgeRun(ctx context.Context, deps cli.Deps, flags forgeFlags, args []string) error {
+func forgeRun(cmd *cobra.Command, deps cli.Deps, flags forgeFlags, args []string) error {
 	prompt, err := cli.PromptFromArgs(args)
 	if err != nil {
 		return err
@@ -125,6 +160,12 @@ func forgeRun(ctx context.Context, deps cli.Deps, flags forgeFlags, args []strin
 	if flags.model == "" {
 		return fmt.Errorf("forge: --model is required")
 	}
+
+	flags, err = resolveNeoFlags(cmd, deps, flags)
+	if err != nil {
+		return fmt.Errorf("forge: %w", err)
+	}
+
 	if flags.preset == "" {
 		return fmt.Errorf("forge: --forge-preset is required")
 	}
@@ -141,12 +182,14 @@ func forgeRun(ctx context.Context, deps cli.Deps, flags forgeFlags, args []strin
 
 	resolver := cli.ImageResolver(deps)
 
-	initImage, err := readInitImage(ctx, resolver, flags.initImage)
+	initImage, err := readInitImage(cmd.Context(), resolver, flags.initImage)
 	if err != nil {
 		return fmt.Errorf("forge: %w", err)
 	}
 
-	images, err := cli.ForgeClient(deps, cfg).Generate(ctx, flags.request(prompt, initImage))
+	client := cli.ForgeClient(deps, cfg)
+
+	images, err := client.Generate(cmd.Context(), flags.request(prompt, initImage))
 	if err != nil {
 		return fmt.Errorf("forge: %w", err)
 	}
@@ -157,6 +200,54 @@ func forgeRun(ctx context.Context, deps cli.Deps, flags forgeFlags, args []strin
 	}
 
 	return cli.PrintPaths(deps.Out, paths)
+}
+
+// resolveNeoFlags fills in the model's configured defaults. An unconfigured id is treated as the
+// checkpoint filename itself, so a bare checkpoint still generates without a registry entry.
+func resolveNeoFlags(cmd *cobra.Command, deps cli.Deps, flags forgeFlags) (forgeFlags, error) {
+	registry, err := cli.NeoRegistry(deps)
+	if err != nil {
+		return forgeFlags{}, err
+	}
+
+	model, ok := registry.Match(flags.model)
+	if !ok {
+		return flags, nil
+	}
+
+	if model.Checkpoint != "" {
+		flags.model = model.Checkpoint
+	}
+
+	if len(flags.vaeAndTextModels) == 0 {
+		flags.vaeAndTextModels = model.Encoders
+	}
+
+	if flags.preset == "" {
+		flags.preset = model.Preset
+	}
+
+	if !cmd.Flags().Changed("sampler-name") && model.Samplers.Default != "" {
+		flags.sampler = model.Samplers.Default
+	}
+
+	if !cmd.Flags().Changed("scheduler") && model.Schedulers.Default != "" {
+		flags.scheduler = model.Schedulers.Default
+	}
+
+	if !cmd.Flags().Changed("steps") && model.Steps.Default != nil {
+		flags.steps = *model.Steps.Default
+	}
+
+	if !cmd.Flags().Changed("cfg-scale") && model.CFG.Default != nil {
+		flags.cfgScale = *model.CFG.Default
+	}
+
+	if !cmd.Flags().Changed("enable-hr") {
+		flags.enableHR = model.Hires.Enabled
+	}
+
+	return flags, nil
 }
 
 func (f forgeFlags) request(prompt string, initImage []byte) forge.GenerateRequest {

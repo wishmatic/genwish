@@ -48,7 +48,7 @@ func (c *Client) postJSON[T any](ctx context.Context, label, path string, payloa
 	httpReq, err := http.NewRequestWithContext(
 		ctx,
 		http.MethodPost,
-		c.baseURL+path,
+		fmt.Sprintf("%s%s", c.baseURL, path),
 		bytes.NewReader(body),
 	)
 	if err != nil {

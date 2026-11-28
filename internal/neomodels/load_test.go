@@ -213,6 +213,38 @@ func TestRegistryIDs(t *testing.T) {
 	})
 }
 
+func TestRegistryMatch(t *testing.T) {
+	registry, err := Parse([]byte(`
+[neo.krea]
+checkpoint = "hyphoria_v002.safetensors"
+
+[neo.illustrious]
+checkpoint = "illustrious_v1.safetensors"
+`))
+	if err != nil {
+		t.Fatalf("Parse() error: %v", err)
+	}
+
+	tests := map[string]struct {
+		value string
+		want  string
+	}{
+		"by id":         {value: "krea", want: "hyphoria_v002.safetensors"},
+		"by checkpoint": {value: "illustrious_v1.safetensors", want: "illustrious_v1.safetensors"},
+		"absent":        {value: "unknown.safetensors", want: ""},
+	}
+
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			model, ok := registry.Match(tt.value)
+
+			if ok != (tt.want != "") || model.Checkpoint != tt.want {
+				t.Errorf("Match(%q) = %+v, %t, want checkpoint %q", tt.value, model, ok, tt.want)
+			}
+		})
+	}
+}
+
 func containsAll(value string, parts ...string) bool {
 	for _, part := range parts {
 		if !strings.Contains(value, part) {

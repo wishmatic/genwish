@@ -49,7 +49,7 @@ func (c *Client) generate(
 	httpReq, err := http.NewRequestWithContext(
 		ctx,
 		http.MethodPost,
-		c.baseURL+generatePath,
+		fmt.Sprintf("%s%s", c.baseURL, generatePath),
 		bytes.NewReader(body),
 	)
 	if err != nil {

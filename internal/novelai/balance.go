@@ -25,7 +25,12 @@ type userDataResponse struct {
 }
 
 func (c *Client) CheckBalance(ctx context.Context) (*Balance, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.baseURL+userDataPath, nil)
+	req, err := http.NewRequestWithContext(
+		ctx,
+		http.MethodGet,
+		fmt.Sprintf("%s%s", c.baseURL, userDataPath),
+		nil,
+	)
 	if err != nil {
 		return nil, fmt.Errorf("novelai: build balance request: %w", err)
 	}

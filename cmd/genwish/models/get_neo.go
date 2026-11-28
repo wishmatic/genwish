@@ -15,7 +15,7 @@ func getNeo(deps cli.Deps, id string, args []string) error {
 		return err
 	}
 
-	registry, err := loadNEORegistry(deps)
+	registry, err := cli.NeoRegistry(deps)
 	if err != nil {
 		return err
 	}

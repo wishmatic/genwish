@@ -54,6 +54,22 @@ func (r Registry) Get(id string) (Model, bool) {
 	return model, ok
 }
 
+// Match finds a model by its id, or else by its checkpoint filename.
+func (r Registry) Match(idOrCheckpoint string) (Model, bool) {
+	if model, ok := r[idOrCheckpoint]; ok {
+		return model, true
+	}
+
+	for _, id := range r.IDs() {
+		model := r[id]
+		if model.Checkpoint == idOrCheckpoint {
+			return model, true
+		}
+	}
+
+	return Model{}, false
+}
+
 func (r Registry) IDs() []string {
 	ids := make([]string, 0, len(r))
 

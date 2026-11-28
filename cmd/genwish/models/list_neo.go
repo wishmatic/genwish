@@ -1,14 +1,11 @@
 package models
 
 import (
-	"errors"
 	"fmt"
-	"io/fs"
 	"strings"
 	"text/tabwriter"
 
 	"github.com/wishmatic/genwish/internal/cli"
-	"github.com/wishmatic/genwish/internal/config"
 	"github.com/wishmatic/genwish/internal/neomodels"
 )
 
@@ -17,7 +14,7 @@ func runNeo(deps cli.Deps, args []string, query string, limit int) error {
 		return err
 	}
 
-	registry, err := loadNEORegistry(deps)
+	registry, err := cli.NeoRegistry(deps)
 	if err != nil {
 		return err
 	}
@@ -86,28 +83,4 @@ func neoModelMatches(id string, model neomodels.Model, needle string) bool {
 	}
 
 	return false
-}
-
-func loadNEORegistry(deps cli.Deps) (neomodels.Registry, error) {
-	cfg, err := cli.ResolveConfig(deps)
-	if err != nil {
-		return nil, err
-	}
-
-	defaultPath := config.DefaultNeoModelsFile()
-	path := strings.TrimSpace(cfg.Neo.ModelsFile)
-	if path == "" {
-		path = defaultPath
-	}
-
-	registry, err := neomodels.Load(path)
-	if err == nil {
-		return registry, nil
-	}
-
-	if errors.Is(err, fs.ErrNotExist) && path == defaultPath {
-		return neomodels.Registry{}, nil
-	}
-
-	return nil, fmt.Errorf("neo.models_file %s: %w", path, err)
 }
