@@ -78,7 +78,7 @@ func NewNeoCommand(deps cli.Deps) *cobra.Command {
 	cmd.Flags().IntVar(&flags.width, "width", 0, "output width in pixels")
 	cmd.Flags().IntVar(&flags.height, "height", 0, "output height in pixels")
 	cmd.Flags().Float64Var(&flags.cfgScale, "cfg-scale", 7, "classifier-free guidance scale")
-	cmd.Flags().IntVar(&flags.seed, "seed", -1, "random seed; -1 is random")
+	cmd.Flags().IntVar(&flags.seed, "seed", -1, "random seed")
 	cmd.Flags().StringVar(
 		&flags.initImage,
 		"init-image",

@@ -45,7 +45,7 @@ func NewListCommand(deps cli.Deps) *cobra.Command {
 	}
 
 	cmd.Flags().StringVar(&query, "query", "", "filter by id, name, description, owner, or tags")
-	cmd.Flags().IntVar(&limit, "limit", 0, "models to show, 25 default and 100 at most")
+	cmd.Flags().IntVar(&limit, "limit", 0, "models to show, at most 100 (default: 25)")
 
 	return cmd
 }

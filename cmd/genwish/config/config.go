@@ -11,7 +11,7 @@ func AddConfigFlag(root *cobra.Command, deps cli.Deps) {
 		&deps.Flags.ConfigPath,
 		"config-file",
 		"",
-		"path to config.toml (default ~/.genwish/config.toml)",
+		"path to config.toml (default: ~/.genwish/config.toml)",
 	)
 
 	root.PersistentPreRunE = func(*cobra.Command, []string) error {

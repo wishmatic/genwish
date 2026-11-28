@@ -49,5 +49,7 @@ func newRoot(deps cli.Deps) *cobra.Command {
 		util.NewCommand(deps),
 	)
 
+	cli.NormalizeFlagDefaults(root)
+
 	return root
 }

@@ -124,15 +124,20 @@ func NewNovelCommand(deps cli.Deps) *cobra.Command {
 	)
 	cmd.Flags().StringVar(&samplerName, "sampler-name", novelai.DefaultSampler, "NovelAI sampler")
 	cmd.Flags().IntVar(&steps, "steps", defaultSteps, "number of sampling steps")
-	cmd.Flags().IntVar(&width, "width", 0, "output width; defaults to 512 or the init image's width")
+	cmd.Flags().IntVar(
+		&width,
+		"width",
+		0,
+		"output width (default: 512 or the init image's width)",
+	)
 	cmd.Flags().IntVar(
 		&height,
 		"height",
 		0,
-		"output height; defaults to 512 or the init image's height",
+		"output height (default: 512 or the init image's height)",
 	)
 	cmd.Flags().Float64Var(&cfgScale, "cfg-scale", defaultCFGScale, "classifier-free guidance scale")
-	cmd.Flags().IntVar(&seed, "seed", defaultSeed, "random seed; -1 uses a random seed")
+	cmd.Flags().IntVar(&seed, "seed", defaultSeed, "random seed")
 	cmd.Flags().StringVar(
 		&initImage,
 		"init-image",
