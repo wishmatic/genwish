@@ -34,14 +34,9 @@ func TestBgkillPayload(t *testing.T) {
 					gotPath = r.URL.Path
 					gotBody, _ = io.ReadAll(r.Body)
 					w.Header().Set("Content-Type", "application/json")
-					_, _ = w.Write(
-						[]byte(
-							fmt.Sprintf(
-								`{"output_image": "%s"}`,
-								base64.StdEncoding.EncodeToString([]byte("foreground")),
-							),
-						),
-					)
+					_, _ = fmt.Fprintf(w,
+						`{"output_image": "%s"}`,
+						base64.StdEncoding.EncodeToString([]byte("foreground")))
 				}),
 			)
 			defer server.Close()
