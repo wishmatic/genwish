@@ -54,17 +54,17 @@ func NewNanoCommand(deps cli.Deps) *cobra.Command {
 
 			resolver := cli.ImageResolver(deps)
 
-			imageDataURL, err := cli.ResolveDataURL(cmd.Context(), resolver, image)
+			imageDataURL, err := cli.ImageDataURL(cmd.Context(), resolver, image)
 			if err != nil {
 				return fmt.Errorf("gen image: %w", err)
 			}
 
-			maskDataURL, err := cli.ResolveDataURL(cmd.Context(), resolver, mask)
+			maskDataURL, err := cli.ImageDataURL(cmd.Context(), resolver, mask)
 			if err != nil {
 				return fmt.Errorf("gen image: %w", err)
 			}
 
-			imageDataURLs, err := cli.ResolveDataURLs(cmd.Context(), resolver, images)
+			imageDataURLs, err := cli.ImageDataURLs(cmd.Context(), resolver, images)
 			if err != nil {
 				return fmt.Errorf("gen image: %w", err)
 			}
@@ -121,9 +121,24 @@ func NewNanoCommand(deps cli.Deps) *cobra.Command {
 	cmd.Flags().StringVar(&model, "model", defaultImageModel, "image model id")
 	cmd.Flags().Int("n", 0, "number of images to generate")
 	cmd.Flags().StringVar(&size, "size", "", "output size or model-specific resolution")
-	cmd.Flags().StringVar(&image, "image", "", "image to transform")
-	cmd.Flags().StringArrayVar(&images, "images", nil, "additional input image")
-	cmd.Flags().StringVar(&mask, "mask", "", "inpainting mask")
+	cmd.Flags().StringVar(
+		&image,
+		"image",
+		"",
+		"input image: a local path, http(s) URL, or data URI",
+	)
+	cmd.Flags().StringArrayVar(
+		&images,
+		"images",
+		nil,
+		"additional input image: a local path, http(s) URL, or data URI; repeatable",
+	)
+	cmd.Flags().StringVar(
+		&mask,
+		"mask",
+		"",
+		"inpainting mask: a local path, http(s) URL, or data URI",
+	)
 	cmd.Flags().StringVar(
 		&outputFormat,
 		"format",

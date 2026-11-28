@@ -23,9 +23,9 @@ Flags:
 - `--model` (`bytedance/seedream-v5.0-pro`): image model id.
 - `--n` (provider default): number of images to generate.
 - `--size` (provider default): output size or model-specific resolution.
-- `--image` (empty): image to transform.
-- `--images` (empty): additional input image, repeatable.
-- `--mask` (empty): inpainting mask.
+- `--image` (empty): image to transform; a local path, an http(s) URL, or a data URI.
+- `--images` (empty): additional input image, same forms, repeatable.
+- `--mask` (empty): inpainting mask; a local path, an http(s) URL, or a data URI.
 - `--format` (`output.format`): `png`, `jpeg`, `jxl`, or `webp`.
 - `--out` (`output.path`): base output directory.
 - `--seed` (unset): seed for models that take one.
@@ -33,7 +33,7 @@ Flags:
 - `--guidance-scale` (unset): how closely the model follows the prompt.
 - `--num-inference-steps` (unset): denoising steps.
 
-Input images accept an http(s) URL, a data URI, or raw base64.
+Input images accept a local path, an http(s) URL, a data URI, or raw base64.
 
 Generated images are written under `<out>/images/<date>/<uuid>.<ext>` in the configured format. The
 command prints each path and `Cost: $...`.
@@ -50,7 +50,8 @@ genwish gen video nano "waves at sunset" --model veo2-video --out ./media
 Flags:
 
 - `--model` (`alibaba/wan-3.0/text-to-video`): video model id.
-- `--image` (empty): image to animate; sets `--mode image-to-video` when no mode is given.
+- `--image` (empty): image to animate; a local path, an http(s) URL, or a data URI. Sets
+  `--mode image-to-video` when no mode is given.
 - `--negative-prompt` (empty): content to suppress.
 - `--duration` (provider default): length in seconds.
 - `--aspect-ratio` (provider default): `16:9`, `9:16`, `1:1`, `4:3`, or `3:4`.

@@ -64,7 +64,7 @@ func NewNanoCommand(deps cli.Deps) *cobra.Command {
 			if image != "" {
 				resolver := cli.ImageResolver(deps)
 
-				imageDataURL, err := cli.ResolveDataURL(cmd.Context(), resolver, image)
+				imageDataURL, err := cli.ImageDataURL(cmd.Context(), resolver, image)
 				if err != nil {
 					return fmt.Errorf("gen video: %w", err)
 				}
@@ -104,7 +104,12 @@ func NewNanoCommand(deps cli.Deps) *cobra.Command {
 	}
 
 	cmd.Flags().StringVar(&model, "model", defaultVideoModel, "video model id")
-	cmd.Flags().StringVar(&image, "image", "", "image to animate")
+	cmd.Flags().StringVar(
+		&image,
+		"image",
+		"",
+		"image to animate: a local path, http(s) URL, or data URI",
+	)
 	cmd.Flags().StringVar(&negativePrompt, "negative-prompt", "", "content to suppress")
 	cmd.Flags().StringVar(&duration, "duration", "", "length in seconds")
 	cmd.Flags().StringVar(&aspectRatio, "aspect-ratio", "", "16:9, 9:16, 1:1, 4:3, or 3:4")

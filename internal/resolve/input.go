@@ -137,3 +137,8 @@ func isSupportedMediaType(mediaType string) bool {
 		return false
 	}
 }
+
+// Identify reports the media type of image data, accepting the formats the API takes.
+func Identify(data []byte) (string, error) {
+	return supportedMediaType(data, "")
+}

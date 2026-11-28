@@ -28,8 +28,7 @@ Flags:
 - `--width` / `--height` (`0`): output size; 0 uses the init image or the model default.
 - `--cfg-scale` (`7`): classifier-free guidance scale.
 - `--seed` (`-1`): random seed; -1 is random.
-- `--init-image` (empty): local image to transform.
-- `--init-image-url` (empty): address to transform; use only one init image flag.
+- `--init-image` (empty): image to transform; a local path, an http(s) URL, or a data URI.
 - `--denoising-strength` (`0`): how much of the init image to change.
 - `--enable-hr` (false): enable hi-res second-pass upscaling.
 - `--hr-scale` (`0`): hi-res upscaling factor.

@@ -3,7 +3,6 @@ package genimage
 import (
 	"errors"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -31,7 +30,6 @@ func NewNovelCommand(deps cli.Deps) *cobra.Command {
 		cfgScale          float64
 		seed              int
 		initImage         string
-		initImageURL      string
 		denoisingStrength float64
 		noise             float64
 		outputFormat      string
@@ -71,7 +69,7 @@ func NewNovelCommand(deps cli.Deps) *cobra.Command {
 				return err
 			}
 
-			initImageData, err := readNovelInitImage(cmd, deps, initImage, initImageURL)
+			initImageData, err := readNovelInitImage(cmd, deps, initImage)
 			if err != nil {
 				return err
 			}
@@ -142,13 +140,7 @@ func NewNovelCommand(deps cli.Deps) *cobra.Command {
 		&initImage,
 		"init-image",
 		"",
-		"path to a local image to transform instead of generating from scratch",
-	)
-	cmd.Flags().StringVar(
-		&initImageURL,
-		"init-image-url",
-		"",
-		"URL of an image to transform instead of generating from scratch",
+		"image to transform instead of generating from scratch: a local path, http(s) URL, or data URI",
 	)
 	cmd.Flags().Float64Var(
 		&denoisingStrength,
@@ -175,27 +167,15 @@ func NewNovelCommand(deps cli.Deps) *cobra.Command {
 	return cmd
 }
 
-func readNovelInitImage(cmd *cobra.Command, deps cli.Deps, path, address string) ([]byte, error) {
-	switch {
-	case path != "" && address != "":
-		return nil, errors.New("novelai: pass only one of --init-image or --init-image-url")
-	case path != "":
-		data, err := os.ReadFile(path)
-		if err != nil {
-			return nil, fmt.Errorf("novelai: read --init-image: %w", err)
-		}
-
-		return data, nil
-	case address != "":
-		resolver := cli.ImageResolver(deps)
-
-		image, err := resolver.Resolve(cmd.Context(), address)
-		if err != nil {
-			return nil, fmt.Errorf("novelai: resolve init image: %w", err)
-		}
-
-		return image.Data, nil
-	default:
+func readNovelInitImage(cmd *cobra.Command, deps cli.Deps, address string) ([]byte, error) {
+	if address == "" {
 		return nil, nil
 	}
+
+	data, err := cli.ReadImage(cmd.Context(), cli.ImageResolver(deps), address)
+	if err != nil {
+		return nil, fmt.Errorf("novelai: read init image: %w", err)
+	}
+
+	return data, nil
 }

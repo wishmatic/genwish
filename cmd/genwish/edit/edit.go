@@ -6,12 +6,14 @@ import (
 	"github.com/wishmatic/genwish/internal/cli"
 )
 
+const imageInputHelp = "The image may be a local path, an http(s) URL, a data URI, or raw base64."
+
 func NewCommand(deps cli.Deps) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "edit",
 		Short: "Trim, pad, square, circularise, re-encode, or remove a background",
-		Long: "Operate on an image given as a local path or an address the resolver can read. Every " +
-			"subcommand writes its result to --out and prints the path.",
+		Long: imageInputHelp + " Every subcommand writes its result to --out and prints the " +
+			"path.",
 		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			return cmd.Help()

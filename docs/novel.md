@@ -40,8 +40,7 @@ Flags:
 - `--width` / `--height` (`0`): output size; 0 uses 512 or the init image's size.
 - `--cfg-scale` (`7`): classifier-free guidance scale.
 - `--seed` (`-1`): random seed; -1 is random.
-- `--init-image` (empty): local image to transform.
-- `--init-image-url` (empty): address to transform; use only one init image flag.
+- `--init-image` (empty): image to transform; a local path, an http(s) URL, or a data URI.
 - `--denoising-strength` (`0.75`): how much of the init image to change.
 - `--noise` (`0`): extra image noise; only used with an init image.
 - `--format` (`output.format`, default `webp`): `png`, `jpeg`, `jxl`, or `webp`.
