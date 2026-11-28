@@ -35,8 +35,9 @@ func NewConvertCommand(deps cli.Deps) *cobra.Command {
 		&flags.out,
 		"out",
 		"",
-		"base directory for the converted image (default: output.path)",
+		"base directory for the converted image",
 	)
+	cli.SetConfigDefault(cmd, "out", "output.path")
 
 	return cmd
 }

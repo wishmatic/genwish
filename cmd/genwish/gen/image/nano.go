@@ -128,14 +128,16 @@ func NewNanoCommand(deps cli.Deps) *cobra.Command {
 		&outputFormat,
 		"format",
 		"",
-		"output format: png, jpeg, jxl, or webp (default: output.format)",
+		"output format: png, jpeg, jxl, or webp",
 	)
+	cli.SetConfigDefault(cmd, "format", "output.format")
 	cmd.Flags().StringVar(
 		&out,
 		"out",
 		"",
-		"base directory for generated images (default: output.path)",
+		"base directory for generated images",
 	)
+	cli.SetConfigDefault(cmd, "out", "output.path")
 	cmd.Flags().Int("seed", 0, "seed for the models that take one")
 	cmd.Flags().Float64("strength", 0, "how far the output may move from the input image")
 	cmd.Flags().Float64("guidance-scale", 0, "how closely the model follows the prompt")

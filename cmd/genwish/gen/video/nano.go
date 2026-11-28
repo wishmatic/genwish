@@ -122,8 +122,9 @@ func NewNanoCommand(deps cli.Deps) *cobra.Command {
 		&out,
 		"out",
 		"",
-		"base directory for the generated video (default: output.path)",
+		"base directory for the generated video",
 	)
+	cli.SetConfigDefault(cmd, "out", "output.path")
 
 	return cmd
 }

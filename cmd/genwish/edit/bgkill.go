@@ -21,7 +21,7 @@ func NewBgkillCommand(deps cli.Deps) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "bgkill <image>",
-		Short: "Remove the background from an image",
+		Short: "Remove the background from an image with AI (Forge Neo + Birefnet)",
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 0 {
@@ -45,12 +45,14 @@ func NewBgkillCommand(deps cli.Deps) *cobra.Command {
 		"",
 		"output image format: png, jpeg, jxl, or webp",
 	)
+	cli.SetConfigDefault(cmd, "format", "output.format")
 	cmd.Flags().StringVar(
 		&flags.out,
 		"out",
 		"",
-		"base directory for the foreground image (default: output.path)",
+		"base directory for the foreground image",
 	)
+	cli.SetConfigDefault(cmd, "out", "output.path")
 
 	return cmd
 }

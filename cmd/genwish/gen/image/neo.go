@@ -113,12 +113,14 @@ func NewNeoCommand(deps cli.Deps) *cobra.Command {
 		"",
 		"output image format: png, jpeg, jxl, or webp",
 	)
+	cli.SetConfigDefault(cmd, "format", "output.format")
 	cmd.Flags().StringVar(
 		&flags.out,
 		"out",
 		"",
-		"base directory for the generated image (default: output.path)",
+		"base directory for the generated image",
 	)
+	cli.SetConfigDefault(cmd, "out", "output.path")
 
 	return cmd
 }

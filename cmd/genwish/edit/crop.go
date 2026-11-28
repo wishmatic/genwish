@@ -90,12 +90,14 @@ func newCropCommand(deps cli.Deps, spec cropCommand) *cobra.Command {
 		"",
 		"output image format: png, jpeg, jxl, or webp",
 	)
+	cli.SetConfigDefault(cmd, "format", "output.format")
 	cmd.Flags().StringVar(
 		&out,
 		"out",
 		"",
-		"base directory for the edited image (default: output.path)",
+		"base directory for the edited image",
 	)
+	cli.SetConfigDefault(cmd, "out", "output.path")
 
 	return cmd
 }
