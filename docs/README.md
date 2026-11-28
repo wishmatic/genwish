@@ -28,12 +28,24 @@ genwish
   login <provider>
   logout <provider>
   status
+  version
   util
     booru <search...>
 ```
 
 Provider names are case-insensitive. `nano` also accepts `nano-gpt`, `nanogpt`, and `nano gpt`.
 `novel` also accepts `novel-ai`, `novel ai`, and `novelai`.
+
+## Version
+
+`genwish version` prints the version that `go install module@version` embedded. A source build
+embeds the latest tag with:
+
+```sh
+go build -ldflags \
+  "-X github.com/wishmatic/genwish/internal/version.Version=$(git describe --tags --abbrev=0)" \
+  ./cmd/genwish
+```
 
 ## Where to look
 

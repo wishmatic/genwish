@@ -12,6 +12,7 @@ import (
 	"github.com/wishmatic/genwish/cmd/genwish/gen"
 	"github.com/wishmatic/genwish/cmd/genwish/models"
 	"github.com/wishmatic/genwish/cmd/genwish/util"
+	"github.com/wishmatic/genwish/cmd/genwish/version"
 	"github.com/wishmatic/genwish/internal/cli"
 )
 
@@ -47,6 +48,7 @@ func newRoot(deps cli.Deps) *cobra.Command {
 		gen.NewCommand(deps),
 		models.NewCommand(deps),
 		util.NewCommand(deps),
+		version.NewCommand(deps),
 	)
 
 	cli.NormalizeFlagDefaults(root)
