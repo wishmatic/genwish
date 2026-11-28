@@ -94,7 +94,11 @@ func normalizeDimensions(width, height int) (int, int, error) {
 	if total < minPixels || total > maxPixels {
 		return 0, 0, fmt.Errorf(
 			"novelai: dimensions %dx%d (%d px) are outside the allowed %d to %d px range",
-			width, height, total, minPixels, maxPixels,
+			width,
+			height,
+			total,
+			minPixels,
+			maxPixels,
 		)
 	}
 

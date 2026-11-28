@@ -52,8 +52,12 @@ func runNeo(deps cli.Deps, args []string, query string, limit int) error {
 
 	for _, id := range shown {
 		model, _ := registry.Get(id)
-		if _, err := fmt.Fprintf(writer, "%s\t%s\t%s\n",
-			tableField(id), tableField(model.Checkpoint), tableField(model.Preset),
+		if _, err := fmt.Fprintf(
+			writer,
+			"%s\t%s\t%s\n",
+			tableField(id),
+			tableField(model.Checkpoint),
+			tableField(model.Preset),
 		); err != nil {
 			return err
 		}

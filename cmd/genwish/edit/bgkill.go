@@ -28,22 +28,34 @@ func NewBgkillCommand(deps cli.Deps) *cobra.Command {
 				return cmd.Help()
 			}
 
-			return bgkillRun(cmd, deps, flags, args[0])
+			return runBgkill(cmd, deps, flags, args[0])
 		},
 	}
 
 	cmd.Flags().StringVar(&flags.model, "model", "General", "BiRefNet model to load")
-	cmd.Flags().
-		BoolVar(&flags.fullMode, "full-mode", false, "run the model in fp32 instead of fp16")
-	cmd.Flags().StringVar(&flags.outputFormat, "format", "",
-		"output image format: png, jpeg, jxl, or webp")
-	cmd.Flags().StringVar(&flags.out, "out", "",
-		"base directory for the foreground image (default: output.path)")
+	cmd.Flags().BoolVar(
+		&flags.fullMode,
+		"full-mode",
+		false,
+		"run the model in fp32 instead of fp16",
+	)
+	cmd.Flags().StringVar(
+		&flags.outputFormat,
+		"format",
+		"",
+		"output image format: png, jpeg, jxl, or webp",
+	)
+	cmd.Flags().StringVar(
+		&flags.out,
+		"out",
+		"",
+		"base directory for the foreground image (default: output.path)",
+	)
 
 	return cmd
 }
 
-func bgkillRun(cmd *cobra.Command, deps cli.Deps, flags bgkillFlags, image string) error {
+func runBgkill(cmd *cobra.Command, deps cli.Deps, flags bgkillFlags, image string) error {
 	cfg, err := cli.ResolveConfig(deps)
 	if err != nil {
 		return err
@@ -61,11 +73,14 @@ func bgkillRun(cmd *cobra.Command, deps cli.Deps, flags bgkillFlags, image strin
 		return fmt.Errorf("bgkill: read image: %w", err)
 	}
 
-	out, err := cli.ForgeClient(deps, cfg).Bgkill(cmd.Context(), forge.BgkillRequest{
-		ModelName:  flags.model,
-		ImageData:  source,
-		IsFullMode: flags.fullMode,
-	})
+	out, err := cli.ForgeClient(deps, cfg).Bgkill(
+		cmd.Context(),
+		forge.BgkillRequest{
+			ModelName:  flags.model,
+			ImageData:  source,
+			IsFullMode: flags.fullMode,
+		},
+	)
 	if err != nil {
 		return fmt.Errorf("bgkill: %w", err)
 	}

@@ -20,10 +20,9 @@ const maxAPIKeyBytes = 4096
 func NewLoginCommand(deps cli.Deps) *cobra.Command {
 	return &cobra.Command{
 		Use:   "login <provider>",
-		Short: "Store a NanoGPT, NovelAI, or Danbooru credential",
-		Long: "Reads credentials from STDIN and stores them in the OS keyring, then pass, then a " +
-			"user-only file. Danbooru reads a login line followed by an API key line.",
-		Args: cobra.MaximumNArgs(1),
+		Short: "Store a credential",
+		Long:  "Stores a credential in the OS keyring/pass/or a file.",
+		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 0 {
 				return cmd.Help()
@@ -38,12 +37,12 @@ func NewLoginCommand(deps cli.Deps) *cobra.Command {
 				return loginDanbooru(deps)
 			}
 
-			return login(deps, name)
+			return loginProvider(deps, name)
 		},
 	}
 }
 
-func login(deps cli.Deps, name provider.Name) error {
+func loginProvider(deps cli.Deps, name provider.Name) error {
 	warnAboutStorage(deps, name)
 
 	store, err := cli.OpenCredentials(deps, name)

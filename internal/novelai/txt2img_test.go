@@ -9,22 +9,31 @@ import (
 )
 
 func TestTxt2ImgRequest(t *testing.T) {
-	server, captured := newGenerateServer(t, encodeFrame(t, map[string]any{
-		"event_type": "final",
-		"image":      []byte("png"),
-	}))
+	server, captured := newGenerateServer(
+		t,
+		encodeFrame(
+			t,
+			map[string]any{
+				"event_type": "final",
+				"image":      []byte("png"),
+			},
+		),
+	)
 
 	client := New(server.URL, "sk-test")
 
-	images, err := client.txt2img(context.Background(), txt2imgRequest{
-		Model:  "nai-diffusion-5-full",
-		Prompt: "a cat",
-		Steps:  23,
-		Width:  832,
-		Height: 1216,
-		Scale:  5,
-		Seed:   42,
-	})
+	images, err := client.txt2img(
+		context.Background(),
+		txt2imgRequest{
+			Model:  "nai-diffusion-5-full",
+			Prompt: "a cat",
+			Steps:  23,
+			Width:  832,
+			Height: 1216,
+			Scale:  5,
+			Seed:   42,
+		},
+	)
 	if err != nil {
 		t.Fatalf("txt2img() error: %v", err)
 	}
@@ -92,18 +101,27 @@ func TestTxt2ImgRequest(t *testing.T) {
 }
 
 func TestTxt2ImgRoundsDimensions(t *testing.T) {
-	server, captured := newGenerateServer(t, encodeFrame(t, map[string]any{
-		"event_type": "final",
-		"image":      []byte("png"),
-	}))
+	server, captured := newGenerateServer(
+		t,
+		encodeFrame(
+			t,
+			map[string]any{
+				"event_type": "final",
+				"image":      []byte("png"),
+			},
+		),
+	)
 
 	client := New(server.URL, "sk-test")
 
-	if _, err := client.txt2img(context.Background(), txt2imgRequest{
-		Model:  "nai-diffusion-5-full",
-		Width:  833,
-		Height: 1217,
-	}); err != nil {
+	if _, err := client.txt2img(
+		context.Background(),
+		txt2imgRequest{
+			Model:  "nai-diffusion-5-full",
+			Width:  833,
+			Height: 1217,
+		},
+	); err != nil {
 		t.Fatalf("txt2img() error: %v", err)
 	}
 
@@ -121,11 +139,14 @@ func TestTxt2ImgRoundsDimensions(t *testing.T) {
 func TestTxt2ImgRejectsBadDimensions(t *testing.T) {
 	client := New("http://example.com", "sk-test")
 
-	if _, err := client.txt2img(context.Background(), txt2imgRequest{
-		Model:  "nai-diffusion-5-full",
-		Width:  4096,
-		Height: 4096,
-	}); err == nil {
+	if _, err := client.txt2img(
+		context.Background(),
+		txt2imgRequest{
+			Model:  "nai-diffusion-5-full",
+			Width:  4096,
+			Height: 4096,
+		},
+	); err == nil {
 		t.Fatal("txt2img() error = nil, want an error")
 	}
 }
@@ -140,11 +161,14 @@ func TestTxt2ImgHTTPError(t *testing.T) {
 
 	client := New(server.URL, "sk-test")
 
-	_, err := client.txt2img(context.Background(), txt2imgRequest{
-		Model:  "nai-diffusion-5-full",
-		Width:  512,
-		Height: 512,
-	})
+	_, err := client.txt2img(
+		context.Background(),
+		txt2imgRequest{
+			Model:  "nai-diffusion-5-full",
+			Width:  512,
+			Height: 512,
+		},
+	)
 	if err == nil {
 		t.Fatal("txt2img() error = nil, want an error")
 	}
@@ -159,21 +183,30 @@ func TestTxt2ImgHTTPError(t *testing.T) {
 }
 
 func TestTxt2ImgContextCancelled(t *testing.T) {
-	server, _ := newGenerateServer(t, encodeFrame(t, map[string]any{
-		"event_type": "final",
-		"image":      []byte("png"),
-	}))
+	server, _ := newGenerateServer(
+		t,
+		encodeFrame(
+			t,
+			map[string]any{
+				"event_type": "final",
+				"image":      []byte("png"),
+			},
+		),
+	)
 
 	client := New(server.URL, "sk-test")
 
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 
-	if _, err := client.txt2img(ctx, txt2imgRequest{
-		Model:  "nai-diffusion-5-full",
-		Width:  512,
-		Height: 512,
-	}); err == nil {
+	if _, err := client.txt2img(
+		ctx,
+		txt2imgRequest{
+			Model:  "nai-diffusion-5-full",
+			Width:  512,
+			Height: 512,
+		},
+	); err == nil {
 		t.Fatal("txt2img() error = nil, want an error")
 	}
 }

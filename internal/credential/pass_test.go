@@ -81,7 +81,8 @@ func TestPassStore(t *testing.T) {
 			t.Fatalf("Save() error: %v", err)
 		}
 
-		if !slices.Equal(runner.calls[0].args,
+		if !slices.Equal(
+			runner.calls[0].args,
 			[]string{"insert", "-m", "-f", "genwish/nanogpt-api-key"},
 		) {
 			t.Errorf("Save() args = %v, want the insert flags", runner.calls[0].args)
@@ -102,7 +103,8 @@ func TestPassStore(t *testing.T) {
 			t.Errorf("Load() = %q, want pass-key", key)
 		}
 
-		if !slices.Equal(runner.calls[1].args,
+		if !slices.Equal(
+			runner.calls[1].args,
 			[]string{"show", "genwish/nanogpt-api-key"},
 		) {
 			t.Errorf("Load() args = %v, want the show command", runner.calls[1].args)

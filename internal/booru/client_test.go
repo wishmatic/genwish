@@ -243,7 +243,8 @@ func TestSearchTagsRejectsEmptySearch(t *testing.T) {
 	})
 
 	if _, err := client.SearchTags(
-		context.Background(), TagQuery{Search: "  ", Limit: 25},
+		context.Background(),
+		TagQuery{Search: "  ", Limit: 25},
 	); err == nil {
 		t.Fatal("SearchTags() error = nil, want an error")
 	}

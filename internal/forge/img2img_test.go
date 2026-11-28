@@ -25,12 +25,15 @@ func TestImg2ImgPayload(t *testing.T) {
 
 	c := New(server.URL, io.Discard)
 
-	_, err := c.img2img(context.Background(), img2imgRequest{
-		Checkpoint:        "model",
-		InitImageData:     []byte("png"),
-		Prompt:            "test",
-		DenoisingStrength: 0.6,
-	})
+	_, err := c.img2img(
+		context.Background(),
+		img2imgRequest{
+			Checkpoint:        "model",
+			InitImageData:     []byte("png"),
+			Prompt:            "test",
+			DenoisingStrength: 0.6,
+		},
+	)
 	if err != nil {
 		t.Fatalf("img2img() error: %v", err)
 	}

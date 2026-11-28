@@ -76,24 +76,27 @@ func NewNovelCommand(deps cli.Deps) *cobra.Command {
 				return err
 			}
 
-			images, err := client.Generate(cmd.Context(), novelai.GenerateRequest{
-				InitImage: initImageData,
+			images, err := client.Generate(
+				cmd.Context(),
+				novelai.GenerateRequest{
+					InitImage: initImageData,
 
-				Model:          model,
-				Prompt:         prompt,
-				NegativePrompt: negativePrompt,
-				Sampler:        samplerName,
-				Steps:          steps,
+					Model:          model,
+					Prompt:         prompt,
+					NegativePrompt: negativePrompt,
+					Sampler:        samplerName,
+					Steps:          steps,
 
-				Width:  width,
-				Height: height,
-				Scale:  cfgScale,
+					Width:  width,
+					Height: height,
+					Scale:  cfgScale,
 
-				Strength: denoisingStrength,
-				Noise:    noise,
+					Strength: denoisingStrength,
+					Noise:    noise,
 
-				Seed: seed,
-			})
+					Seed: seed,
+				},
+			)
 			if err != nil {
 				return fmt.Errorf("novelai: %w", err)
 			}
@@ -107,30 +110,60 @@ func NewNovelCommand(deps cli.Deps) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&model, "model", defaultModel,
-		"NovelAI model id to generate with")
-	cmd.Flags().StringVar(&negativePrompt, "negative-prompt", "",
-		"things to avoid in the generated image")
+	cmd.Flags().StringVar(
+		&model,
+		"model",
+		defaultModel,
+		"NovelAI model id to generate with",
+	)
+	cmd.Flags().StringVar(
+		&negativePrompt,
+		"negative-prompt",
+		"",
+		"things to avoid in the generated image",
+	)
 	cmd.Flags().StringVar(&samplerName, "sampler-name", novelai.DefaultSampler, "NovelAI sampler")
 	cmd.Flags().IntVar(&steps, "steps", defaultSteps, "number of sampling steps")
-	cmd.Flags().
-		IntVar(&width, "width", 0, "output width; defaults to 512 or the init image's width")
-	cmd.Flags().IntVar(&height, "height", 0,
-		"output height; defaults to 512 or the init image's height")
-	cmd.Flags().
-		Float64Var(&cfgScale, "cfg-scale", defaultCFGScale, "classifier-free guidance scale")
+	cmd.Flags().IntVar(&width, "width", 0, "output width; defaults to 512 or the init image's width")
+	cmd.Flags().IntVar(
+		&height,
+		"height",
+		0,
+		"output height; defaults to 512 or the init image's height",
+	)
+	cmd.Flags().Float64Var(&cfgScale, "cfg-scale", defaultCFGScale, "classifier-free guidance scale")
 	cmd.Flags().IntVar(&seed, "seed", defaultSeed, "random seed; -1 uses a random seed")
-	cmd.Flags().StringVar(&initImage, "init-image", "",
-		"path to a local image to transform instead of generating from scratch")
-	cmd.Flags().StringVar(&initImageURL, "init-image-url", "",
-		"URL of an image to transform instead of generating from scratch")
-	cmd.Flags().Float64Var(&denoisingStrength, "denoising-strength", defaultDenoisingStrength,
-		"how much of the init image to change")
+	cmd.Flags().StringVar(
+		&initImage,
+		"init-image",
+		"",
+		"path to a local image to transform instead of generating from scratch",
+	)
+	cmd.Flags().StringVar(
+		&initImageURL,
+		"init-image-url",
+		"",
+		"URL of an image to transform instead of generating from scratch",
+	)
+	cmd.Flags().Float64Var(
+		&denoisingStrength,
+		"denoising-strength",
+		defaultDenoisingStrength,
+		"how much of the init image to change",
+	)
 	cmd.Flags().Float64Var(&noise, "noise", 0, "extra image noise; only used with an init image")
-	cmd.Flags().StringVar(&outputFormat, "format", "",
-		"output format: png, jpeg, jxl, or webp (default: output.format)")
-	cmd.Flags().
-		StringVar(&out, "out", "", "base directory for generated images (default: output.path)")
+	cmd.Flags().StringVar(
+		&outputFormat,
+		"format",
+		"",
+		"output format: png, jpeg, jxl, or webp (default: output.format)",
+	)
+	cmd.Flags().StringVar(
+		&out,
+		"out",
+		"",
+		"base directory for generated images (default: output.path)",
+	)
 
 	return cmd
 }

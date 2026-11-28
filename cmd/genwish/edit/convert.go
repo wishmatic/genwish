@@ -26,19 +26,22 @@ func NewConvertCommand(deps cli.Deps) *cobra.Command {
 				return cmd.Help()
 			}
 
-			return convertRun(cmd, deps, flags, args[0])
+			return runConvert(cmd, deps, flags, args[0])
 		},
 	}
 
-	cmd.Flags().
-		StringVar(&flags.format, "format", "", "format to convert to: png, jpeg, jxl, or webp")
-	cmd.Flags().StringVar(&flags.out, "out", "",
-		"base directory for the converted image (default: output.path)")
+	cmd.Flags().StringVar(&flags.format, "format", "", "format to convert to: png, jpeg, jxl, or webp")
+	cmd.Flags().StringVar(
+		&flags.out,
+		"out",
+		"",
+		"base directory for the converted image (default: output.path)",
+	)
 
 	return cmd
 }
 
-func convertRun(cmd *cobra.Command, deps cli.Deps, flags convertFlags, image string) error {
+func runConvert(cmd *cobra.Command, deps cli.Deps, flags convertFlags, image string) error {
 	target, err := convertTarget(flags.format)
 	if err != nil {
 		return fmt.Errorf("convert: %w", err)

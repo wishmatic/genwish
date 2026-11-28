@@ -10,10 +10,13 @@ import (
 )
 
 func TestDecodeFinalImageBin(t *testing.T) {
-	stream := bytes.NewReader(encodeFrame(t, map[string]any{
-		"event_type": "final",
-		"image":      []byte("png"),
-	}))
+	stream := bytes.NewReader(encodeFrame(
+		t,
+		map[string]any{
+			"event_type": "final",
+			"image":      []byte("png"),
+		},
+	))
 
 	image, err := decodeFinalImage(stream)
 	if err != nil {
@@ -26,10 +29,13 @@ func TestDecodeFinalImageBin(t *testing.T) {
 }
 
 func TestDecodeFinalImageBase64(t *testing.T) {
-	stream := bytes.NewReader(encodeFrame(t, map[string]any{
-		"event_type": "final",
-		"image":      base64.StdEncoding.EncodeToString([]byte("png")),
-	}))
+	stream := bytes.NewReader(encodeFrame(
+		t,
+		map[string]any{
+			"event_type": "final",
+			"image":      base64.StdEncoding.EncodeToString([]byte("png")),
+		},
+	))
 
 	image, err := decodeFinalImage(stream)
 	if err != nil {
@@ -42,10 +48,13 @@ func TestDecodeFinalImageBase64(t *testing.T) {
 }
 
 func TestDecodeFinalImageSkipsIntermediateFrames(t *testing.T) {
-	stream := bytes.NewReader(bytes.Join([][]byte{
-		encodeFrame(t, map[string]any{"event_type": "intermediate", "image": []byte("step")}),
-		encodeFrame(t, map[string]any{"event_type": "final", "image": []byte("final")}),
-	}, nil))
+	stream := bytes.NewReader(bytes.Join(
+		[][]byte{
+			encodeFrame(t, map[string]any{"event_type": "intermediate", "image": []byte("step")}),
+			encodeFrame(t, map[string]any{"event_type": "final", "image": []byte("final")}),
+		},
+		nil,
+	))
 
 	image, err := decodeFinalImage(stream)
 	if err != nil {
@@ -58,10 +67,13 @@ func TestDecodeFinalImageSkipsIntermediateFrames(t *testing.T) {
 }
 
 func TestDecodeFinalImageReturnsFirstFinalFrame(t *testing.T) {
-	stream := bytes.NewReader(bytes.Join([][]byte{
-		encodeFrame(t, map[string]any{"event_type": "final", "image": []byte("first")}),
-		encodeFrame(t, map[string]any{"event_type": "final", "image": []byte("second")}),
-	}, nil))
+	stream := bytes.NewReader(bytes.Join(
+		[][]byte{
+			encodeFrame(t, map[string]any{"event_type": "final", "image": []byte("first")}),
+			encodeFrame(t, map[string]any{"event_type": "final", "image": []byte("second")}),
+		},
+		nil,
+	))
 
 	image, err := decodeFinalImage(stream)
 	if err != nil {
@@ -94,10 +106,13 @@ func TestDecodeFinalImageEmptyStream(t *testing.T) {
 }
 
 func TestDecodeFinalImageWithoutFinalFrame(t *testing.T) {
-	stream := bytes.NewReader(encodeFrame(t, map[string]any{
-		"event_type": "intermediate",
-		"image":      []byte("step"),
-	}))
+	stream := bytes.NewReader(encodeFrame(
+		t,
+		map[string]any{
+			"event_type": "intermediate",
+			"image":      []byte("step"),
+		},
+	))
 
 	if _, err := decodeFinalImage(stream); !errors.Is(err, errNoFinalImage) {
 		t.Fatalf("error = %v, want errNoFinalImage", err)

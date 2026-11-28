@@ -110,13 +110,20 @@ func NewNanoCommand(deps cli.Deps) *cobra.Command {
 	cmd.Flags().StringVar(&aspectRatio, "aspect-ratio", "", "16:9, 9:16, 1:1, 4:3, or 3:4")
 	cmd.Flags().StringVar(&resolution, "resolution", "", "480p, 720p, 1080p, 2k, or 4k")
 	cmd.Flags().StringVar(
-		&mode, "mode", "", "text-to-video, image-to-video, reference-to-video, or video-edit",
+		&mode,
+		"mode",
+		"",
+		"text-to-video, image-to-video, reference-to-video, or video-edit",
 	)
 	cmd.Flags().Int("seed", 0, "seed for the providers that honour one")
 	cmd.Flags().Bool("generate-audio", false, "add AI audio on the models that support it")
 	cmd.Flags().StringVar(&videoURL, "video-url", "", "source video to extend, edit, or upscale")
-	cmd.Flags().
-		StringVar(&out, "out", "", "base directory for the generated video (default: output.path)")
+	cmd.Flags().StringVar(
+		&out,
+		"out",
+		"",
+		"base directory for the generated video (default: output.path)",
+	)
 
 	return cmd
 }

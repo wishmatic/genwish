@@ -46,11 +46,14 @@ func TestBgkillPayload(t *testing.T) {
 
 			c := New(server.URL, io.Discard)
 
-			out, err := c.Bgkill(context.Background(), BgkillRequest{
-				ModelName:  "General",
-				ImageData:  []byte("png"),
-				IsFullMode: tt.isFullMode,
-			})
+			out, err := c.Bgkill(
+				context.Background(),
+				BgkillRequest{
+					ModelName:  "General",
+					ImageData:  []byte("png"),
+					IsFullMode: tt.isFullMode,
+				},
+			)
 			if err != nil {
 				t.Fatalf("Bgkill() error: %v", err)
 			}
@@ -98,7 +101,8 @@ func TestBgkillMissingForeground(t *testing.T) {
 	client := New(server.URL, io.Discard)
 
 	if _, err := client.Bgkill(
-		context.Background(), BgkillRequest{ModelName: "General", ImageData: []byte("png")},
+		context.Background(),
+		BgkillRequest{ModelName: "General", ImageData: []byte("png")},
 	); err == nil {
 		t.Fatal("Bgkill() expected error, got nil")
 	}

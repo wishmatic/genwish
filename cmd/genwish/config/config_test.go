@@ -40,7 +40,9 @@ func TestAddConfigFlag(t *testing.T) {
 			modelsFile := filepath.Join(dir, "models.toml")
 
 			if err := os.WriteFile(
-				modelsFile, []byte("[neo.sd]\ncheckpoint = \"sd.safetensors\"\n"), 0o600,
+				modelsFile,
+				[]byte("[neo.sd]\ncheckpoint = \"sd.safetensors\"\n"),
+				0o600,
 			); err != nil {
 				t.Fatalf("WriteFile() error: %v", err)
 			}

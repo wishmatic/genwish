@@ -188,11 +188,14 @@ func TestTagsExactRespectsCategoryFilter(t *testing.T) {
 		found: true,
 	}
 
-	result, err := New(source, testOptions()).Tags(context.Background(), TagsInput{
-		Search:     "some_artist",
-		Exact:      true,
-		Categories: []booru.TagCategory{booru.CategoryGeneral},
-	})
+	result, err := New(source, testOptions()).Tags(
+		context.Background(),
+		TagsInput{
+			Search:     "some_artist",
+			Exact:      true,
+			Categories: []booru.TagCategory{booru.CategoryGeneral},
+		},
+	)
 	if err != nil {
 		t.Fatalf("Tags() error: %v", err)
 	}
@@ -269,11 +272,14 @@ func TestTagsSnapshotDate(t *testing.T) {
 func TestTagsRejectsUnknownCategory(t *testing.T) {
 	source := &fakeSource{}
 
-	_, err := New(source, testOptions()).Tags(context.Background(), TagsInput{
-		Search:     "blue",
-		Limit:      5,
-		Categories: []booru.TagCategory{"nonsense"},
-	})
+	_, err := New(source, testOptions()).Tags(
+		context.Background(),
+		TagsInput{
+			Search:     "blue",
+			Limit:      5,
+			Categories: []booru.TagCategory{"nonsense"},
+		},
+	)
 	if err == nil {
 		t.Fatal("Tags() error = nil, want an unknown category rejected")
 	}
@@ -286,11 +292,14 @@ func TestTagsRejectsUnknownCategory(t *testing.T) {
 func TestTagsPassesCategoriesUpstream(t *testing.T) {
 	source := &fakeSource{}
 
-	if _, err := New(source, testOptions()).Tags(context.Background(), TagsInput{
-		Search:     "piss",
-		Limit:      5,
-		Categories: []booru.TagCategory{booru.CategoryGeneral},
-	}); err != nil {
+	if _, err := New(source, testOptions()).Tags(
+		context.Background(),
+		TagsInput{
+			Search:     "piss",
+			Limit:      5,
+			Categories: []booru.TagCategory{booru.CategoryGeneral},
+		},
+	); err != nil {
 		t.Fatalf("Tags() error: %v", err)
 	}
 

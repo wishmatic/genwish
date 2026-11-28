@@ -18,14 +18,17 @@ func TestApplyUpscaleSettingsDisabled(t *testing.T) {
 func TestApplyUpscaleSettingsAllFields(t *testing.T) {
 	payload := map[string]any{}
 
-	applyUpscaleSettings(payload, upscaleSettings{
-		IsEnabled:         true,
-		Scale:             2,
-		Upscaler:          "4x-AnimeSharp",
-		SecondPassSteps:   12,
-		CFGScale:          5,
-		DenoisingStrength: 0.4,
-	})
+	applyUpscaleSettings(
+		payload,
+		upscaleSettings{
+			IsEnabled:         true,
+			Scale:             2,
+			Upscaler:          "4x-AnimeSharp",
+			SecondPassSteps:   12,
+			CFGScale:          5,
+			DenoisingStrength: 0.4,
+		},
+	)
 
 	want := map[string]any{
 		"enable_hr":             true,

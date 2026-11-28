@@ -23,7 +23,7 @@ func TestLoginArgs(t *testing.T) {
 		}
 
 		for _, want := range []string{
-			"login <provider>", "Reads credentials from STDIN",
+			"login <provider>", "Stores a credential",
 		} {
 			if !strings.Contains(out.String(), want) {
 				t.Errorf("stdout does not contain %q:\n%s", want, out)
@@ -51,10 +51,14 @@ func TestLoginRejectsNeo(t *testing.T) {
 func TestLoginStoresTrimmedStdin(t *testing.T) {
 	store := &memoryStore{}
 
-	out, errOut, err := runLogin(t, cli.Deps{
-		In:          strings.NewReader("  secret-key\n"),
-		Credentials: store,
-	}, "nano")
+	out, errOut, err := runLogin(
+		t,
+		cli.Deps{
+			In:          strings.NewReader("  secret-key\n"),
+			Credentials: store,
+		},
+		"nano",
+	)
 	if err != nil {
 		t.Fatalf("Execute() error: %v", err)
 	}
@@ -79,10 +83,14 @@ func TestLoginStoresTrimmedStdin(t *testing.T) {
 func TestLoginWarnsWhenAlreadyLoggedIn(t *testing.T) {
 	store := &memoryStore{key: "old-key"}
 
-	out, errOut, err := runLogin(t, cli.Deps{
-		In:          strings.NewReader("new-key\n"),
-		Credentials: store,
-	}, "nano")
+	out, errOut, err := runLogin(
+		t,
+		cli.Deps{
+			In:          strings.NewReader("new-key\n"),
+			Credentials: store,
+		},
+		"nano",
+	)
 	if err != nil {
 		t.Fatalf("Execute() error: %v", err)
 	}
@@ -103,10 +111,14 @@ func TestLoginWarnsWhenAlreadyLoggedIn(t *testing.T) {
 func TestLoginRejectsMultipleLinesOfPipedInput(t *testing.T) {
 	store := &memoryStore{}
 
-	_, _, err := runLogin(t, cli.Deps{
-		In:          strings.NewReader("key-from-pipe\nignored\n"),
-		Credentials: store,
-	}, "nano")
+	_, _, err := runLogin(
+		t,
+		cli.Deps{
+			In:          strings.NewReader("key-from-pipe\nignored\n"),
+			Credentials: store,
+		},
+		"nano",
+	)
 	if err == nil || !strings.Contains(err.Error(), "single line") {
 		t.Fatalf("Execute() error = %v, want a single-line rejection", err)
 	}
@@ -115,10 +127,14 @@ func TestLoginRejectsMultipleLinesOfPipedInput(t *testing.T) {
 		t.Errorf("stored key = %q, want nothing", store.key)
 	}
 
-	if _, _, err := runLogin(t, cli.Deps{
-		In:          strings.NewReader("  one-line-key  \n"),
-		Credentials: store,
-	}, "nano"); err != nil {
+	if _, _, err := runLogin(
+		t,
+		cli.Deps{
+			In:          strings.NewReader("  one-line-key  \n"),
+			Credentials: store,
+		},
+		"nano",
+	); err != nil {
 		t.Fatalf("Execute() error: %v", err)
 	}
 
@@ -130,10 +146,14 @@ func TestLoginRejectsMultipleLinesOfPipedInput(t *testing.T) {
 func TestLoginRejectsAnEmptyKey(t *testing.T) {
 	store := &memoryStore{}
 
-	_, _, err := runLogin(t, cli.Deps{
-		In:          strings.NewReader(" \n\t "),
-		Credentials: store,
-	}, "nano")
+	_, _, err := runLogin(
+		t,
+		cli.Deps{
+			In:          strings.NewReader(" \n\t "),
+			Credentials: store,
+		},
+		"nano",
+	)
 	if !errors.Is(err, credential.ErrEmptyKey) {
 		t.Fatalf("Execute() error = %v, want ErrEmptyKey", err)
 	}
@@ -146,10 +166,14 @@ func TestLoginRejectsAnEmptyKey(t *testing.T) {
 func TestLoginReportsAStoreFailure(t *testing.T) {
 	store := &memoryStore{saveErr: errors.New("keyring exploded")}
 
-	_, _, err := runLogin(t, cli.Deps{
-		In:          strings.NewReader("secret-key\n"),
-		Credentials: store,
-	}, "nano")
+	_, _, err := runLogin(
+		t,
+		cli.Deps{
+			In:          strings.NewReader("secret-key\n"),
+			Credentials: store,
+		},
+		"nano",
+	)
 	if err == nil || !strings.Contains(err.Error(), "store API key") {
 		t.Errorf("Execute() error = %v, want a store failure", err)
 	}
@@ -159,10 +183,14 @@ func TestLoginDanbooru(t *testing.T) {
 	t.Run("stores the login and key", func(t *testing.T) {
 		store := &memoryStore{}
 
-		out, errOut, err := runLogin(t, cli.Deps{
-			In:          strings.NewReader("user\nkey\n"),
-			Credentials: store,
-		}, "danbooru")
+		out, errOut, err := runLogin(
+			t,
+			cli.Deps{
+				In:          strings.NewReader("user\nkey\n"),
+				Credentials: store,
+			},
+			"danbooru",
+		)
 		if err != nil {
 			t.Fatalf("Execute() error: %v", err)
 		}
@@ -183,10 +211,14 @@ func TestLoginDanbooru(t *testing.T) {
 	t.Run("requires both lines", func(t *testing.T) {
 		store := &memoryStore{}
 
-		_, _, err := runLogin(t, cli.Deps{
-			In:          strings.NewReader("user\n"),
-			Credentials: store,
-		}, "danbooru")
+		_, _, err := runLogin(
+			t,
+			cli.Deps{
+				In:          strings.NewReader("user\n"),
+				Credentials: store,
+			},
+			"danbooru",
+		)
 		if err == nil || !strings.Contains(err.Error(), "login line then an API key line") {
 			t.Errorf("Execute() error = %v, want a two-line rejection", err)
 		}
@@ -199,10 +231,14 @@ func TestLoginDanbooru(t *testing.T) {
 	t.Run("warns when already logged in", func(t *testing.T) {
 		store := &memoryStore{key: "old\nkey"}
 
-		_, errOut, err := runLogin(t, cli.Deps{
-			In:          strings.NewReader("user\nkey\n"),
-			Credentials: store,
-		}, "danbooru")
+		_, errOut, err := runLogin(
+			t,
+			cli.Deps{
+				In:          strings.NewReader("user\nkey\n"),
+				Credentials: store,
+			},
+			"danbooru",
+		)
 		if err != nil {
 			t.Fatalf("Execute() error: %v", err)
 		}

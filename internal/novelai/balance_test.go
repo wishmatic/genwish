@@ -67,7 +67,8 @@ func TestCheckBalance(t *testing.T) {
 
 		for level, want := range tests {
 			body := fmt.Sprintf(
-				`{"subscription":{"tier":%d,"trainingStepsLeft":1200}}`, level,
+				`{"subscription":{"tier":%d,"trainingStepsLeft":1200}}`,
+				level,
 			)
 
 			server := httptest.NewServer(

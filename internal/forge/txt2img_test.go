@@ -23,12 +23,15 @@ func TestTxt2ImgOverrideSettings(t *testing.T) {
 
 	c := New(server.URL, io.Discard)
 
-	_, err := c.txt2img(context.Background(), txt2imgRequest{
-		Checkpoint:             "model",
-		ForgePreset:            "flux",
-		ForgeAdditionalModules: []string{"vae", "t5xxl.ckpt"},
-		Prompt:                 "test",
-	})
+	_, err := c.txt2img(
+		context.Background(),
+		txt2imgRequest{
+			Checkpoint:             "model",
+			ForgePreset:            "flux",
+			ForgeAdditionalModules: []string{"vae", "t5xxl.ckpt"},
+			Prompt:                 "test",
+		},
+	)
 	if err != nil {
 		t.Fatalf("txt2img() error: %v", err)
 	}

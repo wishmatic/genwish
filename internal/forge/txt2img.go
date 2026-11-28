@@ -47,14 +47,17 @@ func (c *Client) txt2img(ctx context.Context, req txt2imgRequest) ([][]byte, err
 	}
 
 	applyOverrideSettings(payload, req.Checkpoint, req.ForgePreset, req.ForgeAdditionalModules)
-	applyUpscaleSettings(payload, upscaleSettings{
-		IsEnabled:         req.EnableHR,
-		Scale:             req.HRScale,
-		Upscaler:          req.HRUpscaler,
-		SecondPassSteps:   req.HRSecondPassSteps,
-		CFGScale:          req.HRCFGScale,
-		DenoisingStrength: req.DenoisingStrength,
-	})
+	applyUpscaleSettings(
+		payload,
+		upscaleSettings{
+			IsEnabled:         req.EnableHR,
+			Scale:             req.HRScale,
+			Upscaler:          req.HRUpscaler,
+			SecondPassSteps:   req.HRSecondPassSteps,
+			CFGScale:          req.HRCFGScale,
+			DenoisingStrength: req.DenoisingStrength,
+		},
+	)
 
 	out, err := c.postJSON[imagesResponse](ctx, "txt2img", "/sdapi/v1/txt2img", payload)
 	if err != nil {

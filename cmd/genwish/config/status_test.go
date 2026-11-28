@@ -31,7 +31,7 @@ func runStatusWith(
 		return &memoryStore{}, nil
 	}
 
-	err := testutil.Run(t, newStatusCommand(deps, open))
+	err := runStatus(deps, open)
 
 	return out.String(), err
 }
@@ -92,11 +92,14 @@ func TestStatusReportsAStoreFailure(t *testing.T) {
 func TestStatusUsesTheInjectedStore(t *testing.T) {
 	out := &bytes.Buffer{}
 
-	err := testutil.Run(t, NewStatusCommand(cli.Deps{
-		Out:         out,
-		Err:         &bytes.Buffer{},
-		Credentials: &memoryStore{key: "stored-key"},
-	}))
+	err := testutil.Run(
+		t,
+		NewStatusCommand(cli.Deps{
+			Out:         out,
+			Err:         &bytes.Buffer{},
+			Credentials: &memoryStore{key: "stored-key"},
+		}),
+	)
 	if err != nil {
 		t.Fatalf("Execute() error: %v", err)
 	}

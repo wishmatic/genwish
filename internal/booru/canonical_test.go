@@ -40,7 +40,8 @@ func TestSearchTagsOmitsCategoryWhenUnset(t *testing.T) {
 	})
 
 	if _, err := client.SearchTags(
-		context.Background(), TagQuery{Search: "piss", Limit: 5},
+		context.Background(),
+		TagQuery{Search: "piss", Limit: 5},
 	); err != nil {
 		t.Fatalf("SearchTags() error: %v", err)
 	}

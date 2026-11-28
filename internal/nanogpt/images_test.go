@@ -23,20 +23,23 @@ func TestGenerateImagesSendsTheExposedFields(t *testing.T) {
 	steps := 30
 	seed := 42
 
-	result, err := newTestClient(t, srv.URL).GenerateImages(context.Background(), ImageRequest{
-		Model:             "nano-banana",
-		Prompt:            "a lake at sunset",
-		N:                 &count,
-		Size:              "1024x1024",
-		ResponseFormat:    ResponseFormatBase64,
-		ImageDataURL:      "data:image/png;base64,cG5n",
-		ImageDataURLs:     []string{"data:image/png;base64,cG5n", "data:image/jpeg;base64,anBn"},
-		MaskDataURL:       "data:image/png;base64,bWFzaw==",
-		Strength:          &strength,
-		GuidanceScale:     &guidance,
-		NumInferenceSteps: &steps,
-		Seed:              &seed,
-	})
+	result, err := newTestClient(t, srv.URL).GenerateImages(
+		context.Background(),
+		ImageRequest{
+			Model:             "nano-banana",
+			Prompt:            "a lake at sunset",
+			N:                 &count,
+			Size:              "1024x1024",
+			ResponseFormat:    ResponseFormatBase64,
+			ImageDataURL:      "data:image/png;base64,cG5n",
+			ImageDataURLs:     []string{"data:image/png;base64,cG5n", "data:image/jpeg;base64,anBn"},
+			MaskDataURL:       "data:image/png;base64,bWFzaw==",
+			Strength:          &strength,
+			GuidanceScale:     &guidance,
+			NumInferenceSteps: &steps,
+			Seed:              &seed,
+		},
+	)
 	if err != nil {
 		t.Fatalf("GenerateImages() error: %v", err)
 	}
@@ -78,7 +81,8 @@ func TestGenerateImagesOmitsUnsetFields(t *testing.T) {
 	srv, post := recordingServer(t, `{"data":[{"b64_json":"`+testImageB64+`"}]}`, http.StatusOK)
 
 	if _, err := newTestClient(t, srv.URL).GenerateImages(
-		context.Background(), ImageRequest{Prompt: "a lake"},
+		context.Background(),
+		ImageRequest{Prompt: "a lake"},
 	); err != nil {
 		t.Fatalf("GenerateImages() error: %v", err)
 	}
@@ -110,7 +114,8 @@ func TestGenerateImagesReadsTheBytesHoweverTheyAreWrapped(t *testing.T) {
 			)
 
 			result, err := newTestClient(t, srv.URL).GenerateImages(
-				context.Background(), ImageRequest{Prompt: "a lake"},
+				context.Background(),
+				ImageRequest{Prompt: "a lake"},
 			)
 			if err != nil {
 				t.Fatalf("GenerateImages() error: %v", err)

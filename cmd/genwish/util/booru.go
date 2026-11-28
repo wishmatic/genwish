@@ -55,8 +55,12 @@ func NewBooruCommand(deps cli.Deps) *cobra.Command {
 		false,
 		"search is the whole tag name and aliases resolve to their target",
 	)
-	flags.StringArrayVar(&opts.category, "category", nil,
-		"keep only this category; repeatable ("+booru.CategoryList()+")")
+	flags.StringArrayVar(
+		&opts.category,
+		"category",
+		nil,
+		"keep only this category; repeatable ("+booru.CategoryList()+")",
+	)
 	flags.BoolVar(&opts.json, "json", false, "print JSON instead of text")
 
 	return cmd

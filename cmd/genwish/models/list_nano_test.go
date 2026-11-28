@@ -47,7 +47,8 @@ func TestModelsListDefaultsToBothKinds(t *testing.T) {
 	if imageRequest.Path != "/api/v1/image-models" || imageRequest.Query != "detailed=true" {
 		t.Errorf(
 			"image request = %s?%s, want the detailed image list",
-			imageRequest.Path, imageRequest.Query,
+			imageRequest.Path,
+			imageRequest.Query,
 		)
 	}
 	if imageRequest.Method != http.MethodGet {
@@ -61,7 +62,8 @@ func TestModelsListDefaultsToBothKinds(t *testing.T) {
 	if videoRequest.Path != "/api/v1/video-models" || videoRequest.Query != "detailed=true" {
 		t.Errorf(
 			"video request = %s?%s, want the detailed video list",
-			videoRequest.Path, videoRequest.Query,
+			videoRequest.Path,
+			videoRequest.Query,
 		)
 	}
 

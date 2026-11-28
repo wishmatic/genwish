@@ -112,13 +112,21 @@ func TestUtilBooru(t *testing.T) {
 	t.Run("sends every flag", func(t *testing.T) {
 		source := &stubSource{}
 
-		_, err := runBooru(t, source,
-			"blue", "hair",
-			"--offset", "2",
-			"--limit", "7",
-			"--min-count", "0",
-			"--category", "artist",
-			"--category", "meta",
+		_, err := runBooru(
+			t,
+			source,
+			"blue",
+			"hair",
+			"--offset",
+			"2",
+			"--limit",
+			"7",
+			"--min-count",
+			"0",
+			"--category",
+			"artist",
+			"--category",
+			"meta",
 		)
 		if err != nil {
 			t.Fatalf("Execute() error: %v", err)

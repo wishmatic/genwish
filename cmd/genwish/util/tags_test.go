@@ -197,11 +197,14 @@ func TestRenderHonestEmpties(t *testing.T) {
 }
 
 func TestTagsJSONShape(t *testing.T) {
-	out := newTagsOutput(catalog.TagsResult{
-		Search: "blue_hair",
-		Status: catalog.StatusOK,
-		Tags:   []booru.Tag{{Name: "blue_hair", Category: booru.CategoryGeneral, Count: 1}},
-	}, catalog.TagsInput{Limit: 25, MinCount: 1})
+	out := newTagsOutput(
+		catalog.TagsResult{
+			Search: "blue_hair",
+			Status: catalog.StatusOK,
+			Tags:   []booru.Tag{{Name: "blue_hair", Category: booru.CategoryGeneral, Count: 1}},
+		},
+		catalog.TagsInput{Limit: 25, MinCount: 1},
+	)
 
 	raw, err := json.Marshal(out)
 	if err != nil {

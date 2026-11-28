@@ -17,18 +17,14 @@ var credentialProviders = []provider.Name{provider.Nano, provider.Novel, provide
 type storeOpener func(provider.Name) (credential.Store, error)
 
 func NewStatusCommand(deps cli.Deps) *cobra.Command {
-	return newStatusCommand(deps, func(name provider.Name) (credential.Store, error) {
-		return cli.OpenCredentials(deps, name)
-	})
-}
-
-func newStatusCommand(deps cli.Deps, open storeOpener) *cobra.Command {
 	return &cobra.Command{
 		Use:   "status",
 		Short: "Show which providers have a stored login",
 		Args:  cobra.NoArgs,
 		RunE: func(_ *cobra.Command, _ []string) error {
-			return runStatus(deps, open)
+			return runStatus(deps, func(name provider.Name) (credential.Store, error) {
+				return cli.OpenCredentials(deps, name)
+			})
 		},
 	}
 }
@@ -40,7 +36,7 @@ func runStatus(deps cli.Deps, open storeOpener) error {
 	}
 
 	for _, name := range credentialProviders {
-		status, err := providerStatus(open, name)
+		status, err := fetchProviderStatus(open, name)
 		if err != nil {
 			return err
 		}
@@ -53,14 +49,14 @@ func runStatus(deps cli.Deps, open storeOpener) error {
 	return writer.Flush()
 }
 
-func providerStatus(open storeOpener, name provider.Name) (string, error) {
+func fetchProviderStatus(open storeOpener, name provider.Name) (string, error) {
 	store, err := open(name)
 	if err != nil {
 		return "", err
 	}
 
 	if name == provider.Danbooru {
-		return danbooruStatus(store)
+		return fetchDanbooruStatus(store)
 	}
 
 	if _, err := store.Load(); err != nil {
@@ -74,7 +70,7 @@ func providerStatus(open storeOpener, name provider.Name) (string, error) {
 	return "logged in", nil
 }
 
-func danbooruStatus(store credential.Store) (string, error) {
+func fetchDanbooruStatus(store credential.Store) (string, error) {
 	creds, err := credential.LoadDanbooru(store)
 	if err != nil {
 		if errors.Is(err, credential.ErrNotFound) {

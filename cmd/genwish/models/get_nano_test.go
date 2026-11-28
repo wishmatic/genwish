@@ -95,7 +95,9 @@ func TestModelsGetNano(t *testing.T) {
 		_, err := runGet(
 			t,
 			cli.Deps{Nano: testutil.NewNanoClient(t, server.URL)},
-			"nano", "nano-banana", "image",
+			"nano",
+			"nano-banana",
+			"image",
 		)
 		if err == nil || !strings.Contains(err.Error(), "models get image") {
 			t.Errorf("Execute() error = %v, want the upstream failure", err)

@@ -8,25 +8,34 @@ import (
 )
 
 func TestImg2ImgRequest(t *testing.T) {
-	server, captured := newGenerateServer(t, encodeFrame(t, map[string]any{
-		"event_type": "final",
-		"image":      []byte("out"),
-	}))
+	server, captured := newGenerateServer(
+		t,
+		encodeFrame(
+			t,
+			map[string]any{
+				"event_type": "final",
+				"image":      []byte("out"),
+			},
+		),
+	)
 
 	client := New(server.URL, "sk-test")
 	client.randomSeed = func() uint32 { return 99 }
 
-	images, err := client.img2img(context.Background(), img2imgRequest{
-		Model:     "nai-diffusion-5-full",
-		Prompt:    "a cat",
-		Steps:     23,
-		Width:     832,
-		Height:    1216,
-		Scale:     5,
-		Seed:      42,
-		InitImage: []byte("init"),
-		Strength:  0.7,
-	})
+	images, err := client.img2img(
+		context.Background(),
+		img2imgRequest{
+			Model:     "nai-diffusion-5-full",
+			Prompt:    "a cat",
+			Steps:     23,
+			Width:     832,
+			Height:    1216,
+			Scale:     5,
+			Seed:      42,
+			InitImage: []byte("init"),
+			Strength:  0.7,
+		},
+	)
 	if err != nil {
 		t.Fatalf("img2img() error: %v", err)
 	}

@@ -37,17 +37,27 @@ func TestGenerateVideoWritesTheDownloadedFile(t *testing.T) {
 
 	dir := t.TempDir()
 
-	out, _, err := runNano(t, cli.Deps{Nano: testutil.NewNanoClient(t, server.URL)},
+	out, _, err := runNano(
+		t,
+		cli.Deps{Nano: testutil.NewNanoClient(t, server.URL)},
 		"a wave",
-		"--model", "veo2-video",
-		"--image", server.URL+"/input.png",
-		"--negative-prompt", "blur",
-		"--duration", "5",
-		"--aspect-ratio", "16:9",
-		"--resolution", "720p",
-		"--seed", "7",
+		"--model",
+		"veo2-video",
+		"--image",
+		server.URL+"/input.png",
+		"--negative-prompt",
+		"blur",
+		"--duration",
+		"5",
+		"--aspect-ratio",
+		"16:9",
+		"--resolution",
+		"720p",
+		"--seed",
+		"7",
 		"--generate-audio",
-		"--out", dir,
+		"--out",
+		dir,
 	)
 	if err != nil {
 		t.Fatalf("Execute() error: %v", err)
@@ -128,8 +138,14 @@ func TestGenerateVideoLeavesNoFileWhenTheDownloadFails(t *testing.T) {
 
 	dir := t.TempDir()
 
-	_, _, err := runNano(t, cli.Deps{Nano: testutil.NewNanoClient(t, server.URL)},
-		"a wave", "--model", "veo2-video", "--out", dir,
+	_, _, err := runNano(
+		t,
+		cli.Deps{Nano: testutil.NewNanoClient(t, server.URL)},
+		"a wave",
+		"--model",
+		"veo2-video",
+		"--out",
+		dir,
 	)
 	if err == nil || !strings.Contains(err.Error(), "gen video") {
 		t.Fatalf("Execute() error = %v, want a download failure", err)
@@ -167,7 +183,8 @@ func TestGenerateVideoDefaultsTheModel(t *testing.T) {
 		t,
 		cli.Deps{Nano: testutil.NewNanoClient(t, server.URL)},
 		"a wave",
-		"--out", t.TempDir(),
+		"--out",
+		t.TempDir(),
 	)
 	if err != nil {
 		t.Fatalf("Execute() error: %v", err)

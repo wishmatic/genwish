@@ -111,9 +111,12 @@ style = "Soft shading."
 			t.Errorf("model = %+v, want the checkpoint and preset", model)
 		}
 
-		if !slices.Equal(model.Encoders, []string{
-			"qwen_3_06b_base.safetensors", "qwen_3_4b_base.safetensors",
-		}) {
+		if !slices.Equal(
+			model.Encoders,
+			[]string{
+				"qwen_3_06b_base.safetensors", "qwen_3_4b_base.safetensors",
+			},
+		) {
 			t.Errorf("encoders = %v, want both encoders", model.Encoders)
 		}
 

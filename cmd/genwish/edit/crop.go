@@ -19,27 +19,36 @@ type cropCommand struct {
 }
 
 func NewTrimCommand(deps cli.Deps) *cobra.Command {
-	return newCropCommand(deps, cropCommand{
-		name:  "trim",
-		short: "Trim an image to the bounding box of its visible content",
-	})
+	return newCropCommand(
+		deps,
+		cropCommand{
+			name:  "trim",
+			short: "Trim an image to the bounding box of its visible content",
+		},
+	)
 }
 
 func NewSquareCommand(deps cli.Deps) *cobra.Command {
-	return newCropCommand(deps, cropCommand{
-		name:           "square",
-		short:          "Trim an image and center it on a transparent square",
-		isSquare:       true,
-		defaultPadding: imageedit.DefaultSquarePadding,
-	})
+	return newCropCommand(
+		deps,
+		cropCommand{
+			name:           "square",
+			short:          "Trim an image and center it on a transparent square",
+			isSquare:       true,
+			defaultPadding: imageedit.DefaultSquarePadding,
+		},
+	)
 }
 
 func NewCircleCommand(deps cli.Deps) *cobra.Command {
-	return newCropCommand(deps, cropCommand{
-		name:     "circle",
-		short:    "Trim an image and cut it into the inscribed circle",
-		isCircle: true,
-	})
+	return newCropCommand(
+		deps,
+		cropCommand{
+			name:     "circle",
+			short:    "Trim an image and cut it into the inscribed circle",
+			isCircle: true,
+		},
+	)
 }
 
 func newCropCommand(deps cli.Deps, spec cropCommand) *cobra.Command {
@@ -65,21 +74,33 @@ func newCropCommand(deps cli.Deps, spec cropCommand) *cobra.Command {
 				Padding:  &padding,
 			})
 
-			return editCropRun(cmd, deps, opts, outputFormat, out, args[0])
+			return runCrop(cmd, deps, opts, outputFormat, out, args[0])
 		},
 	}
 
-	cmd.Flags().IntVar(&padding, "padding", spec.defaultPadding,
-		"transparent padding in pixels around the trimmed content")
-	cmd.Flags().StringVar(&outputFormat, "format", "",
-		"output image format: png, jpeg, jxl, or webp")
-	cmd.Flags().StringVar(&out, "out", "",
-		"base directory for the edited image (default: output.path)")
+	cmd.Flags().IntVar(
+		&padding,
+		"padding",
+		spec.defaultPadding,
+		"transparent padding in pixels around the trimmed content",
+	)
+	cmd.Flags().StringVar(
+		&outputFormat,
+		"format",
+		"",
+		"output image format: png, jpeg, jxl, or webp",
+	)
+	cmd.Flags().StringVar(
+		&out,
+		"out",
+		"",
+		"base directory for the edited image (default: output.path)",
+	)
 
 	return cmd
 }
 
-func editCropRun(
+func runCrop(
 	cmd *cobra.Command, deps cli.Deps, opts imageedit.Options, outputFormat, out, image string,
 ) error {
 	cfg, err := cli.ResolveConfig(deps)

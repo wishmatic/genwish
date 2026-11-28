@@ -74,23 +74,26 @@ func NewNanoCommand(deps cli.Deps) *cobra.Command {
 				return err
 			}
 
-			result, err := client.GenerateImages(cmd.Context(), nanogpt.ImageRequest{
-				Model:  model,
-				Prompt: prompt,
-				N:      cli.OptionalInt(cmd, "n"),
-				Size:   size,
+			result, err := client.GenerateImages(
+				cmd.Context(),
+				nanogpt.ImageRequest{
+					Model:  model,
+					Prompt: prompt,
+					N:      cli.OptionalInt(cmd, "n"),
+					Size:   size,
 
-				ResponseFormat: nanogpt.ResponseFormatBase64,
+					ResponseFormat: nanogpt.ResponseFormatBase64,
 
-				ImageDataURL:  imageDataURL,
-				ImageDataURLs: imageDataURLs,
-				MaskDataURL:   maskDataURL,
+					ImageDataURL:  imageDataURL,
+					ImageDataURLs: imageDataURLs,
+					MaskDataURL:   maskDataURL,
 
-				Strength:          cli.OptionalFloat(cmd, "strength"),
-				GuidanceScale:     cli.OptionalFloat(cmd, "guidance-scale"),
-				NumInferenceSteps: cli.OptionalInt(cmd, "num-inference-steps"),
-				Seed:              cli.OptionalInt(cmd, "seed"),
-			})
+					Strength:          cli.OptionalFloat(cmd, "strength"),
+					GuidanceScale:     cli.OptionalFloat(cmd, "guidance-scale"),
+					NumInferenceSteps: cli.OptionalInt(cmd, "num-inference-steps"),
+					Seed:              cli.OptionalInt(cmd, "seed"),
+				},
+			)
 			if err != nil {
 				return fmt.Errorf("gen image: %w", err)
 			}
@@ -121,10 +124,18 @@ func NewNanoCommand(deps cli.Deps) *cobra.Command {
 	cmd.Flags().StringVar(&image, "image", "", "image to transform")
 	cmd.Flags().StringArrayVar(&images, "images", nil, "additional input image")
 	cmd.Flags().StringVar(&mask, "mask", "", "inpainting mask")
-	cmd.Flags().StringVar(&outputFormat, "format", "",
-		"output format: png, jpeg, jxl, or webp (default: output.format)")
-	cmd.Flags().
-		StringVar(&out, "out", "", "base directory for generated images (default: output.path)")
+	cmd.Flags().StringVar(
+		&outputFormat,
+		"format",
+		"",
+		"output format: png, jpeg, jxl, or webp (default: output.format)",
+	)
+	cmd.Flags().StringVar(
+		&out,
+		"out",
+		"",
+		"base directory for generated images (default: output.path)",
+	)
 	cmd.Flags().Int("seed", 0, "seed for the models that take one")
 	cmd.Flags().Float64("strength", 0, "how far the output may move from the input image")
 	cmd.Flags().Float64("guidance-scale", 0, "how closely the model follows the prompt")

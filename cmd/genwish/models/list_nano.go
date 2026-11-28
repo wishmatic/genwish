@@ -96,7 +96,8 @@ func filterModels(models []nanogpt.Model, query string) []nanogpt.Model {
 func modelMatches(model nanogpt.Model, needle string) bool {
 	fields := append(
 		[]string{model.ID, model.Name, model.Description, model.OwnedBy},
-		model.Tags...)
+		model.Tags...,
+	)
 
 	for _, field := range fields {
 		if strings.Contains(strings.ToLower(field), needle) {
@@ -118,8 +119,12 @@ func printModels(
 	}
 
 	for _, model := range shown {
-		if _, err := fmt.Fprintf(writer, "%s\t%s\t%s\t%s\n",
-			tableField(model.ID), tableField(model.Name), tableField(model.OwnedBy),
+		if _, err := fmt.Fprintf(
+			writer,
+			"%s\t%s\t%s\t%s\n",
+			tableField(model.ID),
+			tableField(model.Name),
+			tableField(model.OwnedBy),
 			tableField(model.Description),
 		); err != nil {
 			return err

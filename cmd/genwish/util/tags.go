@@ -95,14 +95,17 @@ func toTagOutputs(tags []booru.Tag) []tagOutput {
 	out := make([]tagOutput, 0, len(tags))
 
 	for _, tag := range tags {
-		out = append(out, tagOutput{
-			Name:          tag.Name,
-			Category:      tag.Category.String(),
-			Count:         tag.Count,
-			CountIsTarget: tag.CountIsTarget,
-			AliasOf:       tag.AliasOf,
-			Implications:  nonNilStrings(tag.Implications),
-		})
+		out = append(
+			out,
+			tagOutput{
+				Name:          tag.Name,
+				Category:      tag.Category.String(),
+				Count:         tag.Count,
+				CountIsTarget: tag.CountIsTarget,
+				AliasOf:       tag.AliasOf,
+				Implications:  nonNilStrings(tag.Implications),
+			},
+		)
 	}
 
 	return out

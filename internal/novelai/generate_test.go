@@ -31,10 +31,13 @@ func TestGenerateTxt2ImgWithoutInitImage(t *testing.T) {
 
 	client := New(server.URL, "sk-test")
 
-	if _, err := client.Generate(context.Background(), GenerateRequest{
-		Model:  "nai-diffusion-5-full",
-		Prompt: "a cat",
-	}); err != nil {
+	if _, err := client.Generate(
+		context.Background(),
+		GenerateRequest{
+			Model:  "nai-diffusion-5-full",
+			Prompt: "a cat",
+		},
+	); err != nil {
 		t.Fatalf("Generate() error: %v", err)
 	}
 
@@ -67,12 +70,15 @@ func TestGenerateImg2ImgWithInitImage(t *testing.T) {
 	client := New(server.URL, "sk-test")
 	client.randomSeed = func() uint32 { return 99 }
 
-	if _, err := client.Generate(context.Background(), GenerateRequest{
-		Model:     "nai-diffusion-5-full",
-		Prompt:    "a cat",
-		InitImage: initImagePNG(t, 1024, 768),
-		Noise:     0.1,
-	}); err != nil {
+	if _, err := client.Generate(
+		context.Background(),
+		GenerateRequest{
+			Model:     "nai-diffusion-5-full",
+			Prompt:    "a cat",
+			InitImage: initImagePNG(t, 1024, 768),
+			Noise:     0.1,
+		},
+	); err != nil {
 		t.Fatalf("Generate() error: %v", err)
 	}
 
@@ -106,11 +112,14 @@ func TestGenerateImg2ImgKeepsRequestedStrength(t *testing.T) {
 
 	client := New(server.URL, "sk-test")
 
-	if _, err := client.Generate(context.Background(), GenerateRequest{
-		Model:     "nai-diffusion-5-full",
-		InitImage: initImagePNG(t, 512, 512),
-		Strength:  0.4,
-	}); err != nil {
+	if _, err := client.Generate(
+		context.Background(),
+		GenerateRequest{
+			Model:     "nai-diffusion-5-full",
+			InitImage: initImagePNG(t, 512, 512),
+			Strength:  0.4,
+		},
+	); err != nil {
 		t.Fatalf("Generate() error: %v", err)
 	}
 
@@ -180,10 +189,13 @@ func TestGenerateSizesImg2ImgFromInitImage(t *testing.T) {
 func TestGenerateWithUnreadableInitImage(t *testing.T) {
 	client := New("http://example.com", "sk-test")
 
-	_, err := client.Generate(context.Background(), GenerateRequest{
-		Model:     "nai-diffusion-5-full",
-		InitImage: []byte("not an image"),
-	})
+	_, err := client.Generate(
+		context.Background(),
+		GenerateRequest{
+			Model:     "nai-diffusion-5-full",
+			InitImage: []byte("not an image"),
+		},
+	)
 	if err == nil || !strings.Contains(err.Error(), "read init image size") {
 		t.Fatalf("Generate() error = %v, want it to name the init image size", err)
 	}

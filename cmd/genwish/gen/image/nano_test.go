@@ -24,17 +24,28 @@ func TestGenerateImageWritesInlineImages(t *testing.T) {
 	server, requests := testutil.CaptureServer(t, http.StatusOK, body)
 	dir := t.TempDir()
 
-	out, _, err := runNano(t, cli.Deps{Nano: testutil.NewNanoClient(t, server.URL)},
+	out, _, err := runNano(
+		t,
+		cli.Deps{Nano: testutil.NewNanoClient(t, server.URL)},
 		"a cat",
-		"--model", "image-model",
-		"--n", "2",
-		"--size", "1024x1024",
-		"--seed", "42",
-		"--strength", "0.5",
-		"--guidance-scale", "7.5",
-		"--num-inference-steps", "20",
-		"--format", "png",
-		"--out", dir,
+		"--model",
+		"image-model",
+		"--n",
+		"2",
+		"--size",
+		"1024x1024",
+		"--seed",
+		"42",
+		"--strength",
+		"0.5",
+		"--guidance-scale",
+		"7.5",
+		"--num-inference-steps",
+		"20",
+		"--format",
+		"png",
+		"--out",
+		dir,
 	)
 	if err != nil {
 		t.Fatalf("Execute() error: %v", err)
@@ -91,12 +102,20 @@ func TestGenerateImageWritesInlineImages(t *testing.T) {
 
 func TestGenerateImageDefaultsTheModel(t *testing.T) {
 	encoded := base64.StdEncoding.EncodeToString(testutil.PNG)
-	server, requests := testutil.CaptureServer(t, http.StatusOK,
+	server, requests := testutil.CaptureServer(
+		t,
+		http.StatusOK,
 		fmt.Sprintf(`{"data":[{"b64_json":%q}],"cost":0.01}`, encoded),
 	)
 
-	_, _, err := runNano(t, cli.Deps{Nano: testutil.NewNanoClient(t, server.URL)},
-		"a cat", "--format", "png", "--out", t.TempDir(),
+	_, _, err := runNano(
+		t,
+		cli.Deps{Nano: testutil.NewNanoClient(t, server.URL)},
+		"a cat",
+		"--format",
+		"png",
+		"--out",
+		t.TempDir(),
 	)
 	if err != nil {
 		t.Fatalf("Execute() error: %v", err)
@@ -116,17 +135,26 @@ func TestGenerateImageResolvesInputAddresses(t *testing.T) {
 	defer input.Close()
 
 	encoded := base64.StdEncoding.EncodeToString(testutil.PNG)
-	server, requests := testutil.CaptureServer(t, http.StatusOK,
+	server, requests := testutil.CaptureServer(
+		t,
+		http.StatusOK,
 		fmt.Sprintf(`{"data":[{"b64_json":%q}],"cost":0.01}`, encoded),
 	)
 
-	_, _, err := runNano(t, cli.Deps{Nano: testutil.NewNanoClient(t, server.URL)},
+	_, _, err := runNano(
+		t,
+		cli.Deps{Nano: testutil.NewNanoClient(t, server.URL)},
 		"a cat",
-		"--image", input.URL+"/image.png",
-		"--images", input.URL+"/extra.png",
-		"--mask", input.URL+"/mask.png",
-		"--format", "png",
-		"--out", t.TempDir(),
+		"--image",
+		input.URL+"/image.png",
+		"--images",
+		input.URL+"/extra.png",
+		"--mask",
+		input.URL+"/mask.png",
+		"--format",
+		"png",
+		"--out",
+		t.TempDir(),
 	)
 	if err != nil {
 		t.Fatalf("Execute() error: %v", err)
@@ -167,8 +195,14 @@ func TestGenerateImageDownloadsAURLResult(t *testing.T) {
 
 	dir := t.TempDir()
 
-	if _, _, err := runNano(t, cli.Deps{Nano: testutil.NewNanoClient(t, server.URL)},
-		"a cat", "--format", "png", "--out", dir,
+	if _, _, err := runNano(
+		t,
+		cli.Deps{Nano: testutil.NewNanoClient(t, server.URL)},
+		"a cat",
+		"--format",
+		"png",
+		"--out",
+		dir,
 	); err != nil {
 		t.Fatalf("Execute() error: %v", err)
 	}
@@ -211,8 +245,12 @@ func TestGenerateImageLeavesNoFileWhenADownloadFails(t *testing.T) {
 
 	dir := t.TempDir()
 
-	_, _, err := runNano(t, cli.Deps{Nano: testutil.NewNanoClient(t, server.URL)},
-		"a cat", "--out", dir,
+	_, _, err := runNano(
+		t,
+		cli.Deps{Nano: testutil.NewNanoClient(t, server.URL)},
+		"a cat",
+		"--out",
+		dir,
 	)
 	if err == nil || !strings.Contains(err.Error(), "gen image") {
 		t.Fatalf("Execute() error = %v, want a download failure", err)
@@ -238,7 +276,9 @@ func TestGenerateImageUsesTheConfiguredOutput(t *testing.T) {
 	source := testutil.ValidPNG(t, 4, 4)
 	encoded := base64.StdEncoding.EncodeToString(source)
 
-	server, _ := testutil.CaptureServer(t, http.StatusOK,
+	server, _ := testutil.CaptureServer(
+		t,
+		http.StatusOK,
 		fmt.Sprintf(`{"data":[{"b64_json":%q}],"cost":0.01}`, encoded),
 	)
 

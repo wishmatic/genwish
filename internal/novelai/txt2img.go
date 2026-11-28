@@ -32,10 +32,14 @@ func (c *Client) txt2img(ctx context.Context, req txt2imgRequest) ([][]byte, err
 	})
 	params["stream"] = streamMsgpack
 
-	return c.generate(ctx, "txt2img", map[string]any{
-		"input":      req.Prompt,
-		"model":      req.Model,
-		"action":     "generate",
-		"parameters": params,
-	})
+	return c.generate(
+		ctx,
+		"txt2img",
+		map[string]any{
+			"input":      req.Prompt,
+			"model":      req.Model,
+			"action":     "generate",
+			"parameters": params,
+		},
+	)
 }

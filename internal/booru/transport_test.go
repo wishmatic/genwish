@@ -50,7 +50,8 @@ func TestSearchTagsOnlyAuthenticatesWhenBothAreSet(t *testing.T) {
 			)
 
 			if _, err := client.SearchTags(
-				context.Background(), TagQuery{Search: "x", Limit: 1},
+				context.Background(),
+				TagQuery{Search: "x", Limit: 1},
 			); err != nil {
 				t.Fatalf("SearchTags() error: %v", err)
 			}
@@ -59,8 +60,13 @@ func TestSearchTagsOnlyAuthenticatesWhenBothAreSet(t *testing.T) {
 
 			if (query.Get("login") != "") != tt.wantLogin ||
 				(query.Get("api_key") != "") != tt.wantKey {
-				t.Errorf("login=%q api_key=%q, want login=%v key=%v",
-					query.Get("login"), query.Get("api_key"), tt.wantLogin, tt.wantKey)
+				t.Errorf(
+					"login=%q api_key=%q, want login=%v key=%v",
+					query.Get("login"),
+					query.Get("api_key"),
+					tt.wantLogin,
+					tt.wantKey,
+				)
 			}
 		})
 	}

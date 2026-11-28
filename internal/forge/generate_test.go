@@ -90,7 +90,8 @@ func TestGenerateTxt2ImgDefaultsOnlyTheMissingDimension(t *testing.T) {
 	client, recorded := newRecordingForge(t)
 
 	if _, err := client.Generate(
-		context.Background(), GenerateRequest{Prompt: "a cat", Width: 768},
+		context.Background(),
+		GenerateRequest{Prompt: "a cat", Width: 768},
 	); err != nil {
 		t.Fatalf("Generate() error: %v", err)
 	}
@@ -113,7 +114,8 @@ func TestGenerateImg2ImgWithInitImage(t *testing.T) {
 	initImage := initImagePNG(t, 1024, 768)
 
 	if _, err := client.Generate(
-		context.Background(), GenerateRequest{Prompt: "a cat", InitImage: initImage},
+		context.Background(),
+		GenerateRequest{Prompt: "a cat", InitImage: initImage},
 	); err != nil {
 		t.Fatalf("Generate() error: %v", err)
 	}
@@ -217,8 +219,13 @@ func TestGenerateSizesImg2ImgFromInitImage(t *testing.T) {
 			payload := payloadOf(t, recorded.body)
 
 			if payload["width"] != tt.wantWidth || payload["height"] != tt.wantHeight {
-				t.Errorf("dimensions = %vx%v, want %vx%v",
-					payload["width"], payload["height"], tt.wantWidth, tt.wantHeight)
+				t.Errorf(
+					"dimensions = %vx%v, want %vx%v",
+					payload["width"],
+					payload["height"],
+					tt.wantWidth,
+					tt.wantHeight,
+				)
 			}
 		})
 	}
@@ -227,10 +234,13 @@ func TestGenerateSizesImg2ImgFromInitImage(t *testing.T) {
 func TestGenerateWithUnreadableInitImage(t *testing.T) {
 	client, _ := newRecordingForge(t)
 
-	_, err := client.Generate(context.Background(), GenerateRequest{
-		Prompt:    "a cat",
-		InitImage: []byte("not an image"),
-	})
+	_, err := client.Generate(
+		context.Background(),
+		GenerateRequest{
+			Prompt:    "a cat",
+			InitImage: []byte("not an image"),
+		},
+	)
 	if err == nil || !strings.Contains(err.Error(), "read init image size") {
 		t.Fatalf("Generate() error = %v, want it to name the init image size", err)
 	}

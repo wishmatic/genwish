@@ -13,8 +13,11 @@ import (
 
 func TestRunNano(t *testing.T) {
 	t.Run("prints the account credit", func(t *testing.T) {
-		server, requests := testutil.CaptureServer(t, http.StatusOK,
-			`{"usd_balance":"12.34","nano_balance":"5.6"}`)
+		server, requests := testutil.CaptureServer(
+			t,
+			http.StatusOK,
+			`{"usd_balance":"12.34","nano_balance":"5.6"}`,
+		)
 
 		out := &bytes.Buffer{}
 		deps := cli.Deps{Out: out, Nano: testutil.NewNanoClient(t, server.URL)}

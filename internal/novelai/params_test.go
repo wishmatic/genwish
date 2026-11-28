@@ -3,14 +3,17 @@ package novelai
 import "testing"
 
 func TestBaseParamsDefaults(t *testing.T) {
-	params := marshalParams(t, baseParams(paramsInput{
-		Prompt: "a cat",
-		Steps:  23,
-		Width:  832,
-		Height: 1216,
-		Scale:  5,
-		Seed:   42,
-	}))
+	params := marshalParams(
+		t,
+		baseParams(paramsInput{
+			Prompt: "a cat",
+			Steps:  23,
+			Width:  832,
+			Height: 1216,
+			Scale:  5,
+			Seed:   42,
+		}),
+	)
 
 	if got := asFloat(t, params, "params_version"); got != 3 {
 		t.Errorf("params_version = %v, want 3", got)
@@ -52,10 +55,13 @@ func TestBaseParamsDefaults(t *testing.T) {
 }
 
 func TestBaseParamsHonorsOverrides(t *testing.T) {
-	params := marshalParams(t, baseParams(paramsInput{
-		NegativePrompt: "bad",
-		Sampler:        "k_dpmpp_2m",
-	}))
+	params := marshalParams(
+		t,
+		baseParams(paramsInput{
+			NegativePrompt: "bad",
+			Sampler:        "k_dpmpp_2m",
+		}),
+	)
 
 	if params["sampler"] != "k_dpmpp_2m" {
 		t.Errorf("sampler = %v, want k_dpmpp_2m", params["sampler"])

@@ -43,10 +43,18 @@ func NewCommand(deps cli.Deps) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.StringVar(&genderValue, "gender", "",
-		"male, female, or non-binary; unset picks one at random")
-	flags.StringVar(&cultureValue, "culture", "",
-		"naming culture; unset picks one at random, and an unknown value lists them")
+	flags.StringVar(
+		&genderValue,
+		"gender",
+		"",
+		"male, female, or non-binary; unset picks one at random",
+	)
+	flags.StringVar(
+		&cultureValue,
+		"culture",
+		"",
+		"naming culture; unset picks one at random, and an unknown value lists them",
+	)
 	flags.IntVar(&count, "count", defaultCount, "how many names to generate")
 	flags.BoolVar(&asJSON, "json", false, "print a JSON array instead of one name per line")
 
@@ -73,11 +81,14 @@ func runGenerate(deps cli.Deps, genderValue, cultureValue string, count int, asJ
 	for range count {
 		generated := name.Generate(resolvedGender, culture)
 
-		names = append(names, generatedName{
-			GivenName: generated.GivenName,
-			Surname:   generated.Surname,
-			Gender:    string(generated.Gender),
-		})
+		names = append(
+			names,
+			generatedName{
+				GivenName: generated.GivenName,
+				Surname:   generated.Surname,
+				Gender:    string(generated.Gender),
+			},
+		)
 	}
 
 	if asJSON {

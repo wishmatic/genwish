@@ -43,7 +43,30 @@ func (c *Client) Generate(ctx context.Context, req GenerateRequest) ([][]byte, e
 	}
 
 	if len(req.InitImage) == 0 {
-		return c.txt2img(ctx, txt2imgRequest{
+		return c.txt2img(
+			ctx,
+			txt2imgRequest{
+				Model:          req.Model,
+				Prompt:         req.Prompt,
+				NegativePrompt: req.NegativePrompt,
+				Sampler:        req.Sampler,
+				Steps:          req.Steps,
+				Width:          width,
+				Height:         height,
+				Scale:          req.Scale,
+				Seed:           req.Seed,
+			},
+		)
+	}
+
+	strength := req.Strength
+	if strength == 0 {
+		strength = defaultStrength
+	}
+
+	return c.img2img(
+		ctx,
+		img2imgRequest{
 			Model:          req.Model,
 			Prompt:         req.Prompt,
 			NegativePrompt: req.NegativePrompt,
@@ -53,28 +76,11 @@ func (c *Client) Generate(ctx context.Context, req GenerateRequest) ([][]byte, e
 			Height:         height,
 			Scale:          req.Scale,
 			Seed:           req.Seed,
-		})
-	}
-
-	strength := req.Strength
-	if strength == 0 {
-		strength = defaultStrength
-	}
-
-	return c.img2img(ctx, img2imgRequest{
-		Model:          req.Model,
-		Prompt:         req.Prompt,
-		NegativePrompt: req.NegativePrompt,
-		Sampler:        req.Sampler,
-		Steps:          req.Steps,
-		Width:          width,
-		Height:         height,
-		Scale:          req.Scale,
-		Seed:           req.Seed,
-		InitImage:      req.InitImage,
-		Strength:       strength,
-		Noise:          req.Noise,
-	})
+			InitImage:      req.InitImage,
+			Strength:       strength,
+			Noise:          req.Noise,
+		},
+	)
 }
 
 // outputSize fills in whichever of width and height the caller left out: 512 each without an init

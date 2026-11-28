@@ -61,8 +61,11 @@ func TestRequestHeaders(t *testing.T) {
 	t.Cleanup(server.Close)
 
 	if _, err := GetJSON[map[string]bool](
-		context.Background(), newTestClient(t, server.URL, &countingLimiter{}),
-		"danbooru", "/posts.json", nil,
+		context.Background(),
+		newTestClient(t, server.URL, &countingLimiter{}),
+		"danbooru",
+		"/posts.json",
+		nil,
 	); err != nil {
 		t.Fatalf("GetJSON() error: %v", err)
 	}
@@ -87,8 +90,11 @@ func TestQueryIsEncoded(t *testing.T) {
 
 	query := url.Values{"tags": {"blue_eyes"}, "limit": {"3"}}
 	if _, err := GetJSON[map[string]any](
-		context.Background(), newTestClient(t, server.URL, &countingLimiter{}),
-		"danbooru", "/posts.json", query,
+		context.Background(),
+		newTestClient(t, server.URL, &countingLimiter{}),
+		"danbooru",
+		"/posts.json",
+		query,
 	); err != nil {
 		t.Fatalf("GetJSON() error: %v", err)
 	}
@@ -122,8 +128,11 @@ func TestRetryThenSucceed(t *testing.T) {
 	limiter := &countingLimiter{}
 
 	if _, err := GetJSON[map[string]bool](
-		context.Background(), newTestClient(t, server.URL, limiter),
-		"danbooru", "/posts.json", nil,
+		context.Background(),
+		newTestClient(t, server.URL, limiter),
+		"danbooru",
+		"/posts.json",
+		nil,
 	); err != nil {
 		t.Fatalf("GetJSON() error: %v", err)
 	}

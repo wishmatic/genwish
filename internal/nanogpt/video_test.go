@@ -25,19 +25,22 @@ func TestGenerateVideoSubmitsTheExposedFields(t *testing.T) {
 	seed := 7
 	audio := true
 
-	video, err := videoTestClient(t, srv.URL).GenerateVideo(context.Background(), VideoRequest{
-		Model:          "veo2-video",
-		Prompt:         "a lake at sunset",
-		NegativePrompt: "blur",
-		Duration:       "8",
-		AspectRatio:    "16:9",
-		Resolution:     "1080p",
-		Mode:           "text-to-video",
-		Seed:           &seed,
-		GenerateAudio:  &audio,
-		ImageDataURL:   "data:image/png;base64,cG5n",
-		VideoURL:       "https://videos.example.com/source.mp4",
-	})
+	video, err := videoTestClient(t, srv.URL).GenerateVideo(
+		context.Background(),
+		VideoRequest{
+			Model:          "veo2-video",
+			Prompt:         "a lake at sunset",
+			NegativePrompt: "blur",
+			Duration:       "8",
+			AspectRatio:    "16:9",
+			Resolution:     "1080p",
+			Mode:           "text-to-video",
+			Seed:           &seed,
+			GenerateAudio:  &audio,
+			ImageDataURL:   "data:image/png;base64,cG5n",
+			VideoURL:       "https://videos.example.com/source.mp4",
+		},
+	)
 	if err != nil {
 		t.Fatalf("GenerateVideo() error: %v", err)
 	}
@@ -82,10 +85,13 @@ func TestGenerateVideoOmitsUnsetFields(t *testing.T) {
 		completedStatus("https://cdn.example.com/a.mp4"),
 	)
 
-	_, err := videoTestClient(t, srv.URL).GenerateVideo(context.Background(), VideoRequest{
-		Model:  "veo2-video",
-		Prompt: "a lake",
-	})
+	_, err := videoTestClient(t, srv.URL).GenerateVideo(
+		context.Background(),
+		VideoRequest{
+			Model:  "veo2-video",
+			Prompt: "a lake",
+		},
+	)
 	if err != nil {
 		t.Fatalf("GenerateVideo() error: %v", err)
 	}
@@ -104,10 +110,13 @@ func TestGenerateVideoResolvesARelativeURL(t *testing.T) {
 		completedStatus("/api/generate-video/content?runId=vid_1&sig=abc"),
 	)
 
-	video, err := videoTestClient(t, srv.URL).GenerateVideo(context.Background(), VideoRequest{
-		Model:  "alibaba/wan-3.0/text-to-video",
-		Prompt: "a wave",
-	})
+	video, err := videoTestClient(t, srv.URL).GenerateVideo(
+		context.Background(),
+		VideoRequest{
+			Model:  "alibaba/wan-3.0/text-to-video",
+			Prompt: "a wave",
+		},
+	)
 	if err != nil {
 		t.Fatalf("GenerateVideo() error: %v", err)
 	}
@@ -119,16 +128,21 @@ func TestGenerateVideoResolvesARelativeURL(t *testing.T) {
 }
 
 func TestGenerateVideoPollsUntilTheJobIsDone(t *testing.T) {
-	srv, calls := videoUpstream(t, `{"runId":"vid_1","status":"pending"}`,
+	srv, calls := videoUpstream(
+		t,
+		`{"runId":"vid_1","status":"pending"}`,
 		`{"data":{"status":"IN_QUEUE","requestId":"vid_1"}}`,
 		`{"data":{"status":"IN_PROGRESS"}}`,
 		completedStatus("https://cdn.example.com/a.mp4"),
 	)
 
-	video, err := videoTestClient(t, srv.URL).GenerateVideo(context.Background(), VideoRequest{
-		Model:  "veo2-video",
-		Prompt: "a lake",
-	})
+	video, err := videoTestClient(t, srv.URL).GenerateVideo(
+		context.Background(),
+		VideoRequest{
+			Model:  "veo2-video",
+			Prompt: "a lake",
+		},
+	)
 	if err != nil {
 		t.Fatalf("GenerateVideo() error: %v", err)
 	}
@@ -154,10 +168,13 @@ func TestGenerateVideoReportsTheCost(t *testing.T) {
 	srv, _ := videoUpstream(t, `{"runId":"vid_1"}`, `{"data":{"status":"COMPLETED","cost":0.35,
 		"output":{"video":{"url":"https://cdn.example.com/a.mp4"}}}}`)
 
-	video, err := videoTestClient(t, srv.URL).GenerateVideo(context.Background(), VideoRequest{
-		Model:  "veo2-video",
-		Prompt: "a lake",
-	})
+	video, err := videoTestClient(t, srv.URL).GenerateVideo(
+		context.Background(),
+		VideoRequest{
+			Model:  "veo2-video",
+			Prompt: "a lake",
+		},
+	)
 	if err != nil {
 		t.Fatalf("GenerateVideo() error: %v", err)
 	}
@@ -168,14 +185,19 @@ func TestGenerateVideoReportsTheCost(t *testing.T) {
 }
 
 func TestGenerateVideoReadsTheFlatStatusShape(t *testing.T) {
-	srv, _ := videoUpstream(t, `{"runId":"vid_2"}`,
+	srv, _ := videoUpstream(
+		t,
+		`{"runId":"vid_2"}`,
 		`{"requestId":"vid_2","status":"completed","videoUrl":"https://cdn.example.com/b.webm"}`,
 	)
 
-	video, err := videoTestClient(t, srv.URL).GenerateVideo(context.Background(), VideoRequest{
-		Model:  "veo2-video",
-		Prompt: "a lake",
-	})
+	video, err := videoTestClient(t, srv.URL).GenerateVideo(
+		context.Background(),
+		VideoRequest{
+			Model:  "veo2-video",
+			Prompt: "a lake",
+		},
+	)
 	if err != nil {
 		t.Fatalf("GenerateVideo() error: %v", err)
 	}
@@ -209,10 +231,13 @@ func TestGenerateVideoSurfacesAFailedJob(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			srv, _ := videoUpstream(t, `{"runId":"vid_3"}`, tt.status)
 
-			_, err := videoTestClient(t, srv.URL).GenerateVideo(context.Background(), VideoRequest{
-				Model:  "veo2-video",
-				Prompt: "a lake",
-			})
+			_, err := videoTestClient(t, srv.URL).GenerateVideo(
+				context.Background(),
+				VideoRequest{
+					Model:  "veo2-video",
+					Prompt: "a lake",
+				},
+			)
 			if err == nil || !strings.Contains(err.Error(), tt.want) {
 				t.Fatalf("GenerateVideo() error = %v, want it to carry %q", err, tt.want)
 			}
@@ -263,9 +288,12 @@ func TestGenerateVideoRejectsAnEmptyModelOrPrompt(t *testing.T) {
 func TestGenerateVideoRejectsASubmitWithoutARunID(t *testing.T) {
 	srv, _ := videoUpstream(t, `{"status":"pending"}`)
 
-	_, err := videoTestClient(t, srv.URL).GenerateVideo(context.Background(), VideoRequest{
-		Model: "veo2-video", Prompt: "a lake",
-	})
+	_, err := videoTestClient(t, srv.URL).GenerateVideo(
+		context.Background(),
+		VideoRequest{
+			Model: "veo2-video", Prompt: "a lake",
+		},
+	)
 	if err == nil || !strings.Contains(err.Error(), "runId") {
 		t.Errorf("GenerateVideo() error = %v, want it to name the missing runId", err)
 	}
@@ -285,9 +313,12 @@ func TestGenerateVideoSurfacesStatusFailures(t *testing.T) {
 	}))
 	t.Cleanup(srv.Close)
 
-	_, err := videoTestClient(t, srv.URL).GenerateVideo(context.Background(), VideoRequest{
-		Model: "veo2-video", Prompt: "a lake",
-	})
+	_, err := videoTestClient(t, srv.URL).GenerateVideo(
+		context.Background(),
+		VideoRequest{
+			Model: "veo2-video", Prompt: "a lake",
+		},
+	)
 	if err == nil || !strings.Contains(err.Error(), "429") {
 		t.Errorf("GenerateVideo() error = %v, want the polling status surfaced", err)
 	}

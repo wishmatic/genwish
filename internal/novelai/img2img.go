@@ -42,10 +42,14 @@ func (c *Client) img2img(ctx context.Context, req img2imgRequest) ([][]byte, err
 	params["noise"] = req.Noise
 	params["extra_noise_seed"] = c.randomSeed()
 
-	return c.generate(ctx, "img2img", map[string]any{
-		"input":      req.Prompt,
-		"model":      req.Model,
-		"action":     "img2img",
-		"parameters": params,
-	})
+	return c.generate(
+		ctx,
+		"img2img",
+		map[string]any{
+			"input":      req.Prompt,
+			"model":      req.Model,
+			"action":     "img2img",
+			"parameters": params,
+		},
+	)
 }

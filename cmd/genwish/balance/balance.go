@@ -12,10 +12,9 @@ import (
 func NewCommand(deps cli.Deps) *cobra.Command {
 	return &cobra.Command{
 		Use:   "balance <provider>",
-		Short: "Read the account balance for a provider",
-		Long: "Read the account balance for a provider.\n\n" +
-			"Providers: nano, novel.",
-		Args: cobra.MaximumNArgs(1),
+		Short: "Read account credit balance",
+		Long:  "Read the account credit balance for a provider (nano or novel).",
+		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 0 {
 				return cmd.Help()

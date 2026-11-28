@@ -60,10 +60,18 @@ func NewNeoCommand(deps cli.Deps) *cobra.Command {
 
 	cmd.Flags().StringVar(&flags.model, "model", "", "checkpoint (model) filename to load")
 	cmd.Flags().StringVar(&flags.preset, "forge-preset", "", "Forge UI preset to apply")
-	cmd.Flags().StringArrayVar(&flags.vaeAndTextModels, "vae-and-text-model", nil,
-		"VAE or text encoder filename to load; repeat for more")
-	cmd.Flags().StringVar(&flags.negativePrompt, "negative-prompt", "",
-		"things to avoid in the generated image")
+	cmd.Flags().StringArrayVar(
+		&flags.vaeAndTextModels,
+		"vae-and-text-model",
+		nil,
+		"VAE or text encoder filename to load; repeat for more",
+	)
+	cmd.Flags().StringVar(
+		&flags.negativePrompt,
+		"negative-prompt",
+		"",
+		"things to avoid in the generated image",
+	)
 	cmd.Flags().StringVar(&flags.sampler, "sampler-name", forgeDefaultSampler, "sampler to use")
 	cmd.Flags().StringVar(&flags.scheduler, "scheduler", forgeDefaultScheduler, "scheduler to use")
 	cmd.Flags().IntVar(&flags.steps, "steps", 20, "number of sampling steps")
@@ -71,22 +79,46 @@ func NewNeoCommand(deps cli.Deps) *cobra.Command {
 	cmd.Flags().IntVar(&flags.height, "height", 0, "output height in pixels")
 	cmd.Flags().Float64Var(&flags.cfgScale, "cfg-scale", 7, "classifier-free guidance scale")
 	cmd.Flags().IntVar(&flags.seed, "seed", -1, "random seed; -1 is random")
-	cmd.Flags().StringVar(&flags.initImage, "init-image", "",
-		"path to a local image to transform instead of generating from scratch")
-	cmd.Flags().StringVar(&flags.initImageURL, "init-image-url", "",
-		"URL of an image to transform instead of generating from scratch")
-	cmd.Flags().Float64Var(&flags.denoisingStrength, "denoising-strength", 0,
-		"how much of the init image to change")
+	cmd.Flags().StringVar(
+		&flags.initImage,
+		"init-image",
+		"",
+		"path to a local image to transform instead of generating from scratch",
+	)
+	cmd.Flags().StringVar(
+		&flags.initImageURL,
+		"init-image-url",
+		"",
+		"URL of an image to transform instead of generating from scratch",
+	)
+	cmd.Flags().Float64Var(
+		&flags.denoisingStrength,
+		"denoising-strength",
+		0,
+		"how much of the init image to change",
+	)
 	cmd.Flags().BoolVar(&flags.enableHR, "enable-hr", false, "enable hi-res second-pass upscaling")
 	cmd.Flags().Float64Var(&flags.hrScale, "hr-scale", 0, "hi-res upscaling factor")
 	cmd.Flags().StringVar(&flags.hrUpscaler, "hr-upscaler", "", "hi-res upscaler to use")
-	cmd.Flags().IntVar(&flags.hrSecondPassSteps, "hr-second-pass-steps", 0,
-		"steps for the hi-res second pass")
+	cmd.Flags().IntVar(
+		&flags.hrSecondPassSteps,
+		"hr-second-pass-steps",
+		0,
+		"steps for the hi-res second pass",
+	)
 	cmd.Flags().Float64Var(&flags.hrCFG, "hr-cfg", 0, "CFG scale for the hi-res second pass")
-	cmd.Flags().StringVar(&flags.outputFormat, "format", "",
-		"output image format: png, jpeg, jxl, or webp")
-	cmd.Flags().StringVar(&flags.out, "out", "",
-		"base directory for the generated image (default: output.path)")
+	cmd.Flags().StringVar(
+		&flags.outputFormat,
+		"format",
+		"",
+		"output image format: png, jpeg, jxl, or webp",
+	)
+	cmd.Flags().StringVar(
+		&flags.out,
+		"out",
+		"",
+		"base directory for the generated image (default: output.path)",
+	)
 
 	return cmd
 }

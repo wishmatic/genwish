@@ -23,7 +23,7 @@ func TestNewCommand(t *testing.T) {
 			t.Fatalf("Execute() error: %v", err)
 		}
 
-		if !strings.Contains(out.String(), "Providers: nano, novel") {
+		if !strings.Contains(out.String(), "nano or novel") {
 			t.Errorf("stdout = %q, want the provider options", out)
 		}
 	})
