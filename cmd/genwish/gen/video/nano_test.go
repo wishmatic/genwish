@@ -25,7 +25,7 @@ func TestGenerateVideoWritesTheDownloadedFile(t *testing.T) {
 		case "/api/video/status":
 			return http.StatusOK, fmt.Sprintf(
 				`{"status":"completed","videoUrl":%q,"data":{"cost":0.25}}`,
-				serverURL+"/video.mp4",
+				fmt.Sprintf("%s/video.mp4", serverURL),
 			)
 		case "/video.mp4":
 			return http.StatusOK, string(testVideo)
@@ -44,7 +44,7 @@ func TestGenerateVideoWritesTheDownloadedFile(t *testing.T) {
 		"--model",
 		"veo2-video",
 		"--image",
-		server.URL+"/input.png",
+		fmt.Sprintf("%s/input.png", server.URL),
 		"--negative-prompt",
 		"blur",
 		"--duration",
@@ -126,7 +126,7 @@ func TestGenerateVideoLeavesNoFileWhenTheDownloadFails(t *testing.T) {
 		case "/api/video/status":
 			return http.StatusOK, fmt.Sprintf(
 				`{"status":"completed","videoUrl":%q,"data":{"cost":0.25}}`,
-				serverURL+"/video.mp4",
+				fmt.Sprintf("%s/video.mp4", serverURL),
 			)
 		case "/video.mp4":
 			return http.StatusInternalServerError, "boom"
@@ -169,7 +169,7 @@ func TestGenerateVideoDefaultsTheModel(t *testing.T) {
 		case "/api/video/status":
 			return http.StatusOK, fmt.Sprintf(
 				`{"status":"completed","videoUrl":%q,"data":{"cost":0}}`,
-				serverURL+"/video.mp4",
+				fmt.Sprintf("%s/video.mp4", serverURL),
 			)
 		case "/video.mp4":
 			return http.StatusOK, string(testVideo)

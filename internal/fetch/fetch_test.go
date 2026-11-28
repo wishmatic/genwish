@@ -372,7 +372,7 @@ func TestLargeJSONBodyDecodesInFull(t *testing.T) {
 		)
 	}
 
-	body := "[" + strings.Join(items, ",") + "]"
+	body := fmt.Sprintf("[%s]", strings.Join(items, ","))
 	if len(body) <= maxBodyExcerpt {
 		t.Fatalf(
 			"fixture is %d bytes, want it above the %d-byte excerpt bound",

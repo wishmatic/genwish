@@ -2,6 +2,7 @@ package resolve
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -25,7 +26,7 @@ func TestFetchFollowsRedirectToPlainURL(t *testing.T) {
 
 	redirector := httptest.NewServer(
 		http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			http.Redirect(w, req, origin.URL+"/x.png", http.StatusMovedPermanently)
+			http.Redirect(w, req, fmt.Sprintf("%s/x.png", origin.URL), http.StatusMovedPermanently)
 		}),
 	)
 	defer redirector.Close()
@@ -62,12 +63,15 @@ func TestFetchSetsUserAgent(t *testing.T) {
 	redirector := httptest.NewServer(
 		http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			record(req)
-			http.Redirect(w, req, origin.URL+"/x.png", http.StatusFound)
+			http.Redirect(w, req, fmt.Sprintf("%s/x.png", origin.URL), http.StatusFound)
 		}),
 	)
 	defer redirector.Close()
 
-	if _, err := New().Fetch(context.Background(), redirector.URL+"/start"); err != nil {
+	if _, err := New().Fetch(
+		context.Background(),
+		fmt.Sprintf("%s/start", redirector.URL),
+	); err != nil {
 		t.Fatalf("Fetch() error: %v", err)
 	}
 
@@ -95,7 +99,7 @@ func TestFetchRejectsARedirectWithoutALocation(t *testing.T) {
 	}))
 	defer server.Close()
 
-	_, err := New().Fetch(context.Background(), server.URL+"/nowhere.png")
+	_, err := New().Fetch(context.Background(), fmt.Sprintf("%s/nowhere.png", server.URL))
 	if err == nil || !strings.Contains(err.Error(), "Location") {
 		t.Errorf("Fetch() error = %v, want it to name the missing Location", err)
 	}
@@ -109,7 +113,7 @@ func TestFetchGivesUpOnARedirectLoop(t *testing.T) {
 	}))
 	defer server.Close()
 
-	_, err := New().Fetch(context.Background(), server.URL+"/loop.png")
+	_, err := New().Fetch(context.Background(), fmt.Sprintf("%s/loop.png", server.URL))
 	if err == nil || !strings.Contains(err.Error(), "too many redirects") {
 		t.Errorf("Fetch() error = %v, want the hop limit named", err)
 	}
@@ -121,7 +125,10 @@ func TestFetchNonOK(t *testing.T) {
 	}))
 	defer server.Close()
 
-	if _, err := New().Fetch(context.Background(), server.URL+"/missing.png"); err == nil {
+	if _, err := New().Fetch(
+		context.Background(),
+		fmt.Sprintf("%s/missing.png", server.URL),
+	); err == nil {
 		t.Fatal("Fetch() expected error, got nil")
 	}
 }

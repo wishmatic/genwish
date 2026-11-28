@@ -30,7 +30,7 @@ func (c *Client) CheckBalance(ctx context.Context) (*Balance, error) {
 		return nil, fmt.Errorf("novelai: build balance request: %w", err)
 	}
 
-	req.Header.Set("Authorization", "Bearer "+c.apiKey)
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.apiKey))
 
 	resp, err := c.http.Do(req)
 	if err != nil {

@@ -168,7 +168,7 @@ func (c *Client) SearchTags(ctx context.Context, query TagQuery) (TagPage, error
 func (c *Client) searchPage(ctx context.Context, query TagQuery, page, limit int) ([]Tag, error) {
 	params := url.Values{}
 	params.Set("search[order]", "count")
-	params.Set("search[name_matches]", "*"+query.Search+"*")
+	params.Set("search[name_matches]", fmt.Sprintf("*%s*", query.Search))
 	params.Set("limit", strconv.Itoa(limit))
 	params.Set("only", tagFields)
 	c.setCategories(params, query.Categories)

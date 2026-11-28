@@ -59,7 +59,7 @@ func NewBooruCommand(deps cli.Deps) *cobra.Command {
 		&opts.category,
 		"category",
 		nil,
-		"keep only this category; repeatable ("+booru.CategoryList()+")",
+		fmt.Sprintf("keep only this category; repeatable (%s)", booru.CategoryList()),
 	)
 	flags.BoolVar(&opts.json, "json", false, "print JSON instead of text")
 

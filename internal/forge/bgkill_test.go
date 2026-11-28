@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"io"
 	"maps"
 	"net/http"
@@ -35,9 +36,10 @@ func TestBgkillPayload(t *testing.T) {
 					w.Header().Set("Content-Type", "application/json")
 					_, _ = w.Write(
 						[]byte(
-							`{"output_image": "` + base64.StdEncoding.EncodeToString(
-								[]byte("foreground"),
-							) + `"}`,
+							fmt.Sprintf(
+								`{"output_image": "%s"}`,
+								base64.StdEncoding.EncodeToString([]byte("foreground")),
+							),
 						),
 					)
 				}),

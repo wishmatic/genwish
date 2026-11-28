@@ -44,9 +44,9 @@ func (c *Client) Models(ctx context.Context, kind string) ([]Model, error) {
 
 	// detailed=true is NanoGPT's own default, stated because it is what carries capabilities,
 	// supported parameters, and pricing.
-	path := "/api/v1/" + kind + "-models?detailed=true"
+	path := fmt.Sprintf("/api/v1/%s-models?detailed=true", kind)
 
-	cred := credential{header: "Authorization", value: "Bearer " + c.apiKey}
+	cred := credential{header: "Authorization", value: fmt.Sprintf("Bearer %s", c.apiKey)}
 	if err := c.get(ctx, path, FastTimeout, cred, &out); err != nil {
 		return nil, err
 	}

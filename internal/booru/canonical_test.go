@@ -2,6 +2,7 @@ package booru
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strings"
 	"sync/atomic"
@@ -282,7 +283,7 @@ func TestAliasTargetFollowsAndTerminates(t *testing.T) {
 
 		_, _ = w.Write(
 			[]byte(
-				`[{"antecedent_name":"` + antecedent + `","consequent_name":"` + consequent + `"}]`,
+				fmt.Sprintf(`[{"antecedent_name":"%s","consequent_name":"%s"}]`, antecedent, consequent),
 			),
 		)
 	})

@@ -80,5 +80,5 @@ func fetchDanbooruStatus(store credential.Store) (string, error) {
 		return "", err
 	}
 
-	return "logged in as " + creds.Login, nil
+	return fmt.Sprintf("logged in as %s", creds.Login), nil
 }

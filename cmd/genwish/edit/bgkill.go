@@ -22,8 +22,10 @@ func NewBgkillCommand(deps cli.Deps) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "bgkill <image>",
 		Short: "Remove the background from an image with AI (Forge Neo + BiRefNet)",
-		Long: "Remove the background from an image with AI (Forge Neo + BiRefNet).\n\n" +
+		Long: fmt.Sprintf(
+			"Remove the background from an image with AI (Forge Neo + BiRefNet).\n\n%s",
 			imageInputHelp,
+		),
 		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 0 {

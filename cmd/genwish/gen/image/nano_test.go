@@ -146,11 +146,11 @@ func TestGenerateImageResolvesInputAddresses(t *testing.T) {
 		cli.Deps{Nano: testutil.NewNanoClient(t, server.URL)},
 		"a cat",
 		"--image",
-		input.URL+"/image.png",
+		fmt.Sprintf("%s/image.png", input.URL),
 		"--images",
-		input.URL+"/extra.png",
+		fmt.Sprintf("%s/extra.png", input.URL),
 		"--mask",
-		input.URL+"/mask.png",
+		fmt.Sprintf("%s/mask.png", input.URL),
 		"--format",
 		"png",
 		"--out",
@@ -161,7 +161,7 @@ func TestGenerateImageResolvesInputAddresses(t *testing.T) {
 	}
 
 	body := testutil.NextRequest(t, requests).JSONBody(t)
-	wantDataURL := "data:image/png;base64," + encoded
+	wantDataURL := fmt.Sprintf("data:image/png;base64,%s", encoded)
 
 	if body["imageDataUrl"] != wantDataURL {
 		t.Errorf("imageDataUrl = %v, want the resolved input", body["imageDataUrl"])
@@ -183,7 +183,7 @@ func TestGenerateImageDownloadsAURLResult(t *testing.T) {
 		case "/api/v1/images/generations":
 			return http.StatusOK, fmt.Sprintf(
 				`{"data":[{"url":%q}],"cost":0.03}`,
-				serverURL+"/asset.png",
+				fmt.Sprintf("%s/asset.png", serverURL),
 			)
 		case "/asset.png":
 			return http.StatusOK, string(testutil.PNG)
@@ -233,7 +233,7 @@ func TestGenerateImageLeavesNoFileWhenADownloadFails(t *testing.T) {
 		case "/api/v1/images/generations":
 			return http.StatusOK, fmt.Sprintf(
 				`{"data":[{"url":%q}],"cost":0.03}`,
-				serverURL+"/asset.png",
+				fmt.Sprintf("%s/asset.png", serverURL),
 			)
 		case "/asset.png":
 			return http.StatusInternalServerError, "boom"
@@ -284,7 +284,7 @@ func TestGenerateImageUsesTheConfiguredOutput(t *testing.T) {
 
 	dir := t.TempDir()
 	configPath := filepath.Join(t.TempDir(), "config.toml")
-	body := "[output]\nformat = \"webp\"\npath = " + strconv.Quote(dir) + "\n"
+	body := fmt.Sprintf("[output]\nformat = \"webp\"\npath = %s\n", strconv.Quote(dir))
 
 	if err := os.WriteFile(configPath, []byte(body), 0o600); err != nil {
 		t.Fatalf("WriteFile() error: %v", err)

@@ -44,7 +44,7 @@ func newPassStore(p provider.Name) (Store, bool) {
 
 	return &PassStore{
 		entry: entry,
-		path:  filepath.Join(dir, entry+".gpg"),
+		path:  filepath.Join(dir, fmt.Sprintf("%s.gpg", entry)),
 		run: func(args []string, stdin io.Reader) ([]byte, []byte, error) {
 			return runPass(bin, args, stdin)
 		},
@@ -92,7 +92,7 @@ func (s *PassStore) Save(secret string) error {
 		return ErrEmptyKey
 	}
 
-	stdin := strings.NewReader(secret + "\n")
+	stdin := strings.NewReader(fmt.Sprintf("%s\n", secret))
 
 	_, stderr, err := s.run([]string{"insert", "-m", "-f", s.entry}, stdin)
 	if err != nil {

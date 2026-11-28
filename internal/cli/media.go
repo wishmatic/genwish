@@ -3,12 +3,17 @@ package cli
 import (
 	"context"
 	"encoding/base64"
+	"fmt"
 
 	"github.com/wishmatic/genwish/internal/resolve"
 )
 
 func DataURL(image resolve.Image) string {
-	return "data:" + image.MediaType + ";base64," + base64.StdEncoding.EncodeToString(image.Data)
+	return fmt.Sprintf(
+		"data:%s;base64,%s",
+		image.MediaType,
+		base64.StdEncoding.EncodeToString(image.Data),
+	)
 }
 
 // ImageDataURL turns an input image into a data URL. The input may be a local path, an http(s) URL,

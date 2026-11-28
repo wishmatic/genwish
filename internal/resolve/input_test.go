@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -18,7 +19,7 @@ var (
 )
 
 func encodeDataURI(mediaType string, data []byte) string {
-	return "data:" + mediaType + ";base64," + base64.StdEncoding.EncodeToString(data)
+	return fmt.Sprintf("data:%s;base64,%s", mediaType, base64.StdEncoding.EncodeToString(data))
 }
 
 func insertWhitespace(s string) string {
@@ -50,11 +51,14 @@ func TestResolveInputForms(t *testing.T) {
 		{"unpadded base64", base64.RawStdEncoding.EncodeToString(pngBytes), MediaPNG, pngBytes},
 		{"url safe base64", base64.RawURLEncoding.EncodeToString(jpegBytes), MediaJPEG, jpegBytes},
 		{"base64 with whitespace", insertWhitespace(rawPNG), MediaPNG, pngBytes},
-		{"surrounding whitespace", "  " + rawPNG + "\n", MediaPNG, pngBytes},
+		{"surrounding whitespace", fmt.Sprintf("  %s\n", rawPNG), MediaPNG, pngBytes},
 		{"uppercase declared type", encodeDataURI("IMAGE/PNG", pngBytes), MediaPNG, pngBytes},
 		{
 			"declared type fallback",
-			"data:image/png;base64," + base64.StdEncoding.EncodeToString([]byte("not an image")),
+			fmt.Sprintf(
+				"data:image/png;base64,%s",
+				base64.StdEncoding.EncodeToString([]byte("not an image")),
+			),
 			MediaPNG,
 			[]byte("not an image"),
 		},
@@ -125,7 +129,7 @@ func TestResolveFetchesURL(t *testing.T) {
 	}))
 	defer server.Close()
 
-	img, err := newResolver(t).Resolve(context.Background(), server.URL+"/x.png")
+	img, err := newResolver(t).Resolve(context.Background(), fmt.Sprintf("%s/x.png", server.URL))
 	if err != nil {
 		t.Fatalf("Resolve() error: %v", err)
 	}
@@ -146,7 +150,7 @@ func TestResolveFollowsMultipleRedirects(t *testing.T) {
 	defer origin.Close()
 
 	hop := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, origin.URL+"/x.png", http.StatusFound)
+		http.Redirect(w, r, fmt.Sprintf("%s/x.png", origin.URL), http.StatusFound)
 	}))
 	defer hop.Close()
 

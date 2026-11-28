@@ -61,29 +61,33 @@ type BodyError struct {
 }
 
 func (e *BodyError) Error() string {
-	message := fmt.Sprintf("%s %s returned HTTP %d", e.Label, e.Path, e.StatusCode)
+	var message strings.Builder
+
+	fmt.Fprintf(&message, "%s %s returned HTTP %d", e.Label, e.Path, e.StatusCode)
 
 	if contentType := mediaType(e.ContentType); contentType != "" {
-		message += " (" + contentType + ")"
+		fmt.Fprintf(&message, " (%s)", contentType)
 	}
 
-	message += " with " + e.Reason
+	fmt.Fprintf(&message, " with %s", e.Reason)
 
 	if e.Body != "" {
-		message += ": " + e.Body
+		fmt.Fprintf(&message, ": %s", e.Body)
 	}
 
-	return message
+	return message.String()
 }
 
 func (e *HTTPError) Error() string {
-	message := fmt.Sprintf("%s %s %s returned HTTP %d", e.Label, e.Method, e.Path, e.StatusCode)
+	var message strings.Builder
+
+	fmt.Fprintf(&message, "%s %s %s returned HTTP %d", e.Label, e.Method, e.Path, e.StatusCode)
 
 	if e.Body != "" {
-		message += ": " + e.Body
+		fmt.Fprintf(&message, ": %s", e.Body)
 	}
 
-	return message
+	return message.String()
 }
 
 func New(cfg Config) (*Client, error) {
@@ -265,9 +269,9 @@ func (c *Client) do(
 	query url.Values,
 	headers http.Header,
 ) (*http.Response, error) {
-	rawURL := c.baseURL + path
+	rawURL := fmt.Sprintf("%s%s", c.baseURL, path)
 	if len(query) > 0 {
-		rawURL += "?" + query.Encode()
+		rawURL = fmt.Sprintf("%s?%s", rawURL, query.Encode())
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rawURL, nil)
@@ -306,7 +310,7 @@ func retryable(status int) bool {
 
 func retryDelay(resp *http.Response, attempt int) time.Duration {
 	if after := resp.Header.Get("Retry-After"); after != "" {
-		if seconds, err := time.ParseDuration(after + "s"); err == nil {
+		if seconds, err := time.ParseDuration(fmt.Sprintf("%ss", after)); err == nil {
 			return seconds
 		}
 

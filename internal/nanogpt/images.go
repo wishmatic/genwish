@@ -77,7 +77,7 @@ func (c *Client) GenerateImages(ctx context.Context, req ImageRequest) (*ImageRe
 
 	var out imageResponse
 
-	cred := credential{header: "Authorization", value: "Bearer " + c.apiKey}
+	cred := credential{header: "Authorization", value: fmt.Sprintf("Bearer %s", c.apiKey)}
 	if err := c.post(ctx, imagesPath, ImageGenerationBudget, cred, req, &out); err != nil {
 		return nil, err
 	}

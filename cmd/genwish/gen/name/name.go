@@ -96,7 +96,7 @@ func runGenerate(deps cli.Deps, genderValue, cultureValue string, count int, asJ
 	}
 
 	for _, generated := range names {
-		line := generated.GivenName + " " + generated.Surname
+		line := fmt.Sprintf("%s %s", generated.GivenName, generated.Surname)
 
 		if _, err := fmt.Fprintln(deps.Out, line); err != nil {
 			return fmt.Errorf("write name: %w", err)

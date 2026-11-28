@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -209,7 +210,7 @@ func TestUtilBooru(t *testing.T) {
 	}
 
 	for name, tt := range badInputs {
-		t.Run("rejects "+name, func(t *testing.T) {
+		t.Run(fmt.Sprintf("rejects %s", name), func(t *testing.T) {
 			source := &stubSource{}
 
 			_, err := runBooru(t, source, tt.args...)

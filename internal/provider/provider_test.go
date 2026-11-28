@@ -1,6 +1,9 @@
 package provider
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestParse(t *testing.T) {
 	tests := []struct {
@@ -35,7 +38,7 @@ func TestParse(t *testing.T) {
 	}
 
 	for _, value := range []string{"", "  ", "atlantean"} {
-		t.Run("rejects "+value, func(t *testing.T) {
+		t.Run(fmt.Sprintf("rejects %s", value), func(t *testing.T) {
 			if _, err := Parse(value); err == nil {
 				t.Errorf("Parse(%q) error = nil, want an error", value)
 			}
@@ -48,7 +51,7 @@ func TestParseBalance(t *testing.T) {
 		"nano", "nano-gpt", "nanogpt",
 		"novel", "novel-ai", "novel ai", "novelai",
 	} {
-		t.Run("accepts "+value, func(t *testing.T) {
+		t.Run(fmt.Sprintf("accepts %s", value), func(t *testing.T) {
 			if _, err := ParseBalance(value); err != nil {
 				t.Errorf("ParseBalance(%q) error: %v", value, err)
 			}
@@ -64,7 +67,7 @@ func TestParseBalance(t *testing.T) {
 
 func TestParseCredential(t *testing.T) {
 	for _, value := range []string{"nano", "nanogpt", "novel", "novelai", "danbooru", "Danbooru"} {
-		t.Run("accepts "+value, func(t *testing.T) {
+		t.Run(fmt.Sprintf("accepts %s", value), func(t *testing.T) {
 			if _, err := ParseCredential(value); err != nil {
 				t.Errorf("ParseCredential(%q) error: %v", value, err)
 			}

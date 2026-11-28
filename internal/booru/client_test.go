@@ -92,7 +92,7 @@ func serveTagPage(w http.ResponseWriter, r *http.Request, names []string) {
 		)
 	}
 
-	_, _ = w.Write([]byte("[" + strings.Join(items, ",") + "]"))
+	_, _ = w.Write([]byte(fmt.Sprintf("[%s]", strings.Join(items, ","))))
 }
 
 func intParam(r *http.Request, name string, fallback int) int {

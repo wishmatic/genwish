@@ -59,9 +59,9 @@ func newCropCommand(deps cli.Deps, spec cropCommand) *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   spec.name + " <image>",
+		Use:   fmt.Sprintf("%s <image>", spec.name),
 		Short: spec.short,
-		Long:  spec.short + "\n\n" + imageInputHelp,
+		Long:  fmt.Sprintf("%s\n\n%s", spec.short, imageInputHelp),
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 0 {

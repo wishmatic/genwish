@@ -2,6 +2,7 @@ package config
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -48,7 +49,7 @@ func TestAddConfigFlag(t *testing.T) {
 			}
 
 			configPath := filepath.Join(dir, "config.toml")
-			body := "[neo]\nmodels_file = " + strconv.Quote(modelsFile) + "\n"
+			body := fmt.Sprintf("[neo]\nmodels_file = %s\n", strconv.Quote(modelsFile))
 
 			if err := os.WriteFile(configPath, []byte(body), 0o600); err != nil {
 				t.Fatalf("WriteFile() error: %v", err)

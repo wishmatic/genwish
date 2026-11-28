@@ -1,6 +1,9 @@
 package forge
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 var knownModelExtensions = []string{
 	".safetensors",
@@ -52,5 +55,5 @@ func ensureSafetensors(name string) string {
 		}
 	}
 
-	return name + ".safetensors"
+	return fmt.Sprintf("%s.safetensors", name)
 }

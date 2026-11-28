@@ -18,11 +18,11 @@ func SaveDanbooru(store Store, creds DanbooruCredentials) error {
 		return fmt.Errorf("Danbooru login and API key are both required")
 	}
 
-	if strings.ContainsAny(login+apiKey, "\r\n") {
+	if strings.ContainsAny(login, "\r\n") || strings.ContainsAny(apiKey, "\r\n") {
 		return fmt.Errorf("Danbooru login and API key must each be a single line")
 	}
 
-	return store.Save(login + "\n" + apiKey)
+	return store.Save(fmt.Sprintf("%s\n%s", login, apiKey))
 }
 
 func LoadDanbooru(store Store) (DanbooruCredentials, error) {

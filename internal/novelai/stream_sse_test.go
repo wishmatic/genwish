@@ -3,6 +3,7 @@ package novelai
 import (
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"strings"
 	"testing"
 )
@@ -10,10 +11,10 @@ import (
 func sseFinalEvent(t *testing.T, image []byte) string {
 	t.Helper()
 
-	return `event: final
-data: {"event_type":"final","image":"` + base64.StdEncoding.EncodeToString(image) + `"}
+	return fmt.Sprintf(`event: final
+data: {"event_type":"final","image":"%s"}
 
-`
+`, base64.StdEncoding.EncodeToString(image))
 }
 
 func TestDecodeFinalImageSSEFinalEvent(t *testing.T) {
@@ -28,10 +29,10 @@ func TestDecodeFinalImageSSEFinalEvent(t *testing.T) {
 }
 
 func TestDecodeFinalImageSSESkipsIntermediateEvents(t *testing.T) {
-	stream := `event: intermediate
+	stream := fmt.Sprintf(`event: intermediate
 data: {"event_type":"intermediate","image":"c3RlcA=="}
 
-` + sseFinalEvent(t, []byte("final"))
+%s`, sseFinalEvent(t, []byte("final")))
 
 	image, err := decodeFinalImage(strings.NewReader(stream))
 	if err != nil {
@@ -44,10 +45,10 @@ data: {"event_type":"intermediate","image":"c3RlcA=="}
 }
 
 func TestDecodeFinalImageSSEMultilineData(t *testing.T) {
-	stream := `data: {"event_type":"final",
-data: "image":"` + base64.StdEncoding.EncodeToString([]byte("png")) + `"}
+	stream := fmt.Sprintf(`data: {"event_type":"final",
+data: "image":"%s"}
 
-`
+`, base64.StdEncoding.EncodeToString([]byte("png")))
 
 	image, err := decodeFinalImage(strings.NewReader(stream))
 	if err != nil {

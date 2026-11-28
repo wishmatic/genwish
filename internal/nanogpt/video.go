@@ -180,7 +180,7 @@ func (c *Client) waitForVideo(ctx context.Context, run *VideoRun) (*Video, error
 func (c *Client) videoStatus(ctx context.Context, runID string) (*VideoStatus, error) {
 	var out VideoStatus
 
-	path := videoStatusPath + "?requestId=" + url.QueryEscape(runID)
+	path := fmt.Sprintf("%s?requestId=%s", videoStatusPath, url.QueryEscape(runID))
 
 	cred := credential{header: "x-api-key", value: c.apiKey}
 	if err := c.get(ctx, path, FastTimeout, cred, &out); err != nil {

@@ -57,7 +57,7 @@ func (c *Client) generate(
 	}
 
 	httpReq.Header.Set("Content-Type", "application/json")
-	httpReq.Header.Set("Authorization", "Bearer "+c.apiKey)
+	httpReq.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.apiKey))
 
 	resp, err := c.http.Do(httpReq)
 	if err != nil {

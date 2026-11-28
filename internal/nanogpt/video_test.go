@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -121,7 +122,7 @@ func TestGenerateVideoResolvesARelativeURL(t *testing.T) {
 		t.Fatalf("GenerateVideo() error: %v", err)
 	}
 
-	want := srv.URL + "/api/generate-video/content?runId=vid_1&sig=abc"
+	want := fmt.Sprintf("%s/api/generate-video/content?runId=vid_1&sig=abc", srv.URL)
 	if video.URL != want {
 		t.Errorf("URL = %q, want %q", video.URL, want)
 	}
@@ -325,7 +326,10 @@ func TestGenerateVideoSurfacesStatusFailures(t *testing.T) {
 }
 
 func completedStatus(videoURL string) string {
-	return `{"data":{"status":"COMPLETED","cost":0.35,"output":{"video":{"url":"` + videoURL + `"}}}}`
+	return fmt.Sprintf(
+		`{"data":{"status":"COMPLETED","cost":0.35,"output":{"video":{"url":"%s"}}}}`,
+		videoURL,
+	)
 }
 
 // videoTestClient shortens the poll loop so a test drives a whole generation without waiting out

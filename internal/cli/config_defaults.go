@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"fmt"
 	"regexp"
 
 	"github.com/spf13/cobra"
@@ -53,7 +54,7 @@ func ApplyConfigDefaults(cmd *cobra.Command, cfg config.Config) {
 		}
 
 		flag.Usage = trailingDefault.ReplaceAllString(flag.Usage, "")
-		flag.Usage += " (default: " + value + ")"
+		flag.Usage += fmt.Sprintf(" (default: %s)", value)
 	})
 }
 

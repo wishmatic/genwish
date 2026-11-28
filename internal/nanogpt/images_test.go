@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"slices"
 	"strings"
@@ -13,7 +14,7 @@ import (
 const testImageB64 = "cG5nIGJ5dGVz"
 
 func TestGenerateImagesSendsTheExposedFields(t *testing.T) {
-	body := `{"created":1,"data":[{"b64_json":"` + testImageB64 + `"}],"cost":0.04}`
+	body := fmt.Sprintf(`{"created":1,"data":[{"b64_json":"%s"}],"cost":0.04}`, testImageB64)
 
 	srv, post := recordingServer(t, body, http.StatusOK)
 
@@ -48,7 +49,7 @@ func TestGenerateImagesSendsTheExposedFields(t *testing.T) {
 		t.Errorf("call = %s %s, want POST %s", post.method, post.path, imagesPath)
 	}
 
-	post.assertHeader(t, "Authorization", "Bearer "+testKey)
+	post.assertHeader(t, "Authorization", fmt.Sprintf("Bearer %s", testKey))
 
 	post.assertBody(t, "model", "nano-banana")
 	post.assertBody(t, "prompt", "a lake at sunset")
@@ -78,7 +79,11 @@ func TestGenerateImagesSendsTheExposedFields(t *testing.T) {
 }
 
 func TestGenerateImagesOmitsUnsetFields(t *testing.T) {
-	srv, post := recordingServer(t, `{"data":[{"b64_json":"`+testImageB64+`"}]}`, http.StatusOK)
+	srv, post := recordingServer(
+		t,
+		fmt.Sprintf(`{"data":[{"b64_json":"%s"}]}`, testImageB64),
+		http.StatusOK,
+	)
 
 	if _, err := newTestClient(t, srv.URL).GenerateImages(
 		context.Background(),
@@ -101,15 +106,15 @@ func TestGenerateImagesReadsTheBytesHoweverTheyAreWrapped(t *testing.T) {
 	tests := map[string]string{
 		"padded":     base64.StdEncoding.EncodeToString(raw),
 		"unpadded":   base64.RawStdEncoding.EncodeToString(raw),
-		"data URI":   "data:image/png;base64," + base64.StdEncoding.EncodeToString(raw),
-		"whitespace": "\n\t" + base64.StdEncoding.EncodeToString(raw) + "\n",
+		"data URI":   fmt.Sprintf("data:image/png;base64,%s", base64.StdEncoding.EncodeToString(raw)),
+		"whitespace": fmt.Sprintf("\n\t%s\n", base64.StdEncoding.EncodeToString(raw)),
 	}
 
 	for name, encoded := range tests {
 		t.Run(name, func(t *testing.T) {
 			srv, _ := recordingServer(
 				t,
-				`{"data":[{"b64_json":`+jsonString(encoded)+`}]}`,
+				fmt.Sprintf(`{"data":[{"b64_json":%s}]}`, jsonString(encoded)),
 				http.StatusOK,
 			)
 
@@ -159,7 +164,7 @@ func TestGenerateImagesReportsAnUnusableEntry(t *testing.T) {
 	}{
 		"no images at all": {response: `{"data":[]}`, want: "no images"},
 		"neither field": {
-			response: `{"data":[{"b64_json":"` + testImageB64 + `"},{}]}`,
+			response: fmt.Sprintf(`{"data":[{"b64_json":"%s"},{}]}`, testImageB64),
 			want:     "image 2 of 2",
 		},
 		"invalid base64": {response: `{"data":[{"b64_json":"not base64!"}]}`, want: "not base64"},

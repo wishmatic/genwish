@@ -87,7 +87,7 @@ func writeMediaFile(base, kind, ext string, data []byte) (string, error) {
 		return "", fmt.Errorf("create output directory: %w", err)
 	}
 
-	tmp, err := os.CreateTemp(dir, "."+id+"-*.tmp")
+	tmp, err := os.CreateTemp(dir, fmt.Sprintf(".%s-*.tmp", id))
 	if err != nil {
 		return "", fmt.Errorf("create output file: %w", err)
 	}
@@ -113,7 +113,7 @@ func writeMediaFile(base, kind, ext string, data []byte) (string, error) {
 		return "", fmt.Errorf("close output file: %w", err)
 	}
 
-	final := filepath.Join(dir, id+"."+ext)
+	final := filepath.Join(dir, fmt.Sprintf("%s.%s", id, ext))
 
 	if err := os.Rename(name, final); err != nil {
 		return "", fmt.Errorf("store output file: %w", err)

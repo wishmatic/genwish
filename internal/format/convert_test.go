@@ -1,6 +1,7 @@
 package format
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 )
@@ -17,7 +18,7 @@ func TestReformatProducesTargetFormat(t *testing.T) {
 				continue
 			}
 
-			t.Run(source.String()+" to "+target.String(), func(t *testing.T) {
+			t.Run(fmt.Sprintf("%s to %s", source, target), func(t *testing.T) {
 				got, err := Reformat(sourceData, target)
 				if err != nil {
 					t.Fatalf("Reformat() error: %v", err)
@@ -73,7 +74,7 @@ func TestReformatPreservesAlpha(t *testing.T) {
 	}
 
 	for _, pair := range pairs {
-		t.Run(pair.source.String()+" to "+pair.target.String(), func(t *testing.T) {
+		t.Run(fmt.Sprintf("%s to %s", pair.source, pair.target), func(t *testing.T) {
 			source, err := Encode(mustDecode(t, transparentPNG(t)), pair.source)
 			if err != nil {
 				t.Fatalf("Encode() error: %v", err)

@@ -2,6 +2,7 @@ package nanogpt
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"slices"
 	"strconv"
@@ -63,7 +64,7 @@ func TestModelsReadsEachListOverGET(t *testing.T) {
 				)
 			}
 
-			rec.assertHeader(t, "Authorization", "Bearer "+testKey)
+			rec.assertHeader(t, "Authorization", fmt.Sprintf("Bearer %s", testKey))
 			rec.assertHeader(t, "x-api-key", "")
 		})
 	}

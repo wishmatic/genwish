@@ -136,10 +136,12 @@ func renderEmpty(out tagsOutput) string {
 
 	case string(catalog.StatusOffsetPastEnd):
 		return fmt.Sprintf(
-			"Offset %d is past the last result for %q; there is no further page. Try a smaller offset.",
+			"Offset %d is past the last result for %q; there is no further page. "+
+				"Try a smaller offset.%s",
 			out.Offset,
 			out.Search,
-		) + renderSynonyms(out)
+			renderSynonyms(out),
+		)
 
 	case string(catalog.StatusExactNotFound):
 		return fmt.Sprintf("No tag named %q exists.", out.Search)
@@ -166,27 +168,29 @@ func renderSynonyms(out tagsOutput) string {
 // saying only that the substring matched nothing would assert that it does not.
 func renderNoSubstringMatch(out tagsOutput) string {
 	if out.Withheld == 0 {
-		return fmt.Sprintf("No tag name contains %q.", out.Search) + renderSynonyms(out)
+		return fmt.Sprintf("No tag name contains %q.%s", out.Search, renderSynonyms(out))
 	}
 
 	if out.Withheld == 1 {
 		return fmt.Sprintf(
 			"No tag name contains %q with at least %d works; "+
 				"one canonical match with %d works was hidden by the floor. "+
-				"Set min_count=0 to include it.",
+				"Set min_count=0 to include it.%s",
 			out.Search,
 			out.MinCount,
 			out.WithheldBest,
-		) + renderSynonyms(out)
+			renderSynonyms(out),
+		)
 	}
 
 	return fmt.Sprintf(
 		"No tag name contains %q with at least %d works; "+
 			"%d canonical matches were hidden by the floor (the best has %d works). "+
-			"Set min_count=0 to include them.",
+			"Set min_count=0 to include them.%s",
 		out.Search,
 		out.MinCount,
 		out.Withheld,
 		out.WithheldBest,
-	) + renderSynonyms(out)
+		renderSynonyms(out),
+	)
 }

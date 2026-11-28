@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -44,7 +45,7 @@ func NormalizeFlagDefaults(cmd *cobra.Command) {
 		}
 
 		if !strings.Contains(flag.Usage, "(default:") {
-			flag.Usage += " (default: " + flag.DefValue + ")"
+			flag.Usage += fmt.Sprintf(" (default: %s)", flag.DefValue)
 		}
 
 		flag.DefValue = zeroDefault(flag)

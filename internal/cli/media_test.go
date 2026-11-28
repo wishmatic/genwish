@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 	"encoding/base64"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -40,7 +41,7 @@ func TestImageDataURL(t *testing.T) {
 			t.Fatalf("ImageDataURL() error: %v", err)
 		}
 
-		want := "data:" + resolve.MediaPNG + ";base64," + encoded
+		want := fmt.Sprintf("data:%s;base64,%s", resolve.MediaPNG, encoded)
 		if dataURL != want {
 			t.Errorf("ImageDataURL() = %q, want %q", dataURL, want)
 		}

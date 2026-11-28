@@ -204,7 +204,7 @@ func (c Config) Validate() error {
 
 func expandHome(path string) (string, error) {
 	if path != "~" && !strings.HasPrefix(path, "~/") &&
-		!strings.HasPrefix(path, "~"+string(os.PathSeparator)) {
+		!strings.HasPrefix(path, fmt.Sprintf("~%s", string(os.PathSeparator))) {
 		return path, nil
 	}
 

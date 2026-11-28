@@ -125,7 +125,7 @@ func (s *FileStore) Save(key string) error {
 		return fmt.Errorf("create config directory: %w", err)
 	}
 
-	tmp, err := os.CreateTemp(dir, "."+filepath.Base(s.path)+"-*")
+	tmp, err := os.CreateTemp(dir, fmt.Sprintf(".%s-*", filepath.Base(s.path)))
 	if err != nil {
 		return fmt.Errorf("create temporary API key file: %w", err)
 	}
